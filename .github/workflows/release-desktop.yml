@@ -8,6 +8,10 @@ on:
       - 'v*'
   workflow_dispatch:
 
+# Permisos del GITHUB_TOKEN para crear el Release (default es read-only).
+permissions:
+  contents: write
+
 jobs:
   build-installers:
     strategy:
@@ -15,11 +19,14 @@ jobs:
       matrix:
         include:
           - os: windows-latest
+            # Targets vacios — rustup usa el default del runner.
             target: ''
             args: ''
           - os: macos-latest
-            # Universal binary (Intel + Apple Silicon).
-            target: universal-apple-darwin
+            # Para universal-apple-darwin se necesitan ambos targets
+            # instalados; tauri-action los combina al pasar el flag --target
+            # universal-apple-darwin en args.
+            target: 'aarch64-apple-darwin,x86_64-apple-darwin'
             args: '--target universal-apple-darwin'
           - os: ubuntu-22.04
             target: ''
