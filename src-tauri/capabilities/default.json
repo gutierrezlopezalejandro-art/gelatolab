@@ -1,0 +1,22 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capabilities por defecto: acceso al filesystem dentro de Documents/GelatoLab",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "os:default",
+    "dialog:default",
+    "fs:default",
+    {
+      "identifier": "fs:scope",
+      "allow": [{ "path": "$DOCUMENT/GelatoLab/**" }]
+    },
+    "fs:allow-mkdir",
+    "fs:allow-write-file",
+    "fs:allow-read-file",
+    "fs:allow-read-dir",
+    "fs:allow-exists",
+    "fs:allow-create"
+  ]
+}

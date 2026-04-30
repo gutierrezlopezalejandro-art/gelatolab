@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background with rounded corners -->
+  <rect width="512" height="512" rx="96" fill="#0f1a12"/>
+
+  <!-- Main logo group, centered -->
+  <g transform="translate(256, 200)">
+    <!-- Flask body (trapezoid) -->
+    <path
+      d="M -65 0 L -65 -105 L 65 -105 L 65 0 L 145 200 Q 145 240 105 240 L -105 240 Q -145 240 -145 200 Z"
+      fill="#c8e8d4"
+      fill-opacity="0.2"
+      stroke="#c8e8d4"
+      stroke-width="10"
+      stroke-linejoin="round"
+    />
+    <!-- Flask top rim -->
+    <line x1="-85" y1="-105" x2="85" y2="-105" stroke="#c8e8d4" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- Liquid inside -->
+    <path
+      d="M -120 130 Q -90 110 -60 130 Q -30 150 0 130 Q 30 110 60 130 Q 90 150 120 130 L 145 200 Q 145 240 105 240 L -105 240 Q -145 240 -145 200 Z"
+      fill="#c8e8d4"
+      fill-opacity="0.65"
+    />
+
+    <!-- Ice cream scoop -->
+    <circle cx="0" cy="-105" r="75" fill="#f5e6c8" stroke="#c8e8d4" stroke-width="8"/>
+    <!-- Scoop highlight -->
+    <ellipse cx="-22" cy="-125" rx="22" ry="18" fill="#ffffff" fill-opacity="0.5"/>
+
+    <!-- Cherry on top -->
+    <circle cx="0" cy="-195" r="20" fill="#b8860b"/>
+    <!-- Cherry stem -->
+    <path d="M 0 -210 Q 10 -230 25 -225" stroke="#2d7a52" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="256" y="470" text-anchor="middle" font-family="serif" font-size="52" font-weight="700" letter-spacing="2">
+    <tspan fill="#f5e6c8">Gelato</tspan><tspan fill="#b8860b">Lab</tspan>
+  </text>
+</svg>

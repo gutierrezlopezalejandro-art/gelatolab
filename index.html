@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- SEO -->
+    <title>GelatoLab — Formulación profesional de helados y gelatos</title>
+    <meta name="description" content="Herramienta profesional para formulación de helados artesanales, gelatos y sorbetes. Calcula FPD, PAC, POD, curva de congelamiento, valores nutricionales y costos de producción." />
+    <meta name="keywords" content="helado, gelato, sorbete, formulación, heladería, FPD, PAC, POD, receta, calculadora de lotes" />
+    <meta name="author" content="GelatoLab" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://gelatolab.app/" />
+
+    <!-- Open Graph (Facebook, LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="GelatoLab — Formulación profesional de helados" />
+    <meta property="og:description" content="Herramienta profesional para formular helados, gelatos y sorbetes con análisis técnico completo." />
+    <meta property="og:image" content="./icons/icon-512.png" />
+    <meta property="og:url" content="https://gelatolab.app/" />
+    <meta property="og:site_name" content="GelatoLab" />
+    <meta property="og:locale" content="es_ES" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GelatoLab — Formulación profesional de helados" />
+    <meta name="twitter:description" content="Herramienta profesional para formular helados, gelatos y sorbetes." />
+    <meta name="twitter:image" content="./icons/icon-512.png" />
+
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Structured data: ayuda a Google/Bing a clasificar la app correctamente
+         en resultados ricos y a aparecer como SoftwareApplication. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "GelatoLab",
+      "description": "Herramienta profesional para formulación de helados artesanales, gelatos y sorbetes. Calcula FPD, PAC, POD, curva de congelamiento, valores nutricionales y costos de producción.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web, Windows, macOS, Linux, iOS",
+      "url": "https://gelatolab.app/",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Cálculos FPD, PAC, POD",
+        "Curva de congelamiento polinomial",
+        "Auto-balance de receta",
+        "Inventario integrado con descuento automático",
+        "Etiquetado Ley 20.606 (Chile) y RDC 429 (Brasil)",
+        "Bitácora HACCP",
+        "Múltiples idiomas (ES/EN/PT/FR/DE/IT/KO/JA)",
+        "Escáner de códigos de barras desde iPhone"
+      ]
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Register SW only in production to avoid stale-chunk issues with Vite HMR.
+      // On localhost we actively unregister any leftover SW from previous sessions.
+      (function () {
+        if (!('serviceWorker' in navigator)) return;
+        var isLocal = ['localhost', '127.0.0.1'].indexOf(location.hostname) !== -1;
+        if (isLocal) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            regs.forEach(function (r) { r.unregister(); });
+          });
+          if (window.caches) {
+            caches.keys().then(function (keys) { keys.forEach(function (k) { caches.delete(k); }); });
+          }
+          return;
+        }
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('./sw.js');
+        });
+      })();
+    </script>
+  </body>
+</html>

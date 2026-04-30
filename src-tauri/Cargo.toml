@@ -1,0 +1,29 @@
+[package]
+name = "gelatolab"
+version = "1.0.0"
+description = "GelatoLab — formulacion profesional de helado y gelato"
+authors = ["GelatoLab"]
+edition = "2021"
+rust-version = "1.70"
+
+[lib]
+name = "gelatolab_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0", features = [] }
+tauri-plugin-fs = "2.0"
+tauri-plugin-dialog = "2.0"
+tauri-plugin-os = "2.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

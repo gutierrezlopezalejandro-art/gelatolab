@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.tauri.app/config/2.0",
+  "productName": "GelatoLab",
+  "version": "1.0.0",
+  "identifier": "com.gelatolab.app",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "GelatoLab",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi", "deb", "appimage", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "Productivity",
+    "shortDescription": "Formulacion profesional de helado y gelato",
+    "longDescription": "GelatoLab es la herramienta para formular, balancear, etiquetar y producir helados, gelatos y sorbetes con cumplimiento legal por pais.",
+    "publisher": "GelatoLab",
+    "windows": {
+      "wix": {
+        "language": ["es-ES", "en-US"]
+      },
+      "nsis": {
+        "languages": ["Spanish", "English"],
+        "installMode": "perMachine"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  },
+  "plugins": {}
+}

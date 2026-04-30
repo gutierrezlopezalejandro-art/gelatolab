@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ink:    #0f1a12;
+    --ink2:   #3d5040;
+    --ink3:   #7a9480;
+    --cream:  #f5f0e8;
+    --cream2: #ece6d8;
+    --cream3: #e0d8c8;
+    --mint:   #1a5c3a;
+    --mint2:  #2d7a52;
+    --mint3:  #c8e8d4;
+    --gold:   #b8860b;
+    --gold2:  #f5e6a0;
+    --coral:  #c0392b;
+    --coral2: #fdecea;
+    --teal:   #0d5c6e;
+    --teal2:  #d4eef5;
+  }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  * { box-sizing: border-box; }
+}
+
+@layer components {
+  .font-display { font-family: 'Playfair Display', serif; }
+
+  .card {
+    @apply bg-white rounded-xl border border-black/10 shadow-sm;
+  }
+
+  .badge-opt  { @apply bg-[#c8e8d4] text-[#0d3d22] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide; }
+  .badge-acc  { @apply bg-[#f5e6a0] text-[#5c3d00] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide; }
+  .badge-bad  { @apply bg-[#fdecea] text-[#c0392b] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide; }
+  .badge-na   { @apply bg-[#ece6d8] text-[#7a9480] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide; }
+
+  /* Primary CTA: estilo outlined mint (igual al boton "Nueva receta" que el
+     usuario eligio como referencia). Liviano, consistente con el resto de la
+     UI, hover suave a fondo crema verdoso. */
+  .btn-primary {
+    @apply bg-transparent hover:bg-[var(--mint3)] text-[var(--mint)] font-semibold
+           rounded-lg px-4 py-2 text-sm transition-colors cursor-pointer
+           border border-[var(--mint2)];
+  }
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-transparent hover:bg-[var(--cream2)] text-[var(--ink2)] font-medium
+           rounded-xl px-4 py-2 text-sm transition-colors cursor-pointer
+           border border-black/10 hover:border-black/20;
+  }
+  .btn-danger {
+    @apply bg-transparent hover:bg-[var(--coral2)] hover:text-[var(--coral)]
+           hover:border-[var(--coral)] text-[var(--ink3)] font-medium
+           rounded-xl px-4 py-2 text-sm transition-colors cursor-pointer
+           border border-black/10;
+  }
+  /* Variante "soft": acento mas claro para acciones secundarias importantes
+     (export, sync, conectar carpeta, etc.) — sustituye los outlined mint. */
+  .btn-soft {
+    @apply bg-[var(--cream2)] hover:bg-[var(--cream3)] text-[var(--ink)] font-medium
+           rounded-xl px-4 py-2 text-sm transition-colors cursor-pointer
+           border border-black/5;
+  }
+
+  .input {
+    @apply border border-black/10 rounded-lg px-3 py-2 text-sm font-[Outfit]
+           bg-white text-[var(--ink)] outline-none focus:border-[var(--mint2)]
+           transition-colors w-full;
+  }
+  .input-gold {
+    @apply border border-black/10 rounded-lg px-3 py-2 text-sm font-semibold
+           bg-[var(--gold2)] text-[#3d2800] outline-none focus:border-[var(--mint2)]
+           transition-colors text-right;
+  }
+  .select {
+    @apply border border-black/10 rounded-lg px-3 py-2 text-sm font-[Outfit]
+           bg-white text-[var(--ink)] outline-none focus:border-[var(--mint2)]
+           transition-colors w-full cursor-pointer;
+  }
+
+  .tbl { @apply w-full border-collapse text-sm; }
+  .tbl th {
+    @apply text-[10px] font-semibold text-[var(--ink3)] uppercase tracking-widest
+           py-2 px-3 border-b-2 border-black/10 text-right whitespace-nowrap bg-white;
+  }
+  .tbl th:first-child { @apply text-left; }
+  .tbl td {
+    @apply py-2 px-3 border-b border-black/10 text-right text-[var(--ink2)];
+  }
+  .tbl td:first-child { @apply text-left text-[var(--ink)] font-medium; }
+  .tbl tr:hover td   { @apply bg-[var(--cream)]; }
+  .tbl tr.row-total td {
+    @apply bg-[var(--ink)] text-white font-semibold;
+  }
+
+  .toast-enter  { animation: toastIn  .3s ease forwards; }
+  .toast-leave  { animation: toastOut .3s ease forwards; }
+}
+
+@keyframes toastIn  { from { opacity:0; transform:translateX(-50%) translateY(12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+@keyframes toastOut { from { opacity:1; transform:translateX(-50%) translateY(0); } to { opacity:0; transform:translateX(-50%) translateY(12px); } }
+
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--cream2); }
+::-webkit-scrollbar-thumb { background: var(--ink3); border-radius: 3px; }
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--cream2) 25%, var(--cream3) 50%, var(--cream2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Screen reader only (visually hidden) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: initial;
+  margin: initial;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Focus visible styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--mint2);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Safe area for iPad */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

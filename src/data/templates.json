@@ -1,0 +1,227 @@
+[
+  {
+    "id": "tpl-gelato-vainilla",
+    "name": "Gelato Vainilla — Base",
+    "type": "gelato",
+    "category": "Clásicos italianos",
+    "description": "Base de gelato vainilla suave y cremoso. Punto de partida para la mayoría de sabores con leche.",
+    "overrun_pct": 30,
+    "serving_temp": 12,
+    "ingredients": [
+      { "ingredient_id": 2,  "qty_grams": 600, "position": 0 },
+      { "ingredient_id": 4,  "qty_grams": 150, "position": 1 },
+      { "ingredient_id": 8,  "qty_grams": 50,  "position": 2 },
+      { "ingredient_id": 13, "qty_grams": 150, "position": 3 },
+      { "ingredient_id": 15, "qty_grams": 40,  "position": 4 },
+      { "ingredient_id": 47, "qty_grams": 5,   "position": 5 },
+      { "ingredient_id": 51, "qty_grams": 5,   "position": 6 }
+    ],
+    "proc_notes": "Mezclar lácteos en frío. Calentar a 65 °C, agregar azúcares + leche en polvo + neutro premezclados. Pasteurizar 85 °C × 15 s. Enfriar a 4 °C, madurar 6 h. Mantecar y endurecer a -18 °C."
+  },
+  {
+    "id": "tpl-gelato-chocolate",
+    "name": "Gelato Chocolate — Base",
+    "type": "gelato",
+    "category": "Clásicos italianos",
+    "description": "Gelato chocolate con cacao + chocolate amargo. Intenso pero cremoso.",
+    "overrun_pct": 25,
+    "serving_temp": 13,
+    "ingredients": [
+      { "ingredient_id": 2,  "qty_grams": 600, "position": 0 },
+      { "ingredient_id": 4,  "qty_grams": 100, "position": 1 },
+      { "ingredient_id": 8,  "qty_grams": 40,  "position": 2 },
+      { "ingredient_id": 13, "qty_grams": 130, "position": 3 },
+      { "ingredient_id": 15, "qty_grams": 30,  "position": 4 },
+      { "ingredient_id": 36, "qty_grams": 50,  "position": 5 },
+      { "ingredient_id": 37, "qty_grams": 50,  "position": 6 },
+      { "ingredient_id": 47, "qty_grams": 4,   "position": 7 }
+    ],
+    "proc_notes": "El cacao y el chocolate suben los sólidos. Calentar lácteos a 70 °C antes de incorporar el chocolate fundido para evitar grumos. Pasteurizar 85 °C × 15 s, enfriar y madurar 6 h."
+  },
+  {
+    "id": "tpl-gelato-pistacho",
+    "name": "Gelato Pistacho",
+    "type": "gelato",
+    "category": "Clásicos italianos",
+    "description": "Pistacho intenso con pasta pura. Tradición siciliana.",
+    "overrun_pct": 28,
+    "serving_temp": 12,
+    "ingredients": [
+      { "ingredient_id": 2,   "qty_grams": 600, "position": 0 },
+      { "ingredient_id": 4,   "qty_grams": 100, "position": 1 },
+      { "ingredient_id": 8,   "qty_grams": 50,  "position": 2 },
+      { "ingredient_id": 13,  "qty_grams": 130, "position": 3 },
+      { "ingredient_id": 15,  "qty_grams": 30,  "position": 4 },
+      { "ingredient_id": 161, "qty_grams": 80,  "position": 5 },
+      { "ingredient_id": 47,  "qty_grams": 4,   "position": 6 }
+    ],
+    "proc_notes": "Disolver la pasta de pistacho en una porción de leche tibia antes de incorporar al resto. Madurar 8 h para que el sabor se asiente. Servir a -12 a -13 °C."
+  },
+  {
+    "id": "tpl-gelato-avellana",
+    "name": "Gelato Avellana (Nocciola)",
+    "type": "gelato",
+    "category": "Clásicos italianos",
+    "description": "Nocciola piamontese. Equilibrio cremoso y aromático.",
+    "overrun_pct": 28,
+    "serving_temp": 12,
+    "ingredients": [
+      { "ingredient_id": 2,  "qty_grams": 580, "position": 0 },
+      { "ingredient_id": 4,  "qty_grams": 100, "position": 1 },
+      { "ingredient_id": 8,  "qty_grams": 50,  "position": 2 },
+      { "ingredient_id": 13, "qty_grams": 130, "position": 3 },
+      { "ingredient_id": 15, "qty_grams": 30,  "position": 4 },
+      { "ingredient_id": 42, "qty_grams": 100, "position": 5 },
+      { "ingredient_id": 47, "qty_grams": 4,   "position": 6 }
+    ],
+    "proc_notes": "Incorporar la pasta de avellana después de la pasteurización para preservar aromas. Madurar 8 h."
+  },
+  {
+    "id": "tpl-helado-vainilla",
+    "name": "Helado Vainilla — Premium",
+    "type": "helado",
+    "category": "Helados americanos",
+    "description": "Helado cremoso estilo americano premium, con crema generosa.",
+    "overrun_pct": 60,
+    "serving_temp": 14,
+    "ingredients": [
+      { "ingredient_id": 2,  "qty_grams": 500, "position": 0 },
+      { "ingredient_id": 4,  "qty_grams": 250, "position": 1 },
+      { "ingredient_id": 8,  "qty_grams": 50,  "position": 2 },
+      { "ingredient_id": 13, "qty_grams": 130, "position": 3 },
+      { "ingredient_id": 15, "qty_grams": 30,  "position": 4 },
+      { "ingredient_id": 39, "qty_grams": 30,  "position": 5 },
+      { "ingredient_id": 47, "qty_grams": 5,   "position": 6 },
+      { "ingredient_id": 51, "qty_grams": 5,   "position": 7 }
+    ],
+    "proc_notes": "Yema y crema = textura sedosa. Pasteurizar 82 °C × 15 s suavemente para no cortar la yema. Madurar 12 h. Mantecar con overrun alto (~60%)."
+  },
+  {
+    "id": "tpl-sorbete-limon",
+    "name": "Sorbete Limón",
+    "type": "sorbete",
+    "category": "Sorbetes",
+    "description": "Sorbete cítrico clásico. Sin lácteos, perfecto para palate cleanser.",
+    "overrun_pct": 25,
+    "serving_temp": 14,
+    "ingredients": [
+      { "ingredient_id": 1,  "qty_grams": 600, "position": 0 },
+      { "ingredient_id": 13, "qty_grams": 200, "position": 1 },
+      { "ingredient_id": 15, "qty_grams": 40,  "position": 2 },
+      { "ingredient_id": 22, "qty_grams": 30,  "position": 3 },
+      { "ingredient_id": 29, "qty_grams": 130, "position": 4 },
+      { "ingredient_id": 47, "qty_grams": 6,   "position": 5 }
+    ],
+    "proc_notes": "Calentar agua + azúcares + neutro a 65 °C para hidratar. NO pasteurizar tan alto (sin lácteos). Enfriar, agregar zumo de limón en frío para preservar aroma. Mantecar inmediatamente."
+  },
+  {
+    "id": "tpl-sorbete-frambuesa",
+    "name": "Sorbete Frambuesa",
+    "type": "sorbete",
+    "category": "Sorbetes",
+    "description": "Sorbete frutal con pulpa concentrada. Color y aroma intensos.",
+    "overrun_pct": 25,
+    "serving_temp": 13,
+    "ingredients": [
+      { "ingredient_id": 1,  "qty_grams": 450, "position": 0 },
+      { "ingredient_id": 13, "qty_grams": 180, "position": 1 },
+      { "ingredient_id": 15, "qty_grams": 40,  "position": 2 },
+      { "ingredient_id": 22, "qty_grams": 30,  "position": 3 },
+      { "ingredient_id": 25, "qty_grams": 300, "position": 4 },
+      { "ingredient_id": 47, "qty_grams": 6,   "position": 5 }
+    ],
+    "proc_notes": "Hidratar el neutro en agua tibia con los azúcares. Enfriar y agregar pulpa de frambuesa en frío. Madurar 4 h. Mantecar en seguida."
+  },
+  {
+    "id": "tpl-sorbete-mango",
+    "name": "Sorbete Mango",
+    "type": "sorbete",
+    "category": "Sorbetes",
+    "description": "Sorbete tropical con alta proporción de pulpa de mango.",
+    "overrun_pct": 25,
+    "serving_temp": 13,
+    "ingredients": [
+      { "ingredient_id": 1,  "qty_grams": 400, "position": 0 },
+      { "ingredient_id": 13, "qty_grams": 160, "position": 1 },
+      { "ingredient_id": 15, "qty_grams": 40,  "position": 2 },
+      { "ingredient_id": 22, "qty_grams": 30,  "position": 3 },
+      { "ingredient_id": 26, "qty_grams": 360, "position": 4 },
+      { "ingredient_id": 47, "qty_grams": 6,   "position": 5 }
+    ],
+    "proc_notes": "Mango tiene azúcares naturales — ajusta sacarosa según madurez de la pulpa. Hidratar el neutro en agua tibia, enfriar y mezclar con pulpa fría."
+  },
+  {
+    "id": "tpl-sorbete-maracuya",
+    "name": "Sorbete Maracuyá",
+    "type": "sorbete",
+    "category": "Sorbetes",
+    "description": "Sorbete ácido y aromático. Equilibra azúcar para domar la acidez.",
+    "overrun_pct": 25,
+    "serving_temp": 14,
+    "ingredients": [
+      { "ingredient_id": 1,  "qty_grams": 500, "position": 0 },
+      { "ingredient_id": 13, "qty_grams": 220, "position": 1 },
+      { "ingredient_id": 15, "qty_grams": 40,  "position": 2 },
+      { "ingredient_id": 22, "qty_grams": 30,  "position": 3 },
+      { "ingredient_id": 28, "qty_grams": 200, "position": 4 },
+      { "ingredient_id": 47, "qty_grams": 6,   "position": 5 }
+    ],
+    "proc_notes": "Maracuyá es muy ácido — sube el azúcar para POD adecuado. Hidratar neutro en agua tibia, enfriar y mezclar con pulpa fría. Mantecar pronto."
+  },
+  {
+    "id": "tpl-helado-dulce-leche",
+    "name": "Helado Manjar (Dulce de Leche)",
+    "type": "helado",
+    "category": "Especiales LATAM",
+    "description": "Clásico chileno/argentino. Manjar como portador de sabor y azúcar.",
+    "overrun_pct": 50,
+    "serving_temp": 13,
+    "ingredients": [
+      { "ingredient_id": 2,  "qty_grams": 550, "position": 0 },
+      { "ingredient_id": 4,  "qty_grams": 200, "position": 1 },
+      { "ingredient_id": 8,  "qty_grams": 30,  "position": 2 },
+      { "ingredient_id": 13, "qty_grams": 50,  "position": 3 },
+      { "ingredient_id": 15, "qty_grams": 30,  "position": 4 },
+      { "ingredient_id": 53, "qty_grams": 130, "position": 5 },
+      { "ingredient_id": 47, "qty_grams": 5,   "position": 6 }
+    ],
+    "proc_notes": "El manjar aporta ~55% azúcar y proteínas. Reducir sacarosa para no pasarse de POD. Disolver el manjar en leche tibia antes de pasteurizar."
+  },
+  {
+    "id": "tpl-helado-lucuma",
+    "name": "Helado Lúcuma",
+    "type": "helado",
+    "category": "Especiales LATAM",
+    "description": "Sabor andino emblemático. Pulpa concentrada para potenciar el aroma.",
+    "overrun_pct": 40,
+    "serving_temp": 13,
+    "ingredients": [
+      { "ingredient_id": 2,  "qty_grams": 500, "position": 0 },
+      { "ingredient_id": 4,  "qty_grams": 150, "position": 1 },
+      { "ingredient_id": 8,  "qty_grams": 50,  "position": 2 },
+      { "ingredient_id": 13, "qty_grams": 130, "position": 3 },
+      { "ingredient_id": 15, "qty_grams": 30,  "position": 4 },
+      { "ingredient_id": 27, "qty_grams": 150, "position": 5 },
+      { "ingredient_id": 47, "qty_grams": 5,   "position": 6 }
+    ],
+    "proc_notes": "La pulpa de lúcuma es densa y pierde aroma con calor — incorporar después de pasteurizar (a 60 °C aprox), enfriar y madurar mínimo 8 h."
+  },
+  {
+    "id": "tpl-helado-fior-di-latte",
+    "name": "Fior di Latte",
+    "type": "gelato",
+    "category": "Clásicos italianos",
+    "description": "Solo leche, sin huevos, sin vainilla. El sabor puro de la leche entera.",
+    "overrun_pct": 30,
+    "serving_temp": 12,
+    "ingredients": [
+      { "ingredient_id": 2,  "qty_grams": 650, "position": 0 },
+      { "ingredient_id": 4,  "qty_grams": 130, "position": 1 },
+      { "ingredient_id": 8,  "qty_grams": 50,  "position": 2 },
+      { "ingredient_id": 13, "qty_grams": 130, "position": 3 },
+      { "ingredient_id": 15, "qty_grams": 30,  "position": 4 },
+      { "ingredient_id": 47, "qty_grams": 5,   "position": 5 }
+    ],
+    "proc_notes": "La calidad del producto final depende 100% de la calidad de la leche. Usar leche entera fresca de día. Pasteurizar 85 °C × 15 s, madurar 6 h."
+  }
+]

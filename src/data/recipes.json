@@ -1,0 +1,1504 @@
+[
+  {
+    "id": 1,
+    "name": "Lúcuma del Sur",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 350,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 130,
+        "position": 2
+      },
+      {
+        "ingredient_id": 27,
+        "qty_grams": 200,
+        "position": 3
+      },
+      {
+        "ingredient_id": 39,
+        "qty_grams": 80,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 30,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Vainilla Clásica",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 420,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 220,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 150,
+        "position": 2
+      },
+      {
+        "ingredient_id": 39,
+        "qty_grams": 90,
+        "position": 3
+      },
+      {
+        "ingredient_id": 51,
+        "qty_grams": 8,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 35,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Stracciatella",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 400,
+        "position": 0
+      },
+      {
+        "ingredient_id": 5,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 140,
+        "position": 2
+      },
+      {
+        "ingredient_id": 39,
+        "qty_grams": 80,
+        "position": 3
+      },
+      {
+        "ingredient_id": 51,
+        "qty_grams": 6,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 30,
+        "position": 5
+      },
+      {
+        "ingredient_id": 37,
+        "qty_grams": 50,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Dulce de Leche Artesanal",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 320,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 180,
+        "position": 1
+      },
+      {
+        "ingredient_id": 53,
+        "qty_grams": 200,
+        "position": 2
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 60,
+        "position": 3
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 30,
+        "position": 4
+      },
+      {
+        "ingredient_id": 39,
+        "qty_grams": 60,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Cheesecake de Frutilla",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 11,
+        "qty_grams": 200,
+        "position": 0
+      },
+      {
+        "ingredient_id": 2,
+        "qty_grams": 280,
+        "position": 1
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 150,
+        "position": 2
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 140,
+        "position": 3
+      },
+      {
+        "ingredient_id": 24,
+        "qty_grams": 180,
+        "position": 4
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 15,
+        "position": 5
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 25,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Chocolate Amargo Intenso",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 360,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 220,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 145,
+        "position": 2
+      },
+      {
+        "ingredient_id": 36,
+        "qty_grams": 65,
+        "position": 3
+      },
+      {
+        "ingredient_id": 37,
+        "qty_grams": 55,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 30,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Chocolate Avellana",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 340,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 190,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 135,
+        "position": 2
+      },
+      {
+        "ingredient_id": 42,
+        "qty_grams": 120,
+        "position": 3
+      },
+      {
+        "ingredient_id": 36,
+        "qty_grams": 40,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 28,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Chocolate Blanco & Frambuesa",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 380,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 100,
+        "position": 2
+      },
+      {
+        "ingredient_id": 6,
+        "qty_grams": 120,
+        "position": 3
+      },
+      {
+        "ingredient_id": 25,
+        "qty_grams": 150,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 25,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Murtilla Frutillar",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 350,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 180,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 125,
+        "position": 2
+      },
+      {
+        "ingredient_id": 61,
+        "qty_grams": 210,
+        "position": 3
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 10,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 25,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Calafate Patagónico",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 360,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 180,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 130,
+        "position": 2
+      },
+      {
+        "ingredient_id": 62,
+        "qty_grams": 190,
+        "position": 3
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 30,
+        "position": 4
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 8,
+        "position": 5
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 25,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "name": "Avellana Chilena Tostada",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 320,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 140,
+        "position": 2
+      },
+      {
+        "ingredient_id": 63,
+        "qty_grams": 150,
+        "position": 3
+      },
+      {
+        "ingredient_id": 39,
+        "qty_grams": 70,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 30,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Frambuesa & Miel",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 380,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 180,
+        "position": 1
+      },
+      {
+        "ingredient_id": 52,
+        "qty_grams": 100,
+        "position": 2
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 60,
+        "position": 3
+      },
+      {
+        "ingredient_id": 25,
+        "qty_grams": 200,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 25,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "Mora Silvestre",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 360,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 175,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 125,
+        "position": 2
+      },
+      {
+        "ingredient_id": 32,
+        "qty_grams": 200,
+        "position": 3
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 25,
+        "position": 4
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 8,
+        "position": 5
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 25,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "Manjar & Coco",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 57,
+        "qty_grams": 200,
+        "position": 0
+      },
+      {
+        "ingredient_id": 2,
+        "qty_grams": 300,
+        "position": 1
+      },
+      {
+        "ingredient_id": 53,
+        "qty_grams": 180,
+        "position": 2
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 60,
+        "position": 3
+      },
+      {
+        "ingredient_id": 64,
+        "qty_grams": 40,
+        "position": 4
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 5
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "Coco & Maracuyá",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 57,
+        "qty_grams": 220,
+        "position": 0
+      },
+      {
+        "ingredient_id": 58,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 130,
+        "position": 2
+      },
+      {
+        "ingredient_id": 28,
+        "qty_grams": 160,
+        "position": 3
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 30,
+        "position": 4
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 10,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "Piña Colada",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 57,
+        "qty_grams": 200,
+        "position": 0
+      },
+      {
+        "ingredient_id": 2,
+        "qty_grams": 280,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 120,
+        "position": 2
+      },
+      {
+        "ingredient_id": 34,
+        "qty_grams": 200,
+        "position": 3
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 30,
+        "position": 4
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 8,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "name": "Mango & Cúrcuma",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 360,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 160,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 120,
+        "position": 2
+      },
+      {
+        "ingredient_id": 26,
+        "qty_grams": 220,
+        "position": 3
+      },
+      {
+        "ingredient_id": 65,
+        "qty_grams": 3,
+        "position": 4
+      },
+      {
+        "ingredient_id": 30,
+        "qty_grams": 30,
+        "position": 5
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 25,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "Café Espresso",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 320,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 145,
+        "position": 2
+      },
+      {
+        "ingredient_id": 59,
+        "qty_grams": 150,
+        "position": 3
+      },
+      {
+        "ingredient_id": 39,
+        "qty_grams": 70,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 30,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "name": "Matcha Premium",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 400,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 140,
+        "position": 2
+      },
+      {
+        "ingredient_id": 66,
+        "qty_grams": 15,
+        "position": 3
+      },
+      {
+        "ingredient_id": 39,
+        "qty_grams": 80,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 30,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Pistacho Siciliano",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 340,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 140,
+        "position": 2
+      },
+      {
+        "ingredient_id": 67,
+        "qty_grams": 130,
+        "position": 3
+      },
+      {
+        "ingredient_id": 39,
+        "qty_grams": 70,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 28,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "Praliné Caramelo",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 360,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 100,
+        "position": 2
+      },
+      {
+        "ingredient_id": 68,
+        "qty_grams": 140,
+        "position": 3
+      },
+      {
+        "ingredient_id": 54,
+        "qty_grams": 60,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 28,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "name": "Maní & Caramelo",
+    "type": "helado",
+    "proc_notes": "",
+    "overrun_pct": 30,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 2,
+        "qty_grams": 350,
+        "position": 0
+      },
+      {
+        "ingredient_id": 4,
+        "qty_grams": 190,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 110,
+        "position": 2
+      },
+      {
+        "ingredient_id": 44,
+        "qty_grams": 130,
+        "position": 3
+      },
+      {
+        "ingredient_id": 54,
+        "qty_grams": 70,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 28,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 4,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Gelato Fior di Latte",
+    "type": "gelato",
+    "proc_notes": "",
+    "overrun_pct": 20,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 69,
+        "qty_grams": 620,
+        "position": 0
+      },
+      {
+        "ingredient_id": 70,
+        "qty_grams": 150,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 160,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 40,
+        "position": 3
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 45,
+        "position": 4
+      },
+      {
+        "ingredient_id": 71,
+        "qty_grams": 20,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 5,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "Gelato Pistachio di Bronte",
+    "type": "gelato",
+    "proc_notes": "",
+    "overrun_pct": 20,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 69,
+        "qty_grams": 580,
+        "position": 0
+      },
+      {
+        "ingredient_id": 70,
+        "qty_grams": 80,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 150,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 40,
+        "position": 3
+      },
+      {
+        "ingredient_id": 72,
+        "qty_grams": 130,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 40,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 5,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "Gelato Nocciola Piemonte",
+    "type": "gelato",
+    "proc_notes": "",
+    "overrun_pct": 20,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 69,
+        "qty_grams": 590,
+        "position": 0
+      },
+      {
+        "ingredient_id": 70,
+        "qty_grams": 80,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 150,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 35,
+        "position": 3
+      },
+      {
+        "ingredient_id": 73,
+        "qty_grams": 140,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 40,
+        "position": 5
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 5,
+        "position": 6
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "name": "Gelato Tiramisù",
+    "type": "gelato",
+    "proc_notes": "",
+    "overrun_pct": 20,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 69,
+        "qty_grams": 540,
+        "position": 0
+      },
+      {
+        "ingredient_id": 10,
+        "qty_grams": 120,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 140,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 40,
+        "position": 3
+      },
+      {
+        "ingredient_id": 74,
+        "qty_grams": 80,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 40,
+        "position": 5
+      },
+      {
+        "ingredient_id": 59,
+        "qty_grams": 50,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 5,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "name": "Gelato Cioccolato Fondente",
+    "type": "gelato",
+    "proc_notes": "",
+    "overrun_pct": 20,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 69,
+        "qty_grams": 570,
+        "position": 0
+      },
+      {
+        "ingredient_id": 70,
+        "qty_grams": 60,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 150,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 40,
+        "position": 3
+      },
+      {
+        "ingredient_id": 36,
+        "qty_grams": 70,
+        "position": 4
+      },
+      {
+        "ingredient_id": 37,
+        "qty_grams": 60,
+        "position": 5
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 40,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 5,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "name": "Gelato Stracciatella Italiana",
+    "type": "gelato",
+    "proc_notes": "",
+    "overrun_pct": 20,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 69,
+        "qty_grams": 610,
+        "position": 0
+      },
+      {
+        "ingredient_id": 70,
+        "qty_grams": 120,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 155,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 35,
+        "position": 3
+      },
+      {
+        "ingredient_id": 75,
+        "qty_grams": 8,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 40,
+        "position": 5
+      },
+      {
+        "ingredient_id": 38,
+        "qty_grams": 30,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 5,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "name": "Gelato Limone di Sicilia",
+    "type": "gelato",
+    "proc_notes": "",
+    "overrun_pct": 20,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 69,
+        "qty_grams": 560,
+        "position": 0
+      },
+      {
+        "ingredient_id": 70,
+        "qty_grams": 80,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 155,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 45,
+        "position": 3
+      },
+      {
+        "ingredient_id": 76,
+        "qty_grams": 100,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 40,
+        "position": 5
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 30,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 5,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "name": "Gelato Mandorla & Miele",
+    "type": "gelato",
+    "proc_notes": "",
+    "overrun_pct": 20,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 69,
+        "qty_grams": 570,
+        "position": 0
+      },
+      {
+        "ingredient_id": 70,
+        "qty_grams": 80,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 100,
+        "position": 2
+      },
+      {
+        "ingredient_id": 52,
+        "qty_grams": 80,
+        "position": 3
+      },
+      {
+        "ingredient_id": 45,
+        "qty_grams": 130,
+        "position": 4
+      },
+      {
+        "ingredient_id": 8,
+        "qty_grams": 40,
+        "position": 5
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 35,
+        "position": 6
+      },
+      {
+        "ingredient_id": 47,
+        "qty_grams": 5,
+        "position": 7
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "name": "Sorbete Limón",
+    "type": "sorbete",
+    "proc_notes": "",
+    "overrun_pct": 25,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 1,
+        "qty_grams": 400,
+        "position": 0
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 180,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 60,
+        "position": 3
+      },
+      {
+        "ingredient_id": 77,
+        "qty_grams": 4,
+        "position": 4
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "name": "Sorbete Arándano & Naranja",
+    "type": "sorbete",
+    "proc_notes": "",
+    "overrun_pct": 25,
+    "created_at": "2026-04-14T02:42:55.271Z",
+    "updated_at": "2026-04-14T02:42:55.271Z",
+    "ingredients": [
+      {
+        "ingredient_id": 31,
+        "qty_grams": 350,
+        "position": 0
+      },
+      {
+        "ingredient_id": 30,
+        "qty_grams": 200,
+        "position": 1
+      },
+      {
+        "ingredient_id": 13,
+        "qty_grams": 160,
+        "position": 2
+      },
+      {
+        "ingredient_id": 15,
+        "qty_grams": 50,
+        "position": 3
+      },
+      {
+        "ingredient_id": 29,
+        "qty_grams": 15,
+        "position": 4
+      },
+      {
+        "ingredient_id": 77,
+        "qty_grams": 4,
+        "position": 5
+      }
+    ]
+  }
+]

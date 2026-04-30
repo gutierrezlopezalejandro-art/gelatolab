@@ -1,0 +1,87 @@
+name: Release desktop (Tauri)
+
+# Se dispara con tags semver (v1.0.0, v1.2.3-beta.1) o manualmente.
+# Genera un Release de GitHub con los instaladores adjuntos.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-installers:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: ''
+            args: ''
+          - os: macos-latest
+            # Universal binary (Intel + Apple Silicon).
+            target: universal-apple-darwin
+            args: '--target universal-apple-darwin'
+          - os: ubuntu-22.04
+            target: ''
+            args: ''
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache Rust target
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install Linux deps (only on ubuntu)
+        if: matrix.os == 'ubuntu-22.04'
+        # webkit2gtk-4.1 + libsoup3 son los req minimos de Tauri 2 en Linux.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libsoup-3.0-dev
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build & release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Las mismas VITE_* del deploy web. Se inyectan al bundle nativo.
+          VITE_SUPABASE_URL:     ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SENTRY_DSN:       ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_PLAUSIBLE_DOMAIN: ${{ secrets.VITE_PLAUSIBLE_DOMAIN }}
+          VITE_PLAUSIBLE_HOST:   ${{ secrets.VITE_PLAUSIBLE_HOST }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'GelatoLab ${{ github.ref_name }}'
+          releaseBody: |
+            Instaladores de la app de escritorio. Todavia sin firma de codigo
+            (Windows/Mac mostraran un warning la primera vez — abrir igual).
+
+            **Windows**: descarga el `.msi` o `.exe` (NSIS).
+            **macOS**: descarga el `.dmg` (universal Intel + Apple Silicon).
+            **Linux**: descarga el `.AppImage` o `.deb`.
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

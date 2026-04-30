@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      # main lo cubre el workflow de deploy (que tambien corre tests + build).
+      # Asi evitamos correr el pipeline dos veces en cada push a main.
+      - main
+      - master
+  pull_request:
+    branches: [main, master]
+
+# Si llegan commits encadenados al mismo branch/PR, cancela el run anterior
+# para no gastar minutos de Actions en builds que ya quedaron obsoletos.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        # --legacy-peer-deps porque @vitejs/plugin-basic-ssl@2.3 espera vite>=6
+        # pero seguimos en vite 5; no es bloqueante en runtime, npm rechaza
+        # de mas. Mantenerlo asi hasta migrar a vite 6.
+        run: npm ci --legacy-peer-deps
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7

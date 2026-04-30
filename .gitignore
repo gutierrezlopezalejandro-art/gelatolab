@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+dist-ssr/
+
+# Tauri build artifacts (Rust)
+src-tauri/target/
+src-tauri/gen/
+
+# iOS Capacitor build artifacts
+ios/App/App/public/
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+ios/App/App/capacitor.config.json
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# User data — el usuario tiene una carpeta local con sus respaldos JSON
+# (recetas, ingredientes, etc.). NO commitear: son datos privados.
+Back up/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Temp
+*.tmp
+*.tmp.js
+
+# Coverage
+coverage/
+
+# OS
+Thumbs.db
