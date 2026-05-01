@@ -90,7 +90,7 @@ export function UIHighlightOverlay() {
           left: rect.left - 6,
           width: rect.width + 12,
           height: rect.height + 12,
-          boxShadow: '0 0 0 4px var(--gold), 0 0 0 9999px rgba(0,0,0,0.55)',
+          boxShadow: '0 0 0 4px var(--gold), 0 0 0 9999px rgba(0,0,0,0.18)',
           transition: 'all 0.3s ease',
         }}
         aria-hidden="true"

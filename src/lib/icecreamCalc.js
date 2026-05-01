@@ -665,17 +665,22 @@ export function calcChileanLabelSeals(nv) {
 // ── Temperatura de servicio ─────────────────────────────────
 // Tabla PAC objetivo → Temperatura de servicio (sistema Corvitto)
 // PAC display = pacPct * 10 (escala donde sacarosa ~ 1000)
+//
+// Valores de "Los Secretos del Helado" (Angelo Corvitto). La tabla
+// previa estaba 1 C mas caliente en cada fila (e.g. PAC 240 → -10) lo
+// que generaba T servicio engaosamente templadas y rompia el balance
+// inverso (tempToPacDisplay). Corregido a la referencia industrial.
 const PAC_TEMP_TABLE = [
-  { pac: 240, temp: -10 },
-  { pac: 260, temp: -11 },
-  { pac: 280, temp: -12 },
-  { pac: 300, temp: -13 },
-  { pac: 320, temp: -14 },
-  { pac: 340, temp: -15 },
-  { pac: 360, temp: -16 },
-  { pac: 380, temp: -16 },
-  { pac: 400, temp: -17 },
-  { pac: 420, temp: -18 },
+  { pac: 200, temp: -8  },
+  { pac: 220, temp: -10 },
+  { pac: 240, temp: -11 },
+  { pac: 260, temp: -12 },
+  { pac: 280, temp: -13 },
+  { pac: 300, temp: -14 },
+  { pac: 320, temp: -15 },
+  { pac: 340, temp: -16 },
+  { pac: 360, temp: -17 },
+  { pac: 380, temp: -18 },
 ];
 
 // Interpola la T° de servicio a partir del PAC total acumulado
@@ -788,8 +793,8 @@ const PARAMS_BY_TYPE = {
     { k:'pGrasa',    lbl:'param_fat',               fmt:pct,     rangeLbl:'0-1%',         oLo:0,   oHi:.01, aLo:0,   aHi:.03, max:.05 },
     { k:'pSng',      lbl:'param_sng',          fmt:pct,     rangeLbl:'0-1%',         oLo:0,   oHi:.01, aLo:0,   aHi:.03, max:.05 },
     { k:'pProtein',  lbl:'param_protein',           fmt:pct,     rangeLbl:'0-1%',         oLo:0,   oHi:.01, aLo:0,   aHi:.02, max:.05 },
-    { k:'podPct',    lbl:'param_pod',        fmt:podDisp, rangeLbl:'100-200',      oLo:10,  oHi:20,  aLo:8,   aHi:25,  max:35 },
-    { k:'pacPct',    lbl:'param_pac',fmt:pacDisp, rangeLbl:'340-380',      oLo:34,  oHi:38,  aLo:28,  aHi:42,  max:50 },
+    { k:'podPct',    lbl:'param_pod',        fmt:podDisp, rangeLbl:'220-280',      oLo:22,  oHi:28,  aLo:18,  aHi:32,  max:40 },
+    { k:'pacPct',    lbl:'param_pac',fmt:pacDisp, rangeLbl:'280-320',      oLo:28,  oHi:32,  aLo:24,  aHi:36,  max:45 },
     { k:'pStab',     lbl:'param_stab',fmt:pct, rangeLbl:'0.3-0.5%',  oLo:.003,oHi:.005,aLo:.002,aHi:.007,max:.010 },
   ],
 };

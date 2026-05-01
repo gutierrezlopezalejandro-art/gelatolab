@@ -186,7 +186,7 @@ export default {
     nutrient_col: 'Naehrstoff',
 
     // Gelato params
-    gelato_params: 'Eisparameter',
+    gelato_params: 'Produkt-Parameter',
     total_solids: 'Gesamtfeststoffe',
     slng_msnf: 'MSNF',
     lactose: 'Laktose',
@@ -270,7 +270,7 @@ export default {
     // Production plan
     production_plan: 'Produktionsplanung',
     select_date: 'Datum auswaehlen',
-    add_order: 'Bestellung hinzufuegen',
+    add_order: 'Produktionscharge hinzufügen',
     recipe: 'Rezept',
     liters: 'Liter',
     remove: 'Entfernen',
@@ -1235,8 +1235,8 @@ export default {
     landing_faq_4_a: "Die aktuelle Version ist kostenlos für die Einzelnutzung ohne Limits. Wir planen einen Pro-Tarif mit Synchronisierung zwischen Geräten und kollaborativen Funktionen. Die kostenlose Version wird immer ausreichen, damit eine Eisdiele vollständig arbeiten kann.",
     landing_faq_5_q: "Kann ich meine Rezepte aus anderer Software importieren?",
     landing_faq_5_a: "Wir haben keine spezifischen Importer für ICC4 oder andere Systeme, aber du kannst alles in JSON oder Excel importieren und exportieren. Wenn du eine Datendatei aus einem alten System hast, schreib uns und wir sehen, wie wir sie migrieren.",
-    tour_welcome_title: "Willkommen bei GelatoLab! 🍦",
-    tour_welcome_body: "Ich zeige dir in 30 Sekunden, wie die App organisiert ist. Du kannst sie jederzeit überspringen oder diese Tour mit der Checkbox unten dauerhaft deaktivieren.",
+    tour_welcome_title: "Buongiorno! Ich bin Marco 🍦",
+    tour_welcome_body: "Ich bin dein persönlicher Eismeister in GelatoLab. Ich führe dich in unter 30 Sekunden durch die 5 Hauptbereiche — Rezepte, Planung, Produktion, Zutaten und Hilfe. Danach verstecke ich mich in der Ecke und du rufst mich, wenn du mich brauchst.",
     tour_recipes_title: "Rezepte",
     tour_recipes_body: "Hier erstellst, balancierst und speicherst du deine Rezepte. Die App sagt dir, ob jeder technische Parameter (FPD, PAC, POD, MSNF) im optimalen Bereich für den gewählten Stil liegt — Eis, Gelato oder Sorbet.",
     tour_plan_title: "Planung",
@@ -1611,4 +1611,7 @@ export default {
     field_hint_address: "Produktionsadresse — auf jedem Produktetikett erforderlich nach Gesetz 20.606 (Chile), RDC 429 (Brasilien), Verordnung EU 1169 und den meisten LATAM-Vorschriften.",
     field_hint_phone: "Kontakttelefon — optional. Verbessert die Rückverfolgbarkeit, wenn ein Verbraucher einen Vorfall meldet.",
     field_hint_email: "Kontakt-E-Mail — optional. Gleicher Zweck wie das Telefon.",
+
+    // === Confirm remove plan order ===
+    confirm_remove_plan_order: "Charge \"{name}\" ({liters} L) aus dem Plan entfernen?",
 };

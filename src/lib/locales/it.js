@@ -186,7 +186,7 @@ export default {
     nutrient_col: 'Nutriente',
 
     // Gelato params
-    gelato_params: 'Parametri del gelato',
+    gelato_params: 'Parametri del prodotto',
     total_solids: 'Solidi totali',
     slng_msnf: 'MSNF',
     lactose: 'Lattosio',
@@ -270,7 +270,7 @@ export default {
     // Production plan
     production_plan: 'Pianificazione della produzione',
     select_date: 'Seleziona data',
-    add_order: 'Aggiungi ordine',
+    add_order: 'Aggiungi lotto di produzione',
     recipe: 'Ricetta',
     liters: 'Litri',
     remove: 'Rimuovi',
@@ -1235,8 +1235,8 @@ export default {
     landing_faq_4_a: "La versione attuale è gratuita per uso individuale senza limiti. Stiamo pianificando un piano Pro con sincronizzazione tra dispositivi e funzioni collaborative. La versione gratuita sarà sempre sufficiente perché una gelateria lavori in modo completo.",
     landing_faq_5_q: "Posso importare le mie ricette da un altro software?",
     landing_faq_5_a: "Non abbiamo importatori specifici per ICC4 o altri sistemi, ma puoi importare ed esportare tutto in JSON o Excel. Se hai un file di dati di un sistema vecchio, scrivici e vedremo come migrarlo.",
-    tour_welcome_title: "Benvenuto in GelatoLab! 🍦",
-    tour_welcome_body: "Ti mostro in 30 secondi com'è organizzata l'app. Puoi saltarlo in qualsiasi momento o disattivare questo tour per sempre con la casella qui sotto.",
+    tour_welcome_title: "Buongiorno! Sono Marco 🍦",
+    tour_welcome_body: "Sono il tuo maestro gelatiere personale in GelatoLab. Ti guido attraverso le 5 aree principali — ricette, pianificazione, produzione, ingredienti e aiuto — in meno di 30 secondi. Poi mi nascondo nell'angolo e mi chiami quando ti servo.",
     tour_recipes_title: "Ricette",
     tour_recipes_body: "Qui crei, bilanci e salvi le tue ricette. L'app ti dice se ogni parametro tecnico (FPD, PAC, POD, MSNF) è nel range ottimale per lo stile scelto — gelato all'italiana, gelato o sorbetto.",
     tour_plan_title: "Pianificazione",
@@ -1611,4 +1611,7 @@ export default {
     field_hint_address: "Indirizzo di produzione — richiesto su ogni etichetta di prodotto da Legge 20.606 (Cile), RDC 429 (Brasile), Reg. UE 1169 e la maggior parte delle normative LATAM.",
     field_hint_phone: "Telefono di contatto — opzionale. Migliora la tracciabilità se un consumatore segnala un incidente.",
     field_hint_email: "Email di contatto — opzionale. Stesso scopo del telefono.",
+
+    // === Confirm remove plan order ===
+    confirm_remove_plan_order: "Rimuovere il lotto \"{name}\" ({liters} L) dal piano?",
 };

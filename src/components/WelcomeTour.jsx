@@ -2,6 +2,7 @@ import { useEffect, useState, useLayoutEffect, useRef } from 'react';
 import { useT } from '../lib/i18n';
 import { useEscapeKey } from '../lib/hooks';
 import { track } from '../lib/analytics';
+import { MarcoAvatar } from './MarcoAvatar';
 
 const TOUR_KEY = 'gelatolab-tour-seen';
 
@@ -20,8 +21,8 @@ export function resetTour() {
 function buildSteps(t) {
   return [
     {
-      anchor: null, // centrado en pantalla — bienvenida general
-      emoji: '🍦',
+      anchor: null, // centrado en pantalla — Marco se presenta grande
+      marco: true,
       title: t('tour_welcome_title'),
       body: t('tour_welcome_body'),
     },
@@ -166,21 +167,31 @@ export function WelcomeTour({ onClose }) {
       <div
         ref={popoverRef}
         role="dialog" aria-modal="true" aria-labelledby="tour-popover-title"
-        className="fixed z-[452] bg-white rounded-2xl shadow-2xl w-[360px] max-w-[calc(100vw-32px)] p-5 border-2 border-[var(--gold)]"
+        className={`fixed z-[452] bg-white rounded-2xl shadow-2xl ${step.marco ? 'w-[460px] p-7' : 'w-[360px] p-5'} max-w-[calc(100vw-32px)] border-2 border-[var(--gold)]`}
         style={popoverStyle}
       >
-        {/* Header con emoji + step counter */}
-        <div className="flex items-baseline justify-between mb-3">
-          <div className="text-3xl" aria-hidden="true">{step.emoji}</div>
-          <div className="text-xs font-mono text-[var(--ink3)]">
-            {stepIdx + 1} / {steps.length}
+        {/* Header */}
+        {step.marco ? (
+          <div className="flex flex-col items-center text-center mb-4">
+            <MarcoAvatar size="lg" talking animated />
+            <div className="mt-2 text-[10px] font-mono text-[var(--ink3)]">
+              {stepIdx + 1} / {steps.length}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-baseline justify-between mb-3">
+            <div className="text-3xl" aria-hidden="true">{step.emoji}</div>
+            <div className="text-xs font-mono text-[var(--ink3)]">
+              {stepIdx + 1} / {steps.length}
+            </div>
+          </div>
+        )}
 
-        <h3 id="tour-popover-title" className="font-display text-xl text-[var(--ink)] mb-2">
+        <h3 id="tour-popover-title"
+            className={`font-display text-[var(--ink)] mb-2 ${step.marco ? 'text-2xl text-center' : 'text-xl'}`}>
           {step.title}
         </h3>
-        <p className="text-sm text-[var(--ink2)] leading-relaxed mb-4">
+        <p className={`text-[var(--ink2)] leading-relaxed mb-4 ${step.marco ? 'text-base text-center' : 'text-sm'}`}>
           {step.body}
         </p>
 

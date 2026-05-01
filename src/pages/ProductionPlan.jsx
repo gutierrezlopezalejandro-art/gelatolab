@@ -165,8 +165,19 @@ export default function ProductionPlan() {
   function addOrder() {
     setOrders(p => [...p, { _key: Date.now(), recipe_id: '', liters: 5, batch_freezer_id: '', pasteurizer_id: '' }]);
   }
-  function removeOrder(key) {
-    setOrders(p => p.filter(o => o._key !== key));
+  async function removeOrder(key) {
+    // Pide confirmacion si el lote ya tiene datos cargados; si esta vacio
+    // (sin receta ni litros) lo quita directo para no molestar.
+    const o = orders.find(x => x._key === key);
+    if (o && (o.recipe_id || (o.liters && o.liters > 0))) {
+      const r = recipeMap[o.recipe_id];
+      const ok = await confirm(t('confirm_remove_plan_order', {
+        name: r?.name || t('select_recipe'),
+        liters: o.liters,
+      }));
+      if (!ok) return;
+    }
+    setOrders(p => p.filter(x => x._key !== key));
   }
   function updateOrder(key, field, val) {
     setOrders(p => p.map(o => o._key !== key ? o : { ...o, [field]: val }));

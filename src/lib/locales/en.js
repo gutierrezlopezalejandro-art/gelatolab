@@ -924,8 +924,8 @@ export default {
     landing_faq_5_a: 'We do not have specific importers for ICC4 or others, but you can import/export everything in JSON or Excel. If you have a dataset from an old system, write to us and we will help you migrate it.',
 
     // Welcome tour (Dashboard, first time)
-    tour_welcome_title: 'Welcome to GelatoLab! 🍦',
-    tour_welcome_body: 'A 30-second tour of how the app is organized. You can skip it any time or disable it permanently with the checkbox below.',
+    tour_welcome_title: 'Buongiorno! I am Marco 🍦',
+    tour_welcome_body: 'I am your personal gelato master in GelatoLab. I will walk you through the 5 main areas — recipes, planning, production, ingredients and help — in under 30 seconds. After that I hide in the corner and you call me when you need me.',
     tour_recipes_title: 'Recipes',
     tour_recipes_body: 'Where you create, balance and save your recipes. The app tells you whether each technical parameter (FPD, PAC, POD, MSNF) is within the optimal range for the chosen style — ice cream, gelato or sorbet.',
     tour_plan_title: 'Planning',
@@ -1247,7 +1247,7 @@ export default {
     chile_per_100g: 'Per 100 g',
     chile_per_portion: 'Per portion',
     chile_label_disclaimer: 'Values calculated from your formulation. For official labeling, use verified technical sheets and, where applicable, accredited laboratory analysis.',
-    gelato_params: 'Ice cream parameters',
+    gelato_params: 'Product parameters',
     total_solids: 'Total solids',
     slng_msnf: 'MSNF',
     lactose: 'Lactose',
@@ -1319,7 +1319,7 @@ export default {
     print: 'Print',
     production_plan: 'Production Planning',
     select_date: 'Select date',
-    add_order: 'Add order',
+    add_order: 'Add production batch',
     recipe: 'Recipe',
     liters: 'Liters',
     remove: 'Remove',
@@ -1645,4 +1645,7 @@ export default {
     field_hint_address: "Production address — required on every product label by Chile Law 20.606, Brazil RDC 429, EU Reg. 1169 and most LATAM regulations.",
     field_hint_phone: "Contact phone — optional. Improves traceability if a consumer reports an incident.",
     field_hint_email: "Contact email — optional. Same purpose as the phone.",
+
+    // === Confirm remove plan order ===
+    confirm_remove_plan_order: "Remove batch \"{name}\" ({liters} L) from the plan?",
 };

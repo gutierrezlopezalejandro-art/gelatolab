@@ -885,8 +885,8 @@ export default {
     landing_faq_5_a: 'Não temos importadores específicos para ICC4 ou outros, mas você pode importar/exportar tudo em JSON ou Excel. Se tiver um dataset de um sistema antigo, escreva para nós e ajudaremos a migrar.',
 
     // Tour de boas-vindas (Dashboard, primeira vez)
-    tour_welcome_title: 'Bem-vindo ao GelatoLab! 🍦',
-    tour_welcome_body: 'Um tour de 30 segundos de como o app está organizado. Você pode pulá-lo a qualquer momento ou desativá-lo para sempre na caixa abaixo.',
+    tour_welcome_title: 'Buongiorno! Eu sou o Marco 🍦',
+    tour_welcome_body: 'Sou seu mestre sorveteiro pessoal no GelatoLab. Vou te guiar pelas 5 áreas principais — receitas, planejamento, produção, ingredientes e ajuda — em menos de 30 segundos. Depois me escondo no canto e você me chama quando precisar.',
     tour_recipes_title: 'Receitas',
     tour_recipes_body: 'Aqui você cria, balanceia e salva suas receitas. O app indica se cada parâmetro técnico (FPD, PAC, POD, MSNF) está dentro da faixa ótima para o estilo escolhido — sorvete, gelato ou sorbet.',
     tour_plan_title: 'Planejamento',
@@ -1210,7 +1210,7 @@ export default {
     chile_label_disclaimer: 'Valores calculados a partir de sua formulação. Para rotulagem oficial use fichas técnicas verificadas e, se aplicável, análise de laboratório credenciado.',
 
     // Gelato params
-    gelato_params: 'Parâmetros do sorvete',
+    gelato_params: 'Parâmetros do produto',
     total_solids: 'Sólidos totais',
     slng_msnf: 'SLNG (MSNF)',
     lactose: 'Lactose',
@@ -1293,7 +1293,7 @@ export default {
     // Production plan
     production_plan: 'Planejamento de Produção',
     select_date: 'Selecionar data',
-    add_order: 'Adicionar pedido',
+    add_order: 'Adicionar lote de produção',
     recipe: 'Receita',
     liters: 'Litros',
     remove: 'Remover',
@@ -1685,4 +1685,7 @@ export default {
     field_hint_address: "Endereço de produção — exigido em cada rótulo de produto pela RDC 429 (Brasil), Lei 20.606 (Chile), Reg. UE 1169 e a maioria das regulações LATAM.",
     field_hint_phone: "Telefone de contato — opcional. Melhora a rastreabilidade se um consumidor reportar um incidente.",
     field_hint_email: "E-mail de contato — opcional. Mesma utilidade do telefone.",
+
+    // === Confirm remove plan order ===
+    confirm_remove_plan_order: "Remover o lote \"{name}\" ({liters} L) do plano?",
 };
