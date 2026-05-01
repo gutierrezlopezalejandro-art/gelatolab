@@ -3,6 +3,7 @@ import { useT } from '../lib/i18n';
 import { calcNutritionalValues, calcRecipeAllergensDetailed } from '../lib/icecreamCalc';
 import { calcLabelSeals } from '../lib/countryRegulations';
 import { useCountryStore } from '../store/countryStore';
+import { NumberInput } from './NumberInput';
 import { Flag } from './CountrySelector';
 
 // Octagon labels — text shown inside each black octagon. The prefix
@@ -229,10 +230,10 @@ export default function LabelingPanel({ stats, items = [], allergenOverrides = {
           <h3 className="font-display text-base text-[var(--ink)]">{t('chile_label_table_title')}</h3>
           <label className="text-xs text-[var(--ink3)] flex items-center gap-2">
             {t('chile_portion_size')}:
-            <input
-              type="number" min="1" max="500" step="1"
+            <NumberInput min="1" max="500" step="1"
               value={portionG}
-              onChange={e => setPortionG(Math.max(1, parseInt(e.target.value) || 1))}
+              onChange={v => setPortionG(Math.max(1, Math.round(v) || 1))}
+              fallback={1}
               className="w-16 px-2 py-1 border border-black/10 rounded text-right"
             />
             <span>g</span>

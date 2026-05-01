@@ -6,7 +6,8 @@ import { calcStats } from '../lib/icecreamCalc';
 import { printHtml } from '../lib/printHtml';
 import { StatCard } from '../components/ui/index.jsx';
 import SearchSelect from '../components/SearchSelect.jsx';
-import { MachineVolumeWarning } from '../components/MachineVolumeWarning';
+import { MachineVolumeWarning, PasteurizerVolumeWarning } from '../components/MachineVolumeWarning';
+import { NumberInput } from '../components/NumberInput';
 
 const CAT_COLORS = {
   'Lacteo':'#1a5c3a','Azucar':'#b8860b','Fruta':'#2e7d52',
@@ -128,16 +129,18 @@ export default function BatchCalc() {
           </div>
           <div>
             <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('liters_to_produce')}</label>
-            <input
-              type="number" min="0.5" max="500" step="0.5"
+            <NumberInput
+              min="0.1" max="500" step="0.1"
               className="input w-full rounded-lg text-right"
               value={liters}
-              onChange={e => setLiters(parseFloat(e.target.value) || 1)}
+              onChange={setLiters}
+              fallback={0}
             />
           </div>
         </div>
-        <div className="mt-3">
+        <div className="mt-3 space-y-2">
           <MachineVolumeWarning liters={liters} />
+          <PasteurizerVolumeWarning liters={liters} />
         </div>
       </div>
 

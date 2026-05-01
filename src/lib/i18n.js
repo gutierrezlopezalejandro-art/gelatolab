@@ -12,6 +12,10 @@ const loadedDicts = { es: esDict };
 
 // Map of lazy loaders. Vite turns each `() => import('./locales/xx.js')`
 // into its own chunk so non-default languages stay out of the main bundle.
+//
+// Idiomas desactivados temporalmente: ja, ko (cobertura ~33% — solo claves
+// viejas, falta traducir todo el contenido nuevo de landing/Marco/guias).
+// Reactivar cuando esten las traducciones completas.
 const loaders = {
   es: () => Promise.resolve(esDict),
   en: () => import('./locales/en.js').then(m => m.default),
@@ -19,8 +23,6 @@ const loaders = {
   fr: () => import('./locales/fr.js').then(m => m.default),
   de: () => import('./locales/de.js').then(m => m.default),
   it: () => import('./locales/it.js').then(m => m.default),
-  ko: () => import('./locales/ko.js').then(m => m.default),
-  ja: () => import('./locales/ja.js').then(m => m.default),
 };
 
 async function loadLanguage(code) {
@@ -60,9 +62,16 @@ export const useI18nStore = create(
       storage: createJSONStorage(() => idbStorage),
       // After rehydrating, ensure the persisted language is actually loaded —
       // otherwise the UI would render in ES until the user touches the
-      // language selector.
+      // language selector. Si el lang persistido es uno que desactivamos
+      // (ej. ja/ko), volvemos a es y limpiamos el flag.
       onRehydrateStorage: () => (state) => {
-        if (state?.lang && state.lang !== 'es') loadLanguage(state.lang);
+        if (!state?.lang) return;
+        if (!loaders[state.lang]) {
+          // Idioma deshabilitado — forzar a es.
+          state.lang = 'es';
+          return;
+        }
+        if (state.lang !== 'es') loadLanguage(state.lang);
       },
     }
   )
@@ -117,6 +126,8 @@ export function useLocale() {
   return LOCALE_MAP[lang] || 'es-CL';
 }
 
+// Idiomas activos en el selector. ja y ko desactivados temporalmente
+// (cobertura ~33%, ver loaders arriba).
 export const LANGUAGES = [
   { code: 'es', label: 'ES', name: 'Espanol' },
   { code: 'en', label: 'EN', name: 'English' },
@@ -124,8 +135,6 @@ export const LANGUAGES = [
   { code: 'fr', label: 'FR', name: 'Francais' },
   { code: 'de', label: 'DE', name: 'Deutsch' },
   { code: 'it', label: 'IT', name: 'Italiano' },
-  { code: 'ko', label: 'KO', name: '한국어' },
-  { code: 'ja', label: 'JA', name: '日本語' },
 ];
 
 // ── Nombres de ingredientes por idioma ──────────────────────

@@ -10,7 +10,7 @@ import { idbStorage } from '../lib/idbStorage';
  *
  * Forma de cada entry:
  *   { id, date, time, type, location, value, unit, status, operator, notes, created_at }
- * type: 'cold_storage' | 'freezer' | 'pasteurization' | 'reception' | 'cleaning' | 'other'
+ * type: 'cold_storage' | 'freezer' | 'pasteurization' | 'churning' | 'reception' | 'cleaning' | 'other'
  * status: 'ok' | 'warn' | 'fail'  (auto-derivado de thresholds segun type+value)
  */
 
@@ -23,6 +23,10 @@ const THRESHOLDS = {
   // Pasteurizacion: en LTLT minimo 65°C, HTST minimo 80°C. Usamos 65°C como
   // threshold conservador; el operador puede registrar el modo en notas.
   pasteurization: { unit: '°C', okMin: 65, warnMin: 60, direction: 'higher_better' },
+  // Mantecacion (churning): temperatura de extraccion del producto. Tiene que
+  // salir suficientemente frio para evitar fundido y pasaje por la "zona de
+  // peligro" (>0 C). Limite practico: <= -5 C ok, -5 a -3 warn, > -3 fail.
+  churning: { unit: '°C', okMax: -5, warnMax: -3, direction: 'lower_better' },
   // Recepcion: temperaturas tipicas. Pero como hay refrigerado y congelado,
   // dejamos al operador setear status. Solo guardamos valor referencial.
   reception: { unit: '°C' },

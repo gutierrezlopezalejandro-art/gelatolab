@@ -21,6 +21,7 @@ import GelatoParams from '../components/GelatoParams';
 import AnalysisCharts from '../components/AnalysisCharts';
 import SearchSelect from '../components/SearchSelect';
 import { Spinner } from '../components/ui/index.jsx';
+import { NumberInput } from '../components/NumberInput';
 import { calcStats, calcDensity, calcServingTemp, getParams, resolveRecipeItems, applyEvaporation } from '../lib/icecreamCalc';
 import { useT, useIngredientName, useCategoryName, useI18nStore } from '../lib/i18n';
 import { analyzeRecipeAI } from '../lib/ai';
@@ -392,11 +393,12 @@ export default function RecipeEditor() {
   return (
     <div>
       {/* ═══════════════════ Header (2 filas) ═══════════════════ */}
-      <div className="card p-4 mb-6 space-y-3">
+      <div data-tour="recipe-header" className="card p-4 mb-6 space-y-3">
         {/* Fila 1: navegacion + nombre + acciones (Balancear, Historial, Guardar) */}
         <div className="flex items-center gap-3 flex-wrap">
           <button className="btn-secondary" onClick={() => navigate('/recipes')}>← {t('back_recipes')}</button>
           <input
+            data-tour="recipe-name"
             className="border-none bg-transparent font-display text-2xl text-[var(--ink)]
                        outline-none flex-1 min-w-[180px] border-b-2 border-black/10
                        focus:border-[var(--mint2)] px-1 py-0.5 transition-colors"
@@ -409,6 +411,7 @@ export default function RecipeEditor() {
           )}
           <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
             <button
+              data-tour="recipe-balance-btn"
               className="text-xs px-3 py-2 rounded-lg border border-[var(--mint2)] text-[var(--mint)]
                          hover:bg-[var(--mint3)] transition-colors cursor-pointer bg-transparent font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => setShowBalance(true)}
@@ -428,6 +431,7 @@ export default function RecipeEditor() {
               </button>
             )}
             <button
+              data-tour="recipe-save-btn"
               className="btn-primary inline-flex items-center gap-1.5 min-w-[120px] justify-center"
               onClick={handleSave}
               disabled={saving}
@@ -441,6 +445,7 @@ export default function RecipeEditor() {
         {/* Fila 2: propiedades de la receta (tipo, subtipo, T° servicio, vence, sub-receta) */}
         <div className="flex items-center gap-3 flex-wrap pt-2 border-t border-black/5">
           <select
+            data-tour="recipe-type"
             className="select max-w-[150px]"
             value={type}
             onChange={e => { setType(e.target.value); setDirty(true); }}
@@ -450,6 +455,7 @@ export default function RecipeEditor() {
             <option value="sorbete">{t('sorbet')}</option>
           </select>
           <select
+            data-tour="recipe-subtype"
             className="select max-w-[180px]"
             value={subtype}
             onChange={e => { setSubtype(e.target.value); setDirty(true); }}
@@ -464,11 +470,11 @@ export default function RecipeEditor() {
             <span className="text-xs text-[var(--ink3)]">{t('serving_temp')}:</span>
             <div className="flex items-center border border-black/10 rounded-lg overflow-hidden">
               <span className="text-xs text-[var(--ink3)] px-1.5 bg-[var(--cream2)]">-</span>
-              <input
-                type="number" min="0" max="30" step="0.5"
+              <NumberInput
+                min="0" max="30" step="0.5"
                 className="w-12 text-center text-sm font-semibold py-1 px-1 outline-none border-none"
                 value={servTemp}
-                onChange={e => { setServTemp(parseFloat(e.target.value) || 0); setDirty(true); }}
+                onChange={v => { setServTemp(v); setDirty(true); }}
               />
               <span className="text-xs text-[var(--ink3)] px-1.5 bg-[var(--cream2)]">°C</span>
             </div>
@@ -476,16 +482,17 @@ export default function RecipeEditor() {
           <div className="flex items-center gap-1 flex-shrink-0" title={t('best_before_tooltip')}>
             <span className="text-xs text-[var(--ink3)]">{t('best_before_label')}:</span>
             <div className="flex items-center border border-black/10 rounded-lg overflow-hidden">
-              <input
-                type="number" min="1" max="730" step="1"
+              <NumberInput
+                min="1" max="730" step="1"
                 className="w-14 text-center text-sm font-semibold py-1 px-1 outline-none border-none"
                 value={bestBeforeDays}
-                onChange={e => { setBestBeforeDays(parseInt(e.target.value) || 0); setDirty(true); }}
+                onChange={v => { setBestBeforeDays(Math.round(v)); setDirty(true); }}
               />
               <span className="text-xs text-[var(--ink3)] px-1.5 bg-[var(--cream2)]">{t('days_short')}</span>
             </div>
           </div>
           <label
+            data-tour="recipe-subrecipe-toggle"
             className={`flex items-center gap-1.5 text-[11px] cursor-pointer select-none rounded-lg px-2 py-1 transition-colors border
               ${isSubRecipe
                 ? 'bg-[#f3e5f5] text-[#6a1b9a] border-[#ce93d8] font-semibold'
@@ -514,7 +521,7 @@ export default function RecipeEditor() {
       </div>
 
       {/* ═══════════════════ Tabs ═══════════════════ */}
-      <div className="flex border-b-2 border-black/10 mb-6">
+      <div data-tour="recipe-tabs" className="flex border-b-2 border-black/10 mb-6">
         {tabs.map(([k, lbl]) => (
           <button
             key={k}
@@ -533,7 +540,7 @@ export default function RecipeEditor() {
       {activeTab === 'formulacion' && (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
           {/* ── Left: ingredients table + diagnostics ── */}
-          <div className="card p-5">
+          <div data-tour="recipe-formulation" className="card p-5">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="font-display text-base text-[var(--ink)]">
                 {t('tab_formulation')}
@@ -656,7 +663,7 @@ export default function RecipeEditor() {
                             onClick={() => updateRow(row._key, 'addin', !row.addin)}
                             className={`text-base leading-none px-1.5 py-0.5 rounded border-none cursor-pointer transition-colors
                               ${row.addin
-                                ? 'bg-[var(--gold)] text-[var(--ink)]'
+                                ? 'bg-[#e8b920] text-[var(--ink)]'
                                 : 'bg-transparent text-black/20 hover:text-[var(--gold)]'}`}
                             title={t('addin_toggle_tooltip')}
                             aria-pressed={row.addin}
@@ -838,11 +845,11 @@ export default function RecipeEditor() {
                   💨 {t('evaporation_title')}
                 </div>
                 <div className="flex items-center gap-1">
-                  <input
-                    type="number" min="0" max="50" step="0.5"
+                  <NumberInput
+                    min="0" max="50" step="0.5"
                     className="w-16 text-right text-sm font-semibold border border-black/10 rounded-lg py-1 px-2 outline-none focus:border-[var(--mint2)]"
                     value={evaporationPct}
-                    onChange={e => { setEvaporationPct(parseFloat(e.target.value) || 0); setDirty(true); }}
+                    onChange={v => { setEvaporationPct(v); setDirty(true); }}
                   />
                   <span className="text-xs text-[var(--ink3)]">% {t('evaporation_of_water')}</span>
                 </div>
@@ -866,11 +873,11 @@ export default function RecipeEditor() {
                   🍡 {t('mould_title')}
                 </div>
                 <div className="flex items-center gap-1">
-                  <input
-                    type="number" min="0" max="500" step="1"
+                  <NumberInput
+                    min="0" max="500" step="1"
                     className="w-16 text-right text-sm font-semibold border border-black/10 rounded-lg py-1 px-2 outline-none focus:border-[var(--mint2)]"
                     value={mouldG}
-                    onChange={e => { setMouldG(parseFloat(e.target.value) || 0); setDirty(true); }}
+                    onChange={v => { setMouldG(v); setDirty(true); }}
                   />
                   <span className="text-xs text-[var(--ink3)]">g {t('mould_per_unit')}</span>
                 </div>

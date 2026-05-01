@@ -1310,38 +1310,61 @@ export const HELP_ARTICLES = [
   {
     id: 'production-machine',
     category: 'production',
-    title: 'Mantecadora: avisos cuando el batch queda fuera de rango',
-    intro: 'Cada mantecadora tiene un volumen óptimo y un mínimo/máximo. Si llenas demasiado se desborda; si llenas poco se forma cristal grueso. GelatoLab te avisa.',
+    title: 'Equipos: mantecador, pasteurizador y recomendaciones por modelo',
+    intro: 'GelatoLab te deja registrar marca y modelo de tu mantecador y de tu pasteurizador. Con esa info te avisa si el lote queda fuera del rango operativo y te muestra setpoints específicos (temperatura, ciclo, tiempo) para tu equipo y tipo de receta.',
     sections: [
       {
-        h: 'Cómo configurarla',
-        p: 'Menú de usuario → **⚙ Configuración del negocio** → campo **Mantecadora**. La lista incluye 15 modelos hogareños/semipro (Lello Musso, Cuisinart ICE-100, KitchenAid, Whynter, Breville, Nemox, etc.) y 5 industriales (Carpigiani Maestro y LB 502, Frigomat M50, Bravo Trittico, Telme Petra). Default: sin especificar.',
+        h: 'Cómo configurar tus equipos',
+        p: 'Menú de usuario → **⚙ Configuración del negocio**. Hay dos campos:',
+        bullets: [
+          '**Mantecador / Batch freezer** — 27 opciones: 15 modelos hogareños/semipro (Lello Musso, Cuisinart ICE-100, KitchenAid, Whynter, Breville, Nemox, etc.) + comerciales europeos (Carpigiani Maestro RTX y LB 502, Frigomat M50, Telme Petra) + **fabricación chilena Icemel 15/30/60/90** + combos (Bravo Trittico, Carpigiani Maestro HE, Icemel C15).',
+          '**Pasteurizador** — 23 opciones: Bravo Pastomaster 30/60/120, Carpigiani Pastomatic 60/120, Frigomat TM30/60, Telme Ecogel 30/60, **Icemel P30/P60/P120 + PD60/PD120 (doble cuba, fabricación chilena)**, 2 genéricos + los combos también listados aquí.',
+          'Si tu máquina es **combo** (pastoriza + manteca, ej. Bravo Trittico) puedes seleccionarla en uno solo de los dos campos: GelatoLab muestra todas las etapas relevantes.',
+        ],
       },
       {
-        h: 'Dónde aparecen los avisos',
-        p: 'En **Lotes** (calculadora de escalado), debajo del input de litros aparece un mensaje:',
+        h: 'Aviso de volumen del lote',
+        p: 'En **Lotes** (calculadora de escalado), debajo del input de litros, aparecen avisos independientes para mantecador y pasteurizador:',
         bullets: [
-          '✓ Verde: el batch está dentro del rango de tu máquina.',
-          '⚠ Amarillo: bajo el mínimo. Vas a obtener cristales grandes y mala incorporación de aire.',
-          '⚠ Rojo: sobre el máximo. La mezcla se desborda durante la mantecación o no congela uniformemente.',
+          '✓ Verde: el lote está dentro del rango operativo.',
+          '⚠ Amarillo: bajo el mínimo. Mantecador → cristales grandes, mala incorporación de aire. Pasteurizador → calentamiento desigual, riesgo HACCP.',
+          '⚠ Rojo: sobre el máximo. Mantecador → desborde, congelación irregular. Pasteurizador → la sonda no llega a la mezcla del fondo.',
+          'Si seleccionaste un combo en ambos campos, el aviso aparece solo una vez.',
+        ],
+      },
+      {
+        h: 'Recomendaciones específicas por equipo (Receta → Proceso)',
+        p: 'En el editor de receta, tab **Proceso**, panel lateral derecho, aparece una tarjeta **🛠 Tu equipo** que adapta los setpoints según el modelo seleccionado y el tipo de receta (helado / gelato / sorbete).',
+        bullets: [
+          'Pasteurización: modo (HTST / LTLT / CUSTOM), setpoint (°C) y tiempo de retención. Ej. Bravo Pastomaster 60 + helado → 85 °C / 15 s · ciclo P85.',
+          'Enfriamiento y maduración: temperatura y duración objetivo.',
+          'Mantecación: temperatura de extracción, tiempo de ciclo y overrun esperado. Ej. Trittico Executive 304 + gelato → -8 °C / 8-12 min / overrun 25-35%.',
+          'Endurecimiento: temperatura de cámara objetivo.',
+        ],
+      },
+      {
+        h: 'De dónde salen los valores recomendados',
+        p: 'Los valores combinan dos fuentes:',
+        bullets: [
+          '**Baseline por tipo de receta** — guías genéricas estándar de la industria (gelato 25-35% overrun, helado 60-100%, sorbete extracción a -5 °C, etc.).',
+          '**Override por modelo** — ajustes finos para máquinas con ciclos preprogramados conocidos (Bravo Pastomaster con su ciclo P85, Trittico con HOT/COLD, etc.).',
+          'Para máquinas sin overrides, GelatoLab cae al baseline. **Siempre cruza los valores con el manual del fabricante** — los firmwares varían entre generaciones.',
         ],
       },
       {
         h: 'Por qué importa el volumen',
         bullets: [
-          '**Mínimo**: la pala no toca suficiente mezcla, no raspa cristal, no incorpora aire.',
-          '**Máximo**: el aire incorporado infla la mezcla y necesita espacio. Si está al tope, rebalsa o no congela.',
-          '**Óptimo**: zona donde la máquina extrae mejor calor y se logra el overrun esperado.',
+          '**Mínimo**: en mantecador, la pala no raspa cristal ni incorpora aire. En pasteurizador, la sonda y la pala calientan desigual la masa.',
+          '**Máximo**: en mantecador, el aire infla la mezcla y rebalsa. En pasteurizador, la mezcla del fondo no llega a temperatura HACCP.',
+          '**Óptimo**: zona donde el equipo trabaja como fue diseñado.',
         ],
-      },
-      {
-        h: 'Estimaciones de volumen',
-        p: 'Los rangos de las máquinas industriales son aproximados — siempre verifica con el manual del fabricante. Los hogareños están extraídos del catálogo de IceCreamCalc 4 y reflejan capacidades típicas reportadas.',
       },
     ],
     tips: [
-      'Si tu máquina no está en la lista, déjalo en "— Sin especificar —". No verás avisos.',
-      'Para una máquina nueva no listada, agrégala como issue en GitHub o solicítala — añadir una son ~30 segundos.',
+      'Si tu máquina no está en la lista, déjalo en "— Sin especificar —". No verás avisos ni recomendaciones específicas, pero el panel de Proceso sigue mostrando las guías genéricas por tipo de receta.',
+      'Si usas un combo (Trittico, Maestro HE, Icemel C-line) y compras además un pasteurizador dedicado, selecciona el combo en Mantecador y el dedicado en Pasteurizador: GelatoLab evita duplicar la etapa de pasteurización.',
+      'Los equipos **Icemel** (Chile, icemel.cl) usan dos convenciones distintas: en mantecadoras y combos C-line el número del modelo indica producción aproximada en **L/hora** (Icemel 30 ≈ 30 L/h con ~4 L por ciclo de 10 min); en pasteurizadores P y PD el número indica **capacidad máxima del tanque en L/ciclo** (P30 = 10-30 L por ciclo de 120 min).',
+      'Para sumar una máquina nueva al catálogo, agrégala como issue en GitHub. Solo necesita litros mínimo / óptimo / máximo del fabricante.',
     ],
   },
   {

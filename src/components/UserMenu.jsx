@@ -19,6 +19,7 @@ export function UserMenu() {
     return (
       <>
         <button
+          data-tour="user-menu"
           onClick={() => setShowBiz(true)}
           className="flex items-center justify-center w-8 h-8 rounded-lg text-white/80 hover:text-white
                      hover:bg-white/10 transition-colors cursor-pointer border-none bg-transparent"
@@ -62,6 +63,7 @@ export function UserMenu() {
   return (
     <div className="relative">
       <button
+        data-tour="user-menu"
         onClick={() => setOpen(!open)}
         onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
         aria-haspopup="menu"

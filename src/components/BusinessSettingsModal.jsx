@@ -4,7 +4,7 @@ import { getBusinessFields } from '../lib/countryRegulations';
 import { useCountryStore } from '../store/countryStore';
 import { useBusinessStore } from '../store/businessStore';
 import { useAppStore } from '../store/appStore';
-import { MACHINES } from '../data/machines';
+import { getBatchFreezers, getPasteurizers } from '../data/machines';
 import { exportBackup, importBackup, getBackupStatus } from '../lib/backup';
 import { setPin as savePin, isPinSet, lock as pinLock } from '../lib/pinLock';
 import {
@@ -158,8 +158,29 @@ export function BusinessSettingsModal({ onClose }) {
     address:      business.address,
     contact_phone: business.contact_phone,
     contact_email: business.contact_email,
-    machine_id:    business.machine_id || '',
+    machine_ids:     Array.isArray(business.machine_ids)     ? business.machine_ids     : [],
+    pasteurizer_ids: Array.isArray(business.pasteurizer_ids) ? business.pasteurizer_ids : [],
   });
+
+  function addMachine(id) {
+    if (!id || form.machine_ids.includes(id)) return;
+    setForm({ ...form, machine_ids: [...form.machine_ids, id] });
+  }
+  function removeMachine(id) {
+    setForm({ ...form, machine_ids: form.machine_ids.filter(x => x !== id) });
+  }
+  function addPasteurizer(id) {
+    if (!id || form.pasteurizer_ids.includes(id)) return;
+    setForm({ ...form, pasteurizer_ids: [...form.pasteurizer_ids, id] });
+  }
+  function removePasteurizer(id) {
+    setForm({ ...form, pasteurizer_ids: form.pasteurizer_ids.filter(x => x !== id) });
+  }
+  function machineLabel(id) {
+    const m = getBatchFreezers().find(x => x.id === id) || getPasteurizers().find(x => x.id === id);
+    if (!m) return id;
+    return `${m.name} (${m.optimal} L)${m.kind === 'combo' ? ` · ${t('business_combo_tag')}` : ''}`;
+  }
 
   const fields = getBusinessFields(country);
 
@@ -193,58 +214,107 @@ export function BusinessSettingsModal({ onClose }) {
             <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('onb_fantasy_name')} *</label>
             <input className="input" value={form.fantasy_name}
                    onChange={e => setForm({ ...form, fantasy_name: e.target.value })} />
+            <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_fantasy_name')}</p>
           </div>
           <div>
             <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('onb_legal_name')}</label>
             <input className="input" value={form.legal_name}
                    onChange={e => setForm({ ...form, legal_name: e.target.value })} />
+            <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_legal_name')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{fields.tax_id_label}</label>
               <input className="input" value={form.tax_id}
                      onChange={e => setForm({ ...form, tax_id: e.target.value })} />
+              <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_tax_id')}</p>
             </div>
             <div>
               <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{fields.sanitary_label}</label>
               <input className="input" value={form.sanitary_reg}
                      onChange={e => setForm({ ...form, sanitary_reg: e.target.value })} />
+              <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_sanitary_reg')}</p>
             </div>
           </div>
           <div>
             <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('onb_address')}</label>
             <input className="input" value={form.address}
                    onChange={e => setForm({ ...form, address: e.target.value })} />
+            <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_address')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('business_phone')}</label>
               <input className="input" type="tel" value={form.contact_phone}
                      onChange={e => setForm({ ...form, contact_phone: e.target.value })} />
+              <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_phone')}</p>
             </div>
             <div>
               <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('business_email')}</label>
               <input className="input" type="email" value={form.contact_email}
                      onChange={e => setForm({ ...form, contact_email: e.target.value })} />
+              <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_email')}</p>
             </div>
           </div>
           <div>
             <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('business_machine_label')}</label>
-            <select className="select w-full" value={form.machine_id}
-                    onChange={e => setForm({ ...form, machine_id: e.target.value })}>
-              <option value="">{t('business_machine_none')}</option>
+            {form.machine_ids.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {form.machine_ids.map(id => (
+                  <span key={id} className="inline-flex items-center gap-1 text-[11px] bg-[var(--cream2)] text-[var(--ink)] rounded-full px-2.5 py-1">
+                    {machineLabel(id)}
+                    <button type="button"
+                            onClick={() => removeMachine(id)}
+                            className="text-[var(--coral)] hover:text-red-700 cursor-pointer bg-transparent border-none px-1 leading-none"
+                            aria-label={t('remove')}>×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <select className="select w-full" value=""
+                    onChange={e => { addMachine(e.target.value); e.target.value = ''; }}>
+              <option value="">{form.machine_ids.length === 0 ? t('business_machine_none') : t('business_machine_add_more')}</option>
               <optgroup label={t('business_machine_home')}>
-                {MACHINES.filter(m => m.type === 'home').map(m => (
+                {getBatchFreezers().filter(m => m.type === 'home' && !form.machine_ids.includes(m.id)).map(m => (
                   <option key={m.id} value={m.id}>{m.name} ({m.optimal} L)</option>
                 ))}
               </optgroup>
               <optgroup label={t('business_machine_commercial')}>
-                {MACHINES.filter(m => m.type === 'commercial').map(m => (
-                  <option key={m.id} value={m.id}>{m.name} ({m.optimal} L)</option>
+                {getBatchFreezers().filter(m => m.type === 'commercial' && !form.machine_ids.includes(m.id)).map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} ({m.optimal} L){m.kind === 'combo' ? ` · ${t('business_combo_tag')}` : ''}
+                  </option>
                 ))}
               </optgroup>
             </select>
             <p className="text-[10px] text-[var(--ink3)] mt-1">{t('business_machine_help')}</p>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('business_pasteurizer_label')}</label>
+            {form.pasteurizer_ids.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {form.pasteurizer_ids.map(id => (
+                  <span key={id} className="inline-flex items-center gap-1 text-[11px] bg-[var(--cream2)] text-[var(--ink)] rounded-full px-2.5 py-1">
+                    {machineLabel(id)}
+                    <button type="button"
+                            onClick={() => removePasteurizer(id)}
+                            className="text-[var(--coral)] hover:text-red-700 cursor-pointer bg-transparent border-none px-1 leading-none"
+                            aria-label={t('remove')}>×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <select className="select w-full" value=""
+                    onChange={e => { addPasteurizer(e.target.value); e.target.value = ''; }}>
+              <option value="">{form.pasteurizer_ids.length === 0 ? t('business_pasteurizer_none') : t('business_pasteurizer_add_more')}</option>
+              {getPasteurizers().filter(m => !form.pasteurizer_ids.includes(m.id)).map(m => (
+                <option key={m.id} value={m.id}>
+                  {m.name} ({m.optimal} L){m.kind === 'combo' ? ` · ${t('business_combo_tag')}` : ''}
+                </option>
+              ))}
+            </select>
+            <p className="text-[10px] text-[var(--ink3)] mt-1">{t('business_pasteurizer_help')}</p>
           </div>
 
           {/* === PIN para proteger el guardado de recetas === */}

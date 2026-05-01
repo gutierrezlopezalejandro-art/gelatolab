@@ -18,6 +18,8 @@ import { NotFound } from './components/NotFound';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
+import { HelpAssistant } from './components/HelpAssistant';
+import { UIHighlightOverlay } from './components/UIHighlightOverlay';
 import { Logo } from './components/Logo';
 import { Onboarding } from './components/Onboarding';
 import Toast           from './components/ui/Toast';
@@ -262,6 +264,7 @@ export default function App() {
                 key={to}
                 to={to}
                 end={to === '/'}
+                data-tour={`nav-${key}`}
                 className={({ isActive }) =>
                   `px-4 py-4 text-[13px] font-medium border-b-2 transition-all whitespace-nowrap inline-flex items-center gap-1.5 ` +
                   (isActive
@@ -287,7 +290,7 @@ export default function App() {
               className={({ isActive }) =>
                 `flex items-center justify-center w-8 h-8 rounded-lg text-base font-semibold cursor-pointer transition-colors border-none ` +
                 (isActive
-                  ? 'bg-[var(--gold)] text-[var(--ink)]'
+                  ? 'bg-[#e8b920] text-[var(--ink)]'
                   : 'bg-white/10 text-white/80 hover:bg-white/20 hover:text-white')
               }
               aria-label={t('help_title')}
@@ -362,6 +365,8 @@ export default function App() {
       <Onboarding />
       <CloudSyncProvider />
       <CookieBanner />
+      <HelpAssistant />
+      <UIHighlightOverlay />
     </div>
   );
 }

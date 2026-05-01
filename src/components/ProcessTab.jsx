@@ -1,6 +1,8 @@
 // ProcessTab.jsx — Pasos de proceso adaptativos segun tipo y composicion
 
 import { useT } from '../lib/i18n';
+import { useBusinessStore } from '../store/businessStore';
+import { getEquipmentRecommendations } from '../data/machines';
 
 const BADGE_COLORS = {
   temp:  { bg:'#fff3e0', border:'#ffcc80', color:'#e65100' },
@@ -55,6 +57,87 @@ function Section({ icon, title, children }) {
         <span>{icon}</span> {title}
       </div>
       {children}
+    </div>
+  );
+}
+
+function EquipmentRecsCard({ recipeType, t }) {
+  const machineIds     = useBusinessStore(s => s.machine_ids || []);
+  const pasteurizerIds = useBusinessStore(s => s.pasteurizer_ids || []);
+
+  // Resolve per-machine recommendations.
+  const machineRecsList = machineIds
+    .map(id => getEquipmentRecommendations(id, recipeType))
+    .filter(Boolean);
+  const pastRecsList = pasteurizerIds
+    .map(id => getEquipmentRecommendations(id, recipeType))
+    .filter(r => r && !machineIds.includes(r.machine.id));
+
+  if (machineRecsList.length === 0 && pastRecsList.length === 0) return null;
+
+  // If a separate pasteurizer is configured, suppress pasteurize/cool/aging
+  // from any combo in the batch-freezer list to avoid duplicate rows.
+  const hasSeparatePasteurizer = pastRecsList.length > 0;
+
+  return (
+    <div className="card p-5">
+      <div className="font-display text-base text-[var(--ink)] mb-3 flex items-center gap-2">
+        <span>🛠</span> {t('equip_recs_title')}
+      </div>
+      {pastRecsList.map(r => (
+        <RecGroup key={r.machine.id} name={r.machine.name} stages={r.stages} t={t} />
+      ))}
+      {machineRecsList.map(r => {
+        const stages = { ...r.stages };
+        if (hasSeparatePasteurizer) {
+          delete stages.pasteurize;
+          delete stages.cool;
+          delete stages.aging;
+        }
+        if (Object.keys(stages).length === 0) return null;
+        return <RecGroup key={r.machine.id} name={r.machine.name} stages={stages} t={t} />;
+      })}
+      <div className="border-t border-black/10 mt-3 pt-2 text-[10px] text-[var(--ink3)] leading-relaxed">
+        {t('equip_recs_footer')}
+      </div>
+    </div>
+  );
+}
+
+function RecGroup({ name, stages, t }) {
+  return (
+    <div className="mb-3 last:mb-0">
+      <div className="text-xs font-semibold text-[var(--ink2)] mb-1.5">{name}</div>
+      <div className="space-y-1.5 text-[11px]">
+        {Object.entries(stages).map(([k, v]) => (
+          <RecRow key={k} stage={k} val={v} t={t} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RecRow({ stage, val, t }) {
+  const label = {
+    pasteurize: t('equip_stage_pasteurize'),
+    cool:       t('equip_stage_cool'),
+    aging:      t('equip_stage_aging'),
+    churn:      t('equip_stage_churn'),
+    harden:     t('equip_stage_harden'),
+  }[stage];
+
+  let detail = '';
+  if (stage === 'pasteurize') {
+    detail = `${val.setpoint} °C · ${val.hold} (${val.mode})`;
+  } else if (stage === 'churn') {
+    detail = `${val.extract_temp} °C · ${val.time} · overrun ${val.overrun}`;
+  } else {
+    detail = [val.setpoint != null ? `${val.setpoint} °C` : '', val.time].filter(Boolean).join(' · ');
+  }
+  return (
+    <div className="flex justify-between items-baseline gap-2">
+      <span className="text-[var(--ink2)]">{label}</span>
+      <span className="text-[var(--ink)] font-medium text-right">{detail}</span>
     </div>
   );
 }
@@ -244,6 +327,8 @@ export default function ProcessTab({ recipe, ingredients = [] }) {
 
       {/* Panel lateral */}
       <div className="sticky top-20 space-y-4">
+        <EquipmentRecsCard recipeType={type} t={t} />
+
         <div className="card p-5">
           <div className="font-display text-base text-[var(--ink)] mb-4">{t('proc_summary')}</div>
           <div className="space-y-1 text-sm">

@@ -11,6 +11,10 @@ import { useAppStore } from '../store/appStore';
 import SearchSelect from '../components/SearchSelect';
 import { calcStats } from '../lib/icecreamCalc';
 import { printHtml } from '../lib/printHtml';
+import { MachineVolumeWarning, PasteurizerVolumeWarning } from '../components/MachineVolumeWarning';
+import { NumberInput } from '../components/NumberInput';
+import { useBusinessStore } from '../store/businessStore';
+import { getMachine, rateBatchVolume, ratePasteurizerVolume, pickBestFit } from '../data/machines';
 
 const today   = () => new Date().toISOString().slice(0, 10);
 const DENSITY = 1070; // g/L
@@ -89,6 +93,30 @@ export default function ProductionPlan() {
   const removePlan  = usePlanStore(s => s.remove);
   const plans       = usePlanStore(s => s.plans);
 
+  // Configured equipment (for warnings and printable sheet)
+  const machineIds     = useBusinessStore(s => s.machine_ids || []);
+  const pasteurizerIds = useBusinessStore(s => s.pasteurizer_ids || []);
+  const batchFreezers  = machineIds.map(getMachine).filter(Boolean);
+  const pasteurizers   = pasteurizerIds.map(getMachine).filter(Boolean);
+  // Show per-order assignment selectors only when the operator has 2+ of
+  // either type — for a single machine the assignment is implicit.
+  const showBatchPicker = batchFreezers.length >= 2;
+  const showPastPicker  = pasteurizers.length >= 2;
+
+  // Resolve effective equipment for an order: explicit > auto-pick > none.
+  function effectiveBatchId(order) {
+    if (order.batch_freezer_id) return order.batch_freezer_id;
+    if (machineIds.length === 0) return '';
+    const m = pickBestFit(order.liters, machineIds, ['batch_freezer', 'combo']);
+    return m?.id || '';
+  }
+  function effectivePasteurizerId(order) {
+    if (order.pasteurizer_id) return order.pasteurizer_id;
+    if (pasteurizerIds.length === 0) return '';
+    const m = pickBestFit(order.liters, pasteurizerIds, ['pasteurizer', 'combo']);
+    return m?.id || '';
+  }
+
   // Local state
   const [date,   setDate]   = useState(today());
   const [pname,  setPname]  = useState('');
@@ -110,9 +138,11 @@ export default function ProductionPlan() {
     const plan = usePlanStore.getState().plans?.[date];
     if (plan && Array.isArray(plan.items) && plan.items.length > 0) {
       setOrders(plan.items.map((it, idx) => ({
-        _key:      Date.now() + idx,
-        recipe_id: String(it.recipe_id),
-        liters:    parseFloat(it.liters) || 0,
+        _key:             Date.now() + idx,
+        recipe_id:        String(it.recipe_id),
+        liters:           parseFloat(it.liters) || 0,
+        batch_freezer_id: it.batch_freezer_id || '',
+        pasteurizer_id:   it.pasteurizer_id   || '',
       })));
       setPname(plan.plan_name || '');
     } else {
@@ -133,7 +163,7 @@ export default function ProductionPlan() {
 
   // ── Order management ──────────────────────────────────────
   function addOrder() {
-    setOrders(p => [...p, { _key: Date.now(), recipe_id: '', liters: 5 }]);
+    setOrders(p => [...p, { _key: Date.now(), recipe_id: '', liters: 5, batch_freezer_id: '', pasteurizer_id: '' }]);
   }
   function removeOrder(key) {
     setOrders(p => p.filter(o => o._key !== key));
@@ -266,8 +296,33 @@ export default function ProductionPlan() {
     const lines = enriched.map(o =>
       `- ${o.r?.name}: ${o.liters}L / ${o.bolas} bolas / $${Math.round(o.cost).toLocaleString(locale)}`
     ).join('\n');
+
+    // Equipment range warnings: list each batch whose effective machine
+    // assignment (explicit or auto-picked) is outside its operating range.
+    // Note: when the operator has multiple machines configured we only
+    // complain when ALL options miss — the auto-picker already chose the
+    // closest one, so its rating is the best achievable.
+    const equipIssues = [];
+    for (const o of enriched) {
+      const bId = effectiveBatchId(o);
+      const pId = effectivePasteurizerId(o);
+      const m = bId && rateBatchVolume(o.liters, bId);
+      const p = pId && ratePasteurizerVolume(o.liters, pId);
+      if (m && (m.state === 'under' || m.state === 'over')) {
+        equipIssues.push(`! ${o.r?.name} (${o.liters}L): ${t(m.state === 'over' ? 'machine_warning_over' : 'machine_warning_under',
+          { name: m.machine.name, max: m.machine.max, min: m.machine.min })}`);
+      }
+      if (p && (p.state === 'under' || p.state === 'over') && p.machine.id !== bId) {
+        equipIssues.push(`! ${o.r?.name} (${o.liters}L): ${t(p.state === 'over' ? 'machine_warning_over' : 'machine_warning_under',
+          { name: p.machine.name, max: p.machine.max, min: p.machine.min })}`);
+      }
+    }
+    const warningsBlock = equipIssues.length > 0
+      ? `\n\n⚠ ${t('plan_confirm_equip_warning')}\n${equipIssues.join('\n')}\n`
+      : '';
+
     const ok = await confirm(
-      `${t('confirm_prod_date')} ${date}?\n\n${lines}\n\nTotal: ${totalLiters.toFixed(1)}L / $${Math.round(totalCost).toLocaleString(locale)}`
+      `${t('confirm_prod_date')} ${date}?\n\n${lines}\n\nTotal: ${totalLiters.toFixed(1)}L / $${Math.round(totalCost).toLocaleString(locale)}${warningsBlock}`
     );
     if (!ok) return;
 
@@ -306,9 +361,11 @@ export default function ProductionPlan() {
       upsertPlan(date, {
         plan_name: pname,
         items: enriched.map(o => ({
-          recipe_id: Number(o.recipe_id),
-          liters:    parseFloat(o.liters.toFixed(1)),
-          cost:      parseFloat(o.cost.toFixed(2)),
+          recipe_id:        Number(o.recipe_id),
+          liters:           parseFloat(o.liters.toFixed(1)),
+          cost:             parseFloat(o.cost.toFixed(2)),
+          batch_freezer_id: o.batch_freezer_id || '',
+          pasteurizer_id:   o.pasteurizer_id   || '',
         })),
       });
 
@@ -327,13 +384,62 @@ export default function ProductionPlan() {
   function handlePrint() {
     const escape = (s) => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
-    const recipesRows = enriched.map(o => `
+    // Per-batch volume warnings + assigned equipment for printing. The
+    // assigned equipment may have been picked explicitly by the operator or
+    // auto-resolved (closest fit) so the printed sheet is unambiguous about
+    // which machine to use for each batch.
+    const equipmentWarnings = enriched.map(o => {
+      const bId = effectiveBatchId(o);
+      const pId = effectivePasteurizerId(o);
+      const bM = bId ? getMachine(bId) : null;
+      const pM = pId ? getMachine(pId) : null;
+      const m = bId && rateBatchVolume(o.liters, bId);
+      const p = pId && ratePasteurizerVolume(o.liters, pId);
+      const issues = [];
+      if (m && (m.state === 'under' || m.state === 'over')) {
+        issues.push(t(m.state === 'over' ? 'machine_warning_over' : 'machine_warning_under',
+          { name: m.machine.name, max: m.machine.max, min: m.machine.min }));
+      }
+      if (p && (p.state === 'under' || p.state === 'over') && p.machine.id !== bId) {
+        issues.push(t(p.state === 'over' ? 'machine_warning_over' : 'machine_warning_under',
+          { name: p.machine.name, max: p.machine.max, min: p.machine.min }));
+      }
+      // Build assigned-equipment label cells (de-dup if the same combo plays both roles).
+      const assigned = [];
+      if (bM) assigned.push(bM.name);
+      if (pM && pM.id !== bM?.id) assigned.push(pM.name);
+      return { order: o, issues, assignedLabel: assigned.join(' / ') };
+    });
+
+    const showAssignedCol = batchFreezers.length > 0 || pasteurizers.length > 0;
+
+    const recipesRows = equipmentWarnings.map(({ order: o, issues, assignedLabel }) => `
       <tr>
-        <td>${escape(o.r?.name || '?')}</td>
+        <td>${escape(o.r?.name || '?')}${issues.length > 0 ? ' <span class="warn">⚠</span>' : ''}</td>
         <td class="num">${o.liters.toFixed(1)} L</td>
         <td class="num">${o.bolas}</td>
         <td class="num">$${Math.round(o.cost).toLocaleString(locale)}</td>
+        ${showAssignedCol ? `<td>${escape(assignedLabel || '—')}</td>` : ''}
       </tr>`).join('');
+
+    const fmtMachine = (m) => `${escape(m.name)} (${m.min}-${m.max} L)`;
+    const equipmentMetaParts = [];
+    if (batchFreezers.length > 0) {
+      equipmentMetaParts.push(`<div><strong>${t('print_equip_batchfreezer')}:</strong> ${batchFreezers.map(fmtMachine).join(' · ')}</div>`);
+    }
+    const standalonePast = pasteurizers.filter(p => !machineIds.includes(p.id));
+    if (standalonePast.length > 0) {
+      equipmentMetaParts.push(`<div><strong>${t('print_equip_pasteurizer')}:</strong> ${standalonePast.map(fmtMachine).join(' · ')}</div>`);
+    }
+    const equipmentMeta = equipmentMetaParts.join('');
+
+    const issuesList = equipmentWarnings.filter(w => w.issues.length > 0);
+    const issuesSection = issuesList.length > 0 ? `
+<h2>${t('print_equip_warnings_title')}</h2>
+<ul style="margin: 0 0 4mm 4mm; font-size: 9.5pt;">
+  ${issuesList.map(w => `<li><strong>${escape(w.order.r?.name || '?')}</strong> (${w.order.liters.toFixed(1)} L): ${w.issues.map(escape).join(' · ')}</li>`).join('')}
+</ul>
+` : '';
 
     const ingredientsRows = consolidated.map(i => `
       <tr>
@@ -360,6 +466,7 @@ export default function ProductionPlan() {
   th.num { text-align: right; }
   td { padding: 2mm; border-bottom: 0.5px solid #ddd; vertical-align: top; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .warn { color: #c0392b; font-weight: bold; }
   tfoot td { font-weight: bold; border-top: 1.5px solid #000; background: #fafafa; }
   footer { margin-top: 10mm; padding-top: 3mm; border-top: 0.5px solid #999; font-size: 8pt; color: #666; display: flex; justify-content: space-between; }
 </style></head><body>
@@ -371,6 +478,7 @@ export default function ProductionPlan() {
     ${pname ? `<div><strong>${t('plan_name_label')}:</strong> ${escape(pname)}</div>` : ''}
     <div><strong>${t('total_recipes_count')}:</strong> ${enriched.length}</div>
     <div><strong>${t('total_litros')}:</strong> ${totalLiters.toFixed(1)} L</div>
+    ${equipmentMeta}
   </div>
 </header>
 
@@ -383,6 +491,7 @@ ${enriched.length > 0 ? `
       <th class="num">${t('litros')}</th>
       <th class="num">${t('scoops')}</th>
       <th class="num">${t('cost')}</th>
+      ${showAssignedCol ? `<th>${t('print_equip_assigned')}</th>` : ''}
     </tr>
   </thead>
   <tbody>${recipesRows}</tbody>
@@ -392,9 +501,11 @@ ${enriched.length > 0 ? `
       <td class="num">${totalLiters.toFixed(1)} L</td>
       <td class="num">${totalBolas}</td>
       <td class="num">$${Math.round(totalCost).toLocaleString(locale)}</td>
+      ${showAssignedCol ? '<td></td>' : ''}
     </tr>
   </tfoot>
 </table>
+${issuesSection}
 ` : ''}
 
 <h2>${t('consolidated_ingredients')}</h2>
@@ -448,7 +559,7 @@ ${enriched.length > 0 ? `
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
         <div className="space-y-5">
           {/* Date and plan name */}
-          <div className="card p-5 flex gap-4 flex-wrap items-end">
+          <div data-tour="plan-date" className="card p-5 flex gap-4 flex-wrap items-end">
             <div className="min-w-[160px]">
               <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('select_date')}</label>
               <input type="date" className="input" value={date} onChange={e => setDate(e.target.value)} />
@@ -487,40 +598,87 @@ ${enriched.length > 0 ? `
               const cost    = stats ? stats.cost * factor : 0;
 
               return (
-                <div key={o._key}
-                     className="grid grid-cols-[1fr_100px_auto_28px] gap-3 items-center
-                                py-3 border-b border-black/10 last:border-0">
-                  <SearchSelect
-                    options={recipes.map(r => ({ value: r.id, label: r.name }))}
-                    value={o.recipe_id}
-                    onChange={val => updateOrder(o._key, 'recipe_id', val)}
-                    placeholder={t('select_recipe')}
-                    className="flex-1"
-                    disabled={isPast}
-                  />
+                <div key={o._key} className="py-3 border-b border-black/10 last:border-0">
+                  <div className="grid grid-cols-[1fr_100px_auto_28px] gap-3 items-center">
+                    <SearchSelect
+                      options={recipes.map(r => ({ value: r.id, label: r.name }))}
+                      value={o.recipe_id}
+                      onChange={val => updateOrder(o._key, 'recipe_id', val)}
+                      placeholder={t('select_recipe')}
+                      className="flex-1"
+                      disabled={isPast}
+                    />
 
-                  <input type="number" min="0.5" max="500" step="0.5"
-                         className="input-gold rounded-lg text-right w-full"
-                         value={o.liters}
-                         onChange={e => updateOrder(o._key, 'liters', parseFloat(e.target.value) || 1)}
-                         disabled={isPast} />
+                    <NumberInput min="0.1" max="500" step="0.1"
+                           className="input-gold rounded-lg text-right w-full"
+                           value={o.liters}
+                           onChange={v => updateOrder(o._key, 'liters', v)}
+                           fallback={0}
+                           disabled={isPast} />
 
-                  {o.recipe_id && stats ? (
-                    <span className="text-xs text-[var(--ink3)] whitespace-nowrap">
-                      {o.liters}L | {bolas} bolas | ${Math.round(cost).toLocaleString(locale)}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-[var(--ink3)]">-- L</span>
+                    {o.recipe_id && stats ? (
+                      <span className="text-xs text-[var(--ink3)] whitespace-nowrap">
+                        {o.liters}L | {bolas} bolas | ${Math.round(cost).toLocaleString(locale)}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-[var(--ink3)]">-- L</span>
+                    )}
+
+                    <button onClick={() => removeOrder(o._key)}
+                            className="text-black/20 hover:text-[var(--coral)] transition-colors text-lg
+                                       bg-transparent border-none cursor-pointer"
+                            title={t('remove')}
+                            disabled={isPast}
+                            style={isPast ? { opacity: 0.3, cursor: 'not-allowed' } : {}}>
+                      x
+                    </button>
+                  </div>
+
+                  {(showBatchPicker || showPastPicker) && o.recipe_id && (
+                    <div className="mt-2 ml-1 flex flex-wrap gap-3 text-[11px] text-[var(--ink2)]">
+                      {showBatchPicker && (
+                        <label className="flex items-center gap-1.5">
+                          <span className="text-[var(--ink3)]">{t('plan_order_batchfreezer')}:</span>
+                          <select className="select py-0.5 px-2 text-[11px]"
+                                  value={o.batch_freezer_id || ''}
+                                  onChange={e => updateOrder(o._key, 'batch_freezer_id', e.target.value)}
+                                  disabled={isPast}>
+                            <option value="">{(() => {
+                              const auto = pickBestFit(o.liters, machineIds, ['batch_freezer', 'combo']);
+                              return auto ? t('plan_order_auto_pick', { name: auto.name }) : t('plan_order_auto');
+                            })()}</option>
+                            {batchFreezers.map(m => (
+                              <option key={m.id} value={m.id}>{m.name}</option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
+                      {showPastPicker && (
+                        <label className="flex items-center gap-1.5">
+                          <span className="text-[var(--ink3)]">{t('plan_order_pasteurizer')}:</span>
+                          <select className="select py-0.5 px-2 text-[11px]"
+                                  value={o.pasteurizer_id || ''}
+                                  onChange={e => updateOrder(o._key, 'pasteurizer_id', e.target.value)}
+                                  disabled={isPast}>
+                            <option value="">{(() => {
+                              const auto = pickBestFit(o.liters, pasteurizerIds, ['pasteurizer', 'combo']);
+                              return auto ? t('plan_order_auto_pick', { name: auto.name }) : t('plan_order_auto');
+                            })()}</option>
+                            {pasteurizers.map(m => (
+                              <option key={m.id} value={m.id}>{m.name}</option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
+                    </div>
                   )}
 
-                  <button onClick={() => removeOrder(o._key)}
-                          className="text-black/20 hover:text-[var(--coral)] transition-colors text-lg
-                                     bg-transparent border-none cursor-pointer"
-                          title={t('remove')}
-                          disabled={isPast}
-                          style={isPast ? { opacity: 0.3, cursor: 'not-allowed' } : {}}>
-                    x
-                  </button>
+                  {o.recipe_id && o.liters > 0 && (
+                    <div className="mt-2 ml-1 space-y-1">
+                      <MachineVolumeWarning liters={o.liters} machineId={effectiveBatchId(o)} />
+                      <PasteurizerVolumeWarning liters={o.liters} machineId={effectivePasteurizerId(o)} />
+                    </div>
+                  )}
                 </div>
               );
             })}

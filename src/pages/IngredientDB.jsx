@@ -13,6 +13,7 @@ import { generateIngredientNutrition } from '../lib/ai';
 import { computeBlendMacros } from '../lib/icecreamCalc';
 import { useAiStore } from '../store/aiStore';
 import { AiKeyModal } from '../components/AiKeyModal';
+import { NumberInput } from '../components/NumberInput';
 import { StocktakeModal } from '../components/StocktakeModal';
 import { SuppliersModal } from '../components/SuppliersModal';
 
@@ -355,7 +356,7 @@ export default function IngredientDB() {
               📷 {t('barcode_scan_btn')}
             </button>
           )}
-          <button className="btn-primary" onClick={() => setShowModal(true)}>
+          <button data-tour="ingredient-add-btn" className="btn-primary" onClick={() => setShowModal(true)}>
             {t('add_ingredient_btn')}
           </button>
           <button className="btn-primary" onClick={() => setShowStocktake(true)}
@@ -384,7 +385,7 @@ export default function IngredientDB() {
       </div>
 
       {/* Filters */}
-      <div className="card p-4 mb-6 flex flex-wrap gap-3 items-center">
+      <div data-tour="ingredients-search" className="card p-4 mb-6 flex flex-wrap gap-3 items-center">
         <input
           className="input max-w-[220px]"
           placeholder={t('search_ingredients')}
@@ -547,14 +548,13 @@ export default function IngredientDB() {
                       return (
                         <td key={key}>
                           {isEd ? (
-                            <input
-                              type="number"
+                            <NumberInput
                               autoFocus
                               min="0"
                               step={step}
                               className={`${isPrice ? 'input-gold' : 'input'} w-24 text-xs py-1 px-2 rounded`}
                               value={editing.value}
-                              onChange={e => setEditing({ ...editing, value: parseFloat(e.target.value) || 0 })}
+                              onChange={v => setEditing({ ...editing, value: v })}
                               onKeyDown={e => {
                                 if (e.key === 'Enter') commitNum(ingredient);
                                 if (e.key === 'Escape') setEditing(null);
@@ -680,12 +680,11 @@ export default function IngredientDB() {
               </div>
               <div>
                 <label className="text-xs font-medium text-[var(--ink2)] block mb-1">$/kg *</label>
-                <input
-                  type="number"
+                <NumberInput
                   min="0"
                   className="input-gold w-full rounded-lg"
                   value={form.cost_per_kg}
-                  onChange={e => setForm(f => ({ ...f, cost_per_kg: parseFloat(e.target.value) || 0 }))}
+                  onChange={v => setForm(f => ({ ...f, cost_per_kg: v }))}
                 />
               </div>
               <div className="col-span-2 bg-[var(--cream2)] rounded-xl p-3 text-xs text-[var(--ink3)]">
@@ -699,14 +698,13 @@ export default function IngredientDB() {
                   <label className="text-xs font-medium text-[var(--ink2)] block mb-1">
                     {labelKey ? `${t(labelKey)} ${suffix || ''}` : field.toUpperCase()}
                   </label>
-                  <input
-                    type="number"
+                  <NumberInput
                     min="0"
                     max="100"
                     step="0.1"
                     className="input"
                     value={form[field]}
-                    onChange={e => setForm(f => ({ ...f, [field]: parseFloat(e.target.value) || 0 }))}
+                    onChange={v => setForm(f => ({ ...f, [field]: v }))}
                   />
                 </div>
               ))}
@@ -726,13 +724,12 @@ export default function IngredientDB() {
                   <label className="text-xs font-medium text-[var(--ink2)] block mb-1">
                     {t(labelKey)} <span className="text-[10px] text-[var(--ink3)]">({suffix}/100g)</span>
                   </label>
-                  <input
-                    type="number"
+                  <NumberInput
                     min="0"
                     step="0.01"
                     className="input"
                     value={form[field]}
-                    onChange={e => setForm(f => ({ ...f, [field]: parseFloat(e.target.value) || 0 }))}
+                    onChange={v => setForm(f => ({ ...f, [field]: v }))}
                     disabled={isBlend}
                     title={isBlend ? t('blend_macros_locked') : ''}
                   />
@@ -770,11 +767,11 @@ export default function IngredientDB() {
                         <tr key={c.ingredient_id}>
                           <td>{ing ? tIng(ing.name) : '?'}</td>
                           <td className="text-right">
-                            <input
-                              type="number" min="0" max="100" step="0.5"
+                            <NumberInput
+                              min="0" max="100" step="0.5"
                               className="w-16 text-right border border-black/10 rounded px-1.5 py-0.5 text-xs"
                               value={c.pct}
-                              onChange={e => updateBlendPct(c.ingredient_id, parseFloat(e.target.value) || 0)}
+                              onChange={v => updateBlendPct(c.ingredient_id, v)}
                             />
                           </td>
                           <td>

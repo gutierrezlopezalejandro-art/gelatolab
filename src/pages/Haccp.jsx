@@ -1,10 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useHaccpStore, getDefaultUnit, getDailySummary } from '../store/haccpStore';
 import { useAppStore } from '../store/appStore';
+import { useBusinessStore } from '../store/businessStore';
+import { getMachine } from '../data/machines';
 import { useT, useLocale } from '../lib/i18n';
 import { track } from '../lib/analytics';
 
-const TYPES = ['cold_storage', 'freezer', 'pasteurization', 'reception', 'cleaning', 'other'];
+const TYPES = ['cold_storage', 'freezer', 'pasteurization', 'churning', 'reception', 'cleaning', 'other'];
 const STATUS_COLOR = {
   ok:   { bg: 'var(--mint)',  fg: 'white' },
   warn: { bg: 'var(--gold)',  fg: 'white' },
@@ -41,6 +43,38 @@ export default function Haccp() {
   const today = todayISO();
   const summary = getDailySummary(today);
 
+  // Configured equipment used to auto-fill / suggest the "location" field for
+  // pasteurization and churning entries. Arrays porque hay multi-equipo.
+  const machineIds     = useBusinessStore(s => s.machine_ids || []);
+  const pasteurizerIds = useBusinessStore(s => s.pasteurizer_ids || []);
+  const batchFreezers  = machineIds.map(getMachine).filter(Boolean);
+  const pasteurizers   = pasteurizerIds.map(getMachine).filter(Boolean);
+  // For churning: list every batch_freezer + combo. For pasteurization: list
+  // every pasteurizer + combos that double as pasteurizers.
+  const suggestedLocations = (() => {
+    if (type === 'churning') {
+      return batchFreezers.map(m => m.name);
+    }
+    if (type === 'pasteurization') {
+      const seen = new Set();
+      const list = [];
+      for (const m of pasteurizers) { if (!seen.has(m.id)) { seen.add(m.id); list.push(m.name); } }
+      for (const m of batchFreezers) {
+        if (m.kind === 'combo' && !seen.has(m.id)) { seen.add(m.id); list.push(m.name); }
+      }
+      return list;
+    }
+    return [];
+  })();
+  // Auto-fill location when switching to a type with a single configured
+  // equipment, but only if the field is empty (don't clobber operator input).
+  useEffect(() => {
+    if (suggestedLocations.length === 1 && !location.trim()) {
+      setLocation(suggestedLocations[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type]);
+
   const filtered = useMemo(() => {
     return entries.filter(e => {
       if (filterType && e.type !== filterType) return false;
@@ -64,7 +98,7 @@ export default function Haccp() {
     e.preventDefault();
     if (!type) return;
     // Para cleaning/reception/other: el valor es opcional. Para temps debe haber numero.
-    const needsNumeric = ['cold_storage', 'freezer', 'pasteurization'].includes(type);
+    const needsNumeric = ['cold_storage', 'freezer', 'pasteurization', 'churning'].includes(type);
     const v = parseFloat(value);
     if (needsNumeric && !Number.isFinite(v)) {
       return showToast(t('haccp_value_required'), 'error');
@@ -119,7 +153,7 @@ export default function Haccp() {
     URL.revokeObjectURL(url);
   }
 
-  const needsNumeric = ['cold_storage', 'freezer', 'pasteurization'].includes(type);
+  const needsNumeric = ['cold_storage', 'freezer', 'pasteurization', 'churning'].includes(type);
 
   return (
     <div>
@@ -159,7 +193,7 @@ export default function Haccp() {
       </div>
 
       {/* Quick-add form */}
-      <form onSubmit={handleAdd} className="card p-4 mb-6">
+      <form data-tour="haccp-form" onSubmit={handleAdd} className="card p-4 mb-6">
         <h3 className="text-xs uppercase tracking-widest text-[var(--ink3)] mb-3">{t('haccp_new_entry')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-[180px_1fr_140px_140px] gap-3 items-end mb-3">
           <div>
@@ -171,7 +205,13 @@ export default function Haccp() {
           <div>
             <label htmlFor="haccp-location" className="text-[10px] uppercase tracking-widest text-[var(--ink3)] block mb-1">{t('haccp_location')}</label>
             <input id="haccp-location" type="text" className="input" placeholder={t('haccp_location_placeholder')}
+                   list={suggestedLocations.length > 0 ? 'haccp-location-suggestions' : undefined}
                    value={location} onChange={e => setLocation(e.target.value)} />
+            {suggestedLocations.length > 0 && (
+              <datalist id="haccp-location-suggestions">
+                {suggestedLocations.map(s => <option key={s} value={s} />)}
+              </datalist>
+            )}
           </div>
           <div>
             <label htmlFor="haccp-value" className="text-[10px] uppercase tracking-widest text-[var(--ink3)] block mb-1">

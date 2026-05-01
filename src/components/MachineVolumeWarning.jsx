@@ -1,19 +1,37 @@
 import { useT } from '../lib/i18n';
 import { useBusinessStore } from '../store/businessStore';
-import { rateBatchVolume } from '../data/machines';
+import { rateBatchVolumeMulti, ratePasteurizerVolumeMulti } from '../data/machines';
 
 /**
- * Aviso compacto si el volumen del batch (en litros) queda fuera del rango
- * de la mantecadora seleccionada. No bloquea — solo informa.
+ * Compact warning if the batch volume (in liters) is outside the optimal
+ * range of all configured equipment of the requested kind. Non-blocking.
+ *
+ * `rate` selects which equipment is checked: 'batch' (default) or 'pasteurizer'.
+ *
+ * `machineId` (optional) restricts the validation to a single machine — used
+ * by ProductionPlan when the operator has explicitly assigned a machine to
+ * a specific batch. If omitted, the warning evaluates against the full list
+ * of configured machines (any-fit logic).
  */
-export function MachineVolumeWarning({ liters }) {
+function VolumeWarning({ liters, rate, machineId }) {
   const t = useT();
-  const machineId = useBusinessStore(s => s.machine_id);
-  if (!machineId || !liters) return null;
+  const storeIds = useBusinessStore(s =>
+    rate === 'pasteurizer' ? s.pasteurizer_ids : s.machine_ids
+  );
+  const ids = machineId ? [machineId] : storeIds;
+  if (!Array.isArray(ids) || ids.length === 0 || !liters) return null;
 
-  const r = rateBatchVolume(liters, machineId);
+  const r = rate === 'pasteurizer'
+    ? ratePasteurizerVolumeMulti(liters, ids)
+    : rateBatchVolumeMulti(liters, ids);
   if (!r) return null;
-  const { state, diff, machine } = r;
+  const { state, diff, machine, alternatives = [] } = r;
+
+  // Build alternatives string (other machines that also fit, when applicable)
+  const altFitting = alternatives.filter(a => a.state === 'optimal' || a.state === 'ok');
+  const altText = altFitting.length > 0
+    ? ' · ' + t('machine_alt_fits', { names: altFitting.map(a => a.machine.name).join(', ') })
+    : '';
 
   if (state === 'ok' || state === 'optimal') {
     return (
@@ -21,6 +39,7 @@ export function MachineVolumeWarning({ liters }) {
         <span>✓</span>
         <span>{t('machine_in_range', { name: machine.name })}</span>
         {state === 'optimal' && <span className="text-[10px] text-[var(--ink3)]">({t('machine_optimal')})</span>}
+        {altText && <span className="text-[10px] text-[var(--ink3)]">{altText}</span>}
       </div>
     );
   }
@@ -50,4 +69,12 @@ export function MachineVolumeWarning({ liters }) {
       </div>
     </div>
   );
+}
+
+export function MachineVolumeWarning({ liters, machineId }) {
+  return <VolumeWarning liters={liters} rate="batch" machineId={machineId} />;
+}
+
+export function PasteurizerVolumeWarning({ liters, machineId }) {
+  return <VolumeWarning liters={liters} rate="pasteurizer" machineId={machineId} />;
 }

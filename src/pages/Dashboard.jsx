@@ -7,6 +7,8 @@ import { usePlanStore } from '../store/planStore';
 import { getLowStock } from '../store/inventoryStore';
 import { useT, useI18nStore, useIngredientName, useLocale } from '../lib/i18n';
 import { BackupReminder } from '../components/BackupReminder';
+import { WelcomeTour, hasSeenTour } from '../components/WelcomeTour';
+import { useEffect, useState } from 'react';
 
 const TYPE_KEY = { helado: 'ice_cream', gelato: 'gelato', sorbete: 'sorbet' };
 const TYPE_COLOR = { helado: '#1a5c3a', gelato: '#6a1b9a', sorbete: '#0d5c6e' };
@@ -55,6 +57,17 @@ export default function Dashboard() {
   const lang       = useI18nStore(s => s.lang);
   const locale     = useLocale();
   const navigate   = useNavigate();
+  // Tour de bienvenida: solo se muestra la primera vez. El usuario puede
+  // cerrarlo o marcar "no volver a mostrar" — el flag vive en localStorage.
+  const [showTour, setShowTour] = useState(false);
+  useEffect(() => {
+    if (!hasSeenTour()) {
+      // Pequeno delay para que el navbar termine de renderizar y el tour
+      // pueda anclarse correctamente a los NavLinks.
+      const timer = setTimeout(() => setShowTour(true), 600);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   const recipes    = useRecipeStore(s => s.recipes);
   const ingredients = useIngredientStore(s => s.ingredients);
   const prodLog    = useProductionStore(s => s.log);
@@ -280,7 +293,7 @@ export default function Dashboard() {
                     <div className="text-sm font-semibold text-[var(--ink)]">
                       {new Date(p.date + 'T12:00:00').toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}
                       {p.date === today && (
-                        <span className="ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--gold)] text-[var(--ink)]">
+                        <span className="ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#e8b920] text-[var(--ink)]">
                           {t('dash_today')}
                         </span>
                       )}
@@ -401,6 +414,8 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {showTour && <WelcomeTour onClose={() => setShowTour(false)} />}
     </div>
   );
 }

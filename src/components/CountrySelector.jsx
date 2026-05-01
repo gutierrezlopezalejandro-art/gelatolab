@@ -44,6 +44,7 @@ export function CountrySelector() {
   return (
     <div className="relative">
       <button
+        data-tour="country-selector"
         onClick={() => setOpen(o => !o)}
         onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
         aria-haspopup="listbox"

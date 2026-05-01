@@ -113,7 +113,8 @@ export default function Recipes() {
             value={q}
             onChange={e => setQ(e.target.value)}
           />
-          <button className="btn-primary inline-flex items-center gap-1.5"
+          <button data-tour="recipe-new-btn"
+                  className="btn-primary inline-flex items-center gap-1.5"
                   onClick={() => setShowNewMenu(true)}>
             <span className="text-base leading-none">＋</span> {t('new_recipe')}
           </button>
@@ -228,10 +229,11 @@ export default function Recipes() {
             📄 {t('report_generate')}
           </button>
           <button
+            data-tour="compare-btn"
             type="button"
             onClick={() => { setShowCompare(true); track('recipes_compared', { count: selectedIds.length }); }}
             disabled={selectedIds.length < 2}
-            className="text-xs font-bold px-4 py-1.5 rounded-full bg-[var(--gold)] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            className="text-xs font-bold px-4 py-1.5 rounded-full bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             title={selectedIds.length < 2 ? t('compare_need_two') : t('compare_btn_tooltip')}
           >
             ⚖️ {t('compare_btn')}

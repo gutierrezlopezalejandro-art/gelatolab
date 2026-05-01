@@ -149,6 +149,7 @@ export function OnboardingWizard() {
                     value={form.legal_name}
                     onChange={e => setForm({ ...form, legal_name: e.target.value })}
                   />
+                  <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_legal_name')}</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
@@ -160,6 +161,7 @@ export function OnboardingWizard() {
                       value={form.tax_id}
                       onChange={e => setForm({ ...form, tax_id: e.target.value })}
                     />
+                    <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_tax_id')}</p>
                   </div>
                   <div>
                     <label className="text-xs font-medium text-[var(--ink2)] block mb-1">
@@ -170,6 +172,7 @@ export function OnboardingWizard() {
                       value={form.sanitary_reg}
                       onChange={e => setForm({ ...form, sanitary_reg: e.target.value })}
                     />
+                    <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_sanitary_reg')}</p>
                   </div>
                 </div>
                 <div>
@@ -182,6 +185,7 @@ export function OnboardingWizard() {
                     value={form.address}
                     onChange={e => setForm({ ...form, address: e.target.value })}
                   />
+                  <p className="text-[10px] text-[var(--ink3)] mt-1">{t('field_hint_address')}</p>
                 </div>
                 <p className="text-[10px] text-[var(--ink3)] leading-relaxed">
                   {t('onb_data_note')}

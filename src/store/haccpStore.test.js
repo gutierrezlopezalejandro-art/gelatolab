@@ -26,6 +26,14 @@ describe('deriveStatus', () => {
     expect(deriveStatus('pasteurization', 50)).toBe('fail');
   });
 
+  it('churning: ≤-5 → ok, -5 to -3 → warn, >-3 → fail', () => {
+    expect(deriveStatus('churning', -8)).toBe('ok');
+    expect(deriveStatus('churning', -5)).toBe('ok');
+    expect(deriveStatus('churning', -4)).toBe('warn');
+    expect(deriveStatus('churning', -3)).toBe('warn');
+    expect(deriveStatus('churning', 0)).toBe('fail');
+  });
+
   it('returns ok for types without thresholds (cleaning, reception, other)', () => {
     expect(deriveStatus('cleaning', 0)).toBe('ok');
     expect(deriveStatus('reception', 5)).toBe('ok');
@@ -42,6 +50,7 @@ describe('getDefaultUnit', () => {
     expect(getDefaultUnit('cold_storage')).toBe('°C');
     expect(getDefaultUnit('freezer')).toBe('°C');
     expect(getDefaultUnit('pasteurization')).toBe('°C');
+    expect(getDefaultUnit('churning')).toBe('°C');
     expect(getDefaultUnit('reception')).toBe('°C');
   });
 

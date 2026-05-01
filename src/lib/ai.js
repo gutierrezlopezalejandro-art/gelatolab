@@ -1,7 +1,8 @@
-// Asistentes IA: completar ingredientes y analizar recetas.
+// Asistentes IA: completar ingredientes, analizar recetas y guia conversacional.
 // Adaptado de los prompts de IceCreamCalc 4 (ICC4) al esquema de GelatoLab.
 // La clave OpenAI se guarda en aiStore (localStorage), nunca sale del cliente.
 import { useAiStore } from '../store/aiStore';
+import { searchHelp, buildArticlesContext } from './helpSearch';
 
 const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -166,4 +167,71 @@ ${itemsTxt}`;
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content || '';
+}
+
+// ── Asistente conversacional (GuidedAssistant) ─────────────────
+// Responde preguntas del usuario sobre como usar la app, usando los articulos
+// del centro de ayuda como contexto RAG. Si la pregunta esta fuera del scope
+// de la app, responde brevemente que no es algo que la app cubra.
+const ASSISTANT_SYSTEM_PROMPT = `Eres el asistente de GelatoLab, una app para
+heladerias y gelaterias profesionales.
+
+Tu rol: ayudar al usuario a entender funciones de la app y como hacer tareas
+concretas (crear receta, registrar inventario, generar etiqueta, etc.).
+
+Reglas:
+- Respondes basandote ESTRICTAMENTE en el contexto que recibes (articulos del
+  centro de ayuda). No inventes funciones que no esten ahi.
+- Si la pregunta esta fuera del scope de la app (ej. "que es la fisica del
+  helado", "recetas de panaderia"), respondes amablemente que la app no cubre
+  ese tema y sugieres temas relacionados que SI cubre.
+- Tono: claro, conversacional, sin jerga innecesaria. Como un colega que ya
+  uso la app y le explica a otro.
+- Formato: parrafos cortos, listas si conviene. Sin markdown pesado.
+- Citas opcionales: si el usuario quiere profundizar, mencionas el nombre del
+  articulo del centro de ayuda donde puede leer mas.
+- Si la pregunta es ambigua, pides una aclaracion en una linea.
+- Maximo 200 palabras. Si necesitas mas, ofreces seguir profundizando si el
+  usuario quiere.
+- Idioma: el del usuario (default espanol).`;
+
+export async function askAssistantAI({ question, currentRoute = '', language = 'es' }) {
+  const { apiKey, model } = useAiStore.getState();
+  if (!apiKey) throw new Error('AI_KEY_MISSING');
+
+  // Selecciona los 4 articulos mas relevantes a la pregunta para usar como
+  // contexto. Limitamos a 6000 chars para no inflar tokens.
+  const relevant = await searchHelp(question, 4);
+  const context = buildArticlesContext(relevant, 6000);
+
+  const userMsg = `Idioma: ${language}
+${currentRoute ? `Ruta actual del usuario: ${currentRoute}` : ''}
+
+Contexto (centro de ayuda):
+${context || '(sin articulos relevantes en el centro de ayuda)'}
+
+Pregunta del usuario:
+${question}`;
+
+  const res = await fetch(OPENAI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: ASSISTANT_SYSTEM_PROMPT },
+        { role: 'user',   content: userMsg },
+      ],
+      temperature: 0.3,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`AI_ERROR: ${res.status} ${err.slice(0, 200)}`);
+  }
+  const data = await res.json();
+  return {
+    answer: data.choices?.[0]?.message?.content || '',
+    sources: relevant.map(a => ({ id: a.id, title: a.title })),
+  };
 }
