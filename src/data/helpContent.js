@@ -121,7 +121,7 @@ export const HELP_ARTICLES = [
         bullets: [
           'IndexedDB sobrevive más que localStorage, pero "borrar datos del sitio" lo elimina.',
           'El modo incógnito no persiste nada al cerrar.',
-          'Si cambias de PC o querés sincronizar al teléfono, necesitas exportar e importar el ZIP.',
+          'Si cambias de PC o quieres sincronizar al teléfono, necesitas exportar e importar el ZIP.',
           'La sincronización en la nube (cuando estás logueado) es complementaria pero no reemplaza tener un ZIP local.',
         ],
       },
@@ -150,12 +150,12 @@ export const HELP_ARTICLES = [
       },
       {
         h: '📸 Snapshots diarios (auto, en carpeta del PC)',
-        p: 'Si tenés conectada la carpeta de respaldo (Tauri o web vía File System Access API), GelatoLab además escribe **una vez por día** un snapshot completo en `GelatoLab/snapshots/YYYY-MM-DD/`. Es como un backup ZIP automático pero como archivos sueltos, sin necesidad de tu intervención. Retención de 30 días, prune automático.',
+        p: 'Si tienes conectada la carpeta de respaldo (Tauri o web vía File System Access API), GelatoLab además escribe **una vez por día** un snapshot completo en `GelatoLab/snapshots/YYYY-MM-DD/`. Es como un backup ZIP automático pero como archivos sueltos, sin necesidad de tu intervención. Retención de 30 días, prune automático.',
         bullets: [
           'Sirve para volver atrás si se borra una receta o se corrompe un dato.',
-          'Cada carpeta de fecha tiene los mismos JSONs que el ZIP — podés copiar/pegar uno puntual.',
+          'Cada carpeta de fecha tiene los mismos JSONs que el ZIP — puedes copiar/pegar uno puntual.',
           'Se hace solo una vez al día (idempotente). Abrir la app 5 veces no genera 5 snapshots.',
-          'Si la carpeta vive en Drive/OneDrive, tenés versionado real e historial cross-device gratis.',
+          'Si la carpeta vive en Drive/OneDrive, tienes versionado real e historial cross-device gratis.',
         ],
       },
       {
@@ -328,12 +328,12 @@ export const HELP_ARTICLES = [
     id: 'recipe-comparison',
     category: 'recipes',
     title: '⚖️ Comparar recetas lado a lado',
-    intro: 'Selecciona varias recetas y comparalas en una tabla con métricas técnicas (PAC, POD, FPD), composición (grasa, azúcar, agua, SNG, sólidos) y nutrición por 100 g (calorías, proteína, grasa saturada, azúcares, sodio, fibra, lactosa). Te muestra de un vistazo cuál tiene "más" o "menos" de cada cosa.',
+    intro: 'Selecciona varias recetas y compáralas en una tabla con métricas técnicas (PAC, POD, FPD), composición (grasa, azúcar, agua, SNG, sólidos) y nutrición por 100 g (calorías, proteína, grasa saturada, azúcares, sodio, fibra, lactosa). Te muestra de un vistazo cuál tiene "más" o "menos" de cada cosa.',
     sections: [
       {
         h: 'Cómo abrir la comparación',
         bullets: [
-          'En **Recetas**, marcá el checkbox de cada tarjeta que querás incluir (mínimo 2).',
+          'En **Recetas**, marca el checkbox de cada tarjeta que quieras incluir (mínimo 2).',
           'En la barra flotante inferior aparece el botón **⚖️ Comparar**. Clic.',
           'Se abre un modal con la tabla side-by-side. Cerrar con × o clic afuera.',
         ],
@@ -348,12 +348,12 @@ export const HELP_ARTICLES = [
       },
       {
         h: 'Veredicto de balance',
-        p: 'Bajo el nombre de cada receta verás el veredicto del balance (✓ Balanceada, ⚠ Aceptable, ✗ Fuera de rango), calculado para el tipo+subtipo configurado en cada receta. Usalo para descartar rápido las que no están listas para producción.',
+        p: 'Bajo el nombre de cada receta verás el veredicto del balance (✓ Balanceada, ⚠ Aceptable, ✗ Fuera de rango), calculado para el tipo+subtipo configurado en cada receta. Úsalo para descartar rápido las que no están listas para producción.',
       },
       {
         h: 'Casos de uso típicos',
         bullets: [
-          '**Variantes de un sabor**: comparás 3 versiones de pistacho para elegir la más barata o la de menor azúcar añadido.',
+          '**Variantes de un sabor**: comparas 3 versiones de pistacho para elegir la más barata o la de menor azúcar añadido.',
           '**Portafolio de productos**: ¿está balanceado tu menú? Con la comparación ves de un toque si todos tus sorbetes son altos en sodio o altos en azúcar.',
           '**Decisiones de etiquetado**: si una versión queda bajo el umbral chileno de "ALTO EN AZÚCARES", te conviene esa para el rotulado.',
         ],
@@ -536,7 +536,7 @@ export const HELP_ARTICLES = [
           '**2. Una leche**: filtra automáticamente las opciones de tu base con grasa ≤5%.',
           '**3. Una crema**: filtra opciones con grasa >15%.',
           '**4. Un azúcar principal**: sacarosa default; puedes elegir dextrosa, glucosa, miel, etc.',
-          '**5. Una leche en polvo (opcional)**: si querés MSNF extra sin más agua.',
+          '**5. Una leche en polvo (opcional)**: si quieres MSNF extra sin más agua.',
           '**6. Un estabilizante**: garrofín, guar, blends comerciales.',
           '**7. El sabor principal**: pasta de pistacho, cacao, vainilla, fruta, etc.',
         ],
@@ -685,7 +685,7 @@ export const HELP_ARTICLES = [
       },
       {
         h: '💡 Prefill inteligente al registrar movimiento',
-        p: 'Cuando abrís el modal Inv. de un ingrediente que YA tuvo movimientos, el formulario aparece prellenado con los valores del último (tipo, cantidad, notas). El operador solo confirma o ajusta — sin retipear "Saco 25kg IANSA" cada vez.',
+        p: 'Cuando abres el modal Inv. de un ingrediente que YA tuvo movimientos, el formulario aparece prellenado con los valores del último (tipo, cantidad, notas). El operador solo confirma o ajusta — sin retipear "Saco 25kg IANSA" cada vez.',
         bullets: [
           'Ejemplo: registraste un ingreso de Sacarosa de 25000g con notas "Saco IANSA 25kg".',
           'La próxima vez que abrás Inv. de Sacarosa, el form ya viene con tipo=Ingreso, qty=25000, notas="Saco IANSA 25kg".',
@@ -699,7 +699,7 @@ export const HELP_ARTICLES = [
         bullets: [
           'Si entrás "Precio total = 50000" para 25000g, queda guardado como 2000/kg.',
           'El campo Proveedor tiene autocomplete con tus proveedores ya registrados. Si escribís uno nuevo, se crea solo en el catálogo.',
-          'Dejá ambos campos en blanco si solo querés ajustar stock sin tocar costos.',
+          'Deja ambos campos en blanco si solo quieres ajustar stock sin tocar costos.',
           'En el modal verás un panel **Estadísticas de costo** con: último precio, promedio ponderado, mín/máx, total invertido en histórico.',
         ],
       },
@@ -728,11 +728,11 @@ export const HELP_ARTICLES = [
       },
       {
         h: 'Registrar costo en una entrada',
-        p: 'Cuando registrás un movimiento tipo **Entrada** en el modal Inv. de un ingrediente, aparecen los campos **Precio total** y **Proveedor**. Son opcionales — si los completas, queda guardado el costo por kg y la referencia al proveedor en el movimiento.',
+        p: 'Cuando registras un movimiento tipo **Entrada** en el modal Inv. de un ingrediente, aparecen los campos **Precio total** y **Proveedor**. Son opcionales — si los completas, queda guardado el costo por kg y la referencia al proveedor en el movimiento.',
         bullets: [
           'Precio total: lo que pagaste en esa compra completa (sin IVA o con IVA, según prefieras — la app no diferencia).',
           'La app calcula automáticamente el costo por kilo y lo muestra en vivo abajo del campo (ej. "= 2000 / kg").',
-          'Proveedor: input con autocomplete que sugiere proveedores ya creados. Si tipeás uno nuevo, se crea solo al guardar.',
+          'Proveedor: input con autocomplete que sugiere proveedores ya creados. Si tipeas uno nuevo, se crea solo al guardar.',
         ],
       },
       {
@@ -753,7 +753,7 @@ export const HELP_ARTICLES = [
     tips: [
       'No es obligatorio capturar el precio en cada entrada — pero mientras más compras registres con costo, mejor el promedio ponderado refleja tu realidad.',
       'El campo lead time del proveedor te sirve para planificar: si tu proveedor tarda 5 días en entregar, no esperes hasta tener stock cero para pedir.',
-      'Los proveedores y movimientos se guardan localmente. Si tenés el respaldo a carpeta activado, también van al backup automático y al snapshot diario.',
+      'Los proveedores y movimientos se guardan localmente. Si tienes el respaldo a carpeta activado, también van al backup automático y al snapshot diario.',
     ],
   },
 
@@ -821,9 +821,9 @@ export const HELP_ARTICLES = [
       },
       {
         h: 'Cómo registrar',
-        p: 'Entrá a **HACCP** desde el menú principal. Arriba tenés el formulario de nuevo chequeo:',
+        p: 'Entra a **HACCP** desde el menú principal. Arriba tienes el formulario de nuevo chequeo:',
         bullets: [
-          'Tipo: seleccioná de la lista (cámara fría, congelador, pasteurización, recepción, limpieza, otro).',
+          'Tipo: selecciona de la lista (cámara fría, congelador, pasteurización, recepción, limpieza, otro).',
           'Lugar: campo libre para identificar el equipo (ej. "Cámara 1", "Mantenedora vitrina B").',
           'Valor: temperatura medida (en °C). La app deriva automáticamente el status según los thresholds.',
           'Estado: dejalo en **Auto** para que se calcule, o forzá manualmente OK/Alerta/Crítico (útil para limpieza).',
@@ -833,7 +833,7 @@ export const HELP_ARTICLES = [
       },
       {
         h: 'Resumen del día y filtros',
-        p: 'Arriba siempre ves un resumen: cuántos chequeos llevás hoy y el desglose OK / Alerta / Crítico. Más abajo podés filtrar el histórico por tipo y rango de fechas, agrupado por día.',
+        p: 'Arriba siempre ves un resumen: cuántos chequeos llevas hoy y el desglose OK / Alerta / Crítico. Más abajo puedes filtrar el histórico por tipo y rango de fechas, agrupado por día.',
       },
       {
         h: 'Exportar a CSV',
@@ -842,7 +842,7 @@ export const HELP_ARTICLES = [
     ],
     tips: [
       'Hacé los chequeos en horario fijo (ej. 9 am al abrir, 2 pm post-pasteurización, 6 pm al cerrar). El registro a hora regular es más creíble que datos esporádicos.',
-      'Si registrás un crítico, anotá la acción correctiva en notas (ej. "subí termostato a 4°C, reverificar 30 min"). La auditoría busca esto.',
+      'Si registras un crítico, anota la acción correctiva en notas (ej. "subo termostato a 4°C, reverificar 30 min"). La auditoría busca esto.',
       'La bitácora se respalda automáticamente a la carpeta de backup y al snapshot diario — no se pierde aunque cambies de PC.',
     ],
   },
@@ -850,12 +850,12 @@ export const HELP_ARTICLES = [
     id: 'mobile-warehouse',
     category: 'production',
     title: '📱 Bodega móvil — usa tu iPhone como escáner',
-    intro: 'En vez de comprar un lector de códigos de barra USB ($150-300 USD), usás tu iPhone (o cualquier teléfono Android) caminando por la bodega. Apuntás la cámara, escaneás, registrás ingresos o conteos. El PC ve los movimientos en segundos vía sincronización a Supabase.',
+    intro: 'En vez de comprar un lector de códigos de barra USB ($150-300 USD), usas tu iPhone (o cualquier teléfono Android) caminando por la bodega. Apuntas la cámara, escaneas, registras ingresos o conteos. El PC ve los movimientos en segundos vía sincronización a Supabase.',
     sections: [
       {
         h: 'Por qué este modo',
         bullets: [
-          'Cero hardware extra: el smartphone que ya tenés es el escáner.',
+          'Cero hardware extra: el smartphone que ya tienes es el escáner.',
           'UI dedicada con botones grandes pensados para una mano.',
           'Sin App Store ni instalación: abres la URL en Safari/Chrome y "Add to Home Screen" para ícono.',
           'Sincronización con el PC en tiempo real (vía Supabase Realtime).',
@@ -879,7 +879,7 @@ export const HELP_ARTICLES = [
         ],
       },
       {
-        h: 'Si escaneás un código que aún no está asignado',
+        h: 'Si escaneas un código que aún no está asignado',
         bullets: [
           'El sistema te muestra el código detectado.',
           'Tocás "🔗 Asignar a un ingrediente".',
@@ -890,7 +890,7 @@ export const HELP_ARTICLES = [
       },
       {
         h: 'Permiso de cámara en iOS Safari',
-        p: 'La primera vez Safari te pide permiso para usar la cámara. Aceptá. Si por error denegaste, podés volver a habilitarlo en **Ajustes iOS → Safari → Cámara → Preguntar** o **Permitir**.',
+        p: 'La primera vez Safari te pide permiso para usar la cámara. Acepta. Si por error denegaste, puedes volver a habilitarlo en **Ajustes iOS → Safari → Cámara → Preguntar** o **Permitir**.',
       },
       {
         h: 'HTTPS obligatorio para acceso a cámara',
@@ -907,7 +907,7 @@ export const HELP_ARTICLES = [
     id: 'ingredients-multi-barcodes',
     category: 'ingredients',
     title: '📷 Múltiples códigos de barra por ingrediente',
-    intro: 'En la realidad un mismo ingrediente puede comprarse de marcas distintas (sacarosa IANSA y CCU, por ejemplo). Cada marca tiene su propio código de barras pero querés que se descuente del MISMO stock. GelatoLab soporta múltiples códigos por ingrediente.',
+    intro: 'En la realidad un mismo ingrediente puede comprarse de marcas distintas (sacarosa IANSA y CCU, por ejemplo). Cada marca tiene su propio código de barras pero quieres que se descuente del MISMO stock. GelatoLab soporta múltiples códigos por ingrediente.',
     sections: [
       {
         h: 'Cómo agregar códigos a un ingrediente',
@@ -921,7 +921,7 @@ export const HELP_ARTICLES = [
       {
         h: 'Cómo agregar desde el iPhone (modo bodega)',
         bullets: [
-          'Cuando llega una marca nueva del mismo producto, escaneás el código.',
+          'Cuando llega una marca nueva del mismo producto, escaneas el código.',
           'El sistema dice "código no reconocido" y ofrece "🔗 Asignar a un ingrediente".',
           'Buscás el ingrediente existente (ej. Sacarosa) — ahora el picker muestra TODOS los ingredientes incluso los que ya tienen códigos (con un chip "N cód").',
           'Tocás el ingrediente → el código nuevo se **suma** a los existentes, no reemplaza.',
@@ -929,7 +929,7 @@ export const HELP_ARTICLES = [
       },
       {
         h: 'Cómo se busca al escanear',
-        p: 'Cuando escaneás CUALQUIER código (en PC o móvil), GelatoLab busca en TODOS los códigos de TODOS los ingredientes. Si el código aparece en alguno (ya sea el primero, segundo, quinto), abre ese ingrediente.',
+        p: 'Cuando escaneas CUALQUIER código (en PC o móvil), GelatoLab busca en TODOS los códigos de TODOS los ingredientes. Si el código aparece en alguno (ya sea el primero, segundo, quinto), abre ese ingrediente.',
       },
       {
         h: 'Compatibilidad backward',
@@ -952,7 +952,7 @@ export const HELP_ARTICLES = [
         bullets: [
           '**iOS / Android nativo (Capacitor)**: usa MLKit para lectura precisa con cámara del teléfono. La opción más rápida para producción.',
           '**Web/Tauri (ZXing)**: librería JavaScript que lee desde cualquier cámara accesible vía `getUserMedia`. Funciona en Chrome, Edge, Safari iOS, Tauri webview, etc. ~99% de los casos.',
-          '**Lector USB tipo HID**: cualquier escáner barato que enchufás por USB y "tipea" el código en el campo con foco. Cero código, funciona automáticamente — solo necesitás tener foco en un input.',
+          '**Lector USB tipo HID**: cualquier escáner barato que enchufas por USB y "tipea" el código en el campo con foco. Cero código, funciona automáticamente — solo necesitas tener foco en un input.',
         ],
       },
       {
@@ -979,8 +979,8 @@ export const HELP_ARTICLES = [
       },
     ],
     tips: [
-      'Si tenés mala luz en bodega, considerá un lector USB barato. La cámara del celular tiene problemas con códigos pequeños o brillosos en penumbra.',
-      'Para etiquetar tus PROPIOS productos (helados artesanales) podés generar QRs internos y leerlos con el mismo escáner.',
+      'Si tienes mala luz en bodega, considerá un lector USB barato. La cámara del celular tiene problemas con códigos pequeños o brillosos en penumbra.',
+      'Para etiquetar tus PROPIOS productos (helados artesanales) puedes generar QRs internos y leerlos con el mismo escáner.',
     ],
   },
   {
@@ -1018,12 +1018,12 @@ export const HELP_ARTICLES = [
       },
       {
         h: '📸 Snapshots diarios (historial día por día)',
-        p: 'Una vez por día, además del respaldo "vivo" descrito arriba (que sobrescribe los mismos archivos), la app escribe una copia con timestamp dentro de `GelatoLab/snapshots/YYYY-MM-DD/`. Así tenés cómo volver atrás si alguien borra una receta o se corrompe un dato — abrís la carpeta de la fecha que querés y restaurás los JSON.',
+        p: 'Una vez por día, además del respaldo "vivo" descrito arriba (que sobrescribe los mismos archivos), la app escribe una copia con timestamp dentro de `GelatoLab/snapshots/YYYY-MM-DD/`. Así tienes cómo volver atrás si alguien borra una receta o se corrompe un dato — abres la carpeta de la fecha que quieres y restaurás los JSON.',
         bullets: [
-          'El snapshot del día se hace una sola vez por jornada (idempotente — si abrís la app 5 veces, solo se escribe una).',
+          'El snapshot del día se hace una sola vez por jornada (idempotente — si abres la app 5 veces, solo se escribe una).',
           'Incluye TODOS los stores: recipes, ingredients, productions, plans, inventory, business, suppliers, haccp, más un meta.json con fecha y runtime.',
           'Retención automática: 30 días. Los snapshots más viejos se borran solos para no acumular gigas.',
-          'Funciona también en navegador (Chrome/Edge/Opera) si tenés conectada una carpeta vía File System Access API. En Tauri es transparente.',
+          'Funciona también en navegador (Chrome/Edge/Opera) si tienes conectada una carpeta vía File System Access API. En Tauri es transparente.',
           'Si guardás esa carpeta en Drive/OneDrive, la nube indexa cada snapshot — versionado real y gratuito.',
         ],
       },
@@ -1031,8 +1031,8 @@ export const HELP_ARTICLES = [
         h: 'Cuándo usar la app de escritorio',
         bullets: [
           'Heladería con un PC fijo en cocina/oficina donde GelatoLab corre todo el día.',
-          'Cuando querés respaldo sin depender del navegador ni de cuentas online.',
-          'Cuando querés que el equipo de cocina use la app sin saber de URLs ni navegadores.',
+          'Cuando quieres respaldo sin depender del navegador ni de cuentas online.',
+          'Cuando quieres que el equipo de cocina use la app sin saber de URLs ni navegadores.',
         ],
       },
       {
@@ -1063,7 +1063,7 @@ export const HELP_ARTICLES = [
           'Copia el DSN y agrega `VITE_SENTRY_DSN=https://xxx@oXXX.ingest.sentry.io/XXX` a tu `.env`.',
           'Build de producción: `npm run build` — Sentry se carga lazy en el primer error.',
           'Build de desarrollo (`npm run dev`): nunca carga Sentry. Los errores van a la consola y a `localStorage`.',
-          '`logError(err, ctx)` — usalo para reportar errores manuales con contexto extra.',
+          '`logError(err, ctx)` — úsalo para reportar errores manuales con contexto extra.',
           '`setUserContext(user)` — adjunta el id del usuario a cada error que se reporte después.',
         ],
       },
@@ -1103,7 +1103,7 @@ export const HELP_ARTICLES = [
       },
     ],
     tips: [
-      'En desarrollo local podés probar Plausible con un dominio real (ej. localhost) si querés ver eventos en el dashboard, pero asegurate de NO commitear el DSN o el dominio a un repo público.',
+      'En desarrollo local puedes probar Plausible con un dominio real (ej. localhost) si quieres ver eventos en el dashboard, pero asegúrate de NO commitear el DSN o el dominio a un repo público.',
       '`getErrorLog()` y `clearErrorLog()` — helpers para que el usuario te exporte los errores locales si Sentry no está activo.',
       'Si decidís NO usar analytics, simplemente no agregues `VITE_PLAUSIBLE_DOMAIN` ni `VITE_SENTRY_DSN`. La app funciona idéntico, solo que no reportás nada.',
     ],
