@@ -53,6 +53,11 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        with:
+          # Auto-enable Pages on first run if it's not yet configured. Avoids
+          # the "Get Pages site failed: Not Found" error when the repo has
+          # never had Pages turned on.
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
