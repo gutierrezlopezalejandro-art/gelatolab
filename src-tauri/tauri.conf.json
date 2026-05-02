@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0",
   "productName": "GelatoLab",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "identifier": "com.gelatolab.app",
   "build": {
     "frontendDist": "../dist",
@@ -57,7 +57,7 @@
     "updater": {
       "active": true,
       "dialog": false,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJBOTQ0N0QyRkFBMzhFNkMKUldSc2pxUDYwa2VVdXF3eVJWQzNyRDZ4WnJ6Y2xMREZaUjBlcU55VVpGY0RZa2g2NkFvTFhRUEQK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY3RTFBMkRGQ0E4M0JEMDgKUldRSXZZUEszNkxoOTlpcmxUMEhjR2NBZ1M1VlhBcFRONUhEQ1dYVWhOQ2JvWVhSQnd4U0FtSzAK",
       "endpoints": [
         "https://github.com/gutierrezlopezalejandro-art/gelatolab/releases/latest/download/latest.json"
       ]
