@@ -45,21 +45,39 @@ function getTranslation(lang, key) {
 }
 
 // ── Store ───────────────────────────────────────────────────
+// `dictsLoaded` es un contador que se incrementa cada vez que termina de
+// cargar un diccionario. Sirve para forzar el re-render de useT cuando el
+// chunk async de un idioma llega DESPUES de haber cambiado `lang`. Sin
+// este tick, React no se entera de que `loadedDicts` se populo y la UI
+// queda en español por fallback. Solo hay que suscribirse a este valor
+// desde useT para que la lectura via getTranslation se rehaga.
 export const useI18nStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       lang: 'es',
+      dictsLoaded: 1, // arranca en 1 (es ya esta cargado)
       setLang: (lang) => {
-        // Kick off the lazy load; the store updates synchronously so the UI
-        // re-renders, and getTranslation falls back to ES until the dict
-        // arrives a tick later.
-        loadLanguage(lang);
+        // Cambiamos `lang` ya para que el badge del selector y los
+        // formateadores reaccionen al instante. Si el dict esta cargado, los
+        // strings tambien cambian al toque; si no, al resolver loadLanguage
+        // bumpeamos dictsLoaded y se hace el re-render con los strings reales.
         set({ lang });
+        loadLanguage(lang).then((dict) => {
+          if (!dict) return;
+          // Solo bumpeamos si el lang sigue siendo el mismo (evita flicker
+          // cuando el usuario clickea rapido entre idiomas).
+          if (get().lang === lang) {
+            set({ dictsLoaded: get().dictsLoaded + 1 });
+          }
+        });
       },
     }),
     {
       name: 'heladeria-lang',
       storage: createJSONStorage(() => idbStorage),
+      // Solo persistimos `lang`. `dictsLoaded` es estado en memoria, no tiene
+      // sentido guardarlo (los dicts arrancan vacios al abrir la app).
+      partialize: (state) => ({ lang: state.lang }),
       // After rehydrating, ensure the persisted language is actually loaded —
       // otherwise the UI would render in ES until the user touches the
       // language selector. Si el lang persistido es uno que desactivamos
@@ -71,15 +89,25 @@ export const useI18nStore = create(
           state.lang = 'es';
           return;
         }
-        if (state.lang !== 'es') loadLanguage(state.lang);
+        if (state.lang !== 'es') {
+          loadLanguage(state.lang).then(() => {
+            useI18nStore.setState((s) => ({ dictsLoaded: s.dictsLoaded + 1 }));
+          });
+        }
       },
     }
   )
 );
 
-// Hook reactivo: re-renderiza cuando cambia el idioma
+// Hook reactivo: re-renderiza cuando cambia el idioma O cuando termina de
+// cargarse un diccionario async. La suscripcion a `dictsLoaded` es el truco
+// que hace que la UI se actualice cuando el chunk del idioma llega despues
+// del cambio de `lang`.
 export function useT() {
   const lang = useI18nStore(s => s.lang);
+  // Subscripcion para forzar re-render cuando carga un dict nuevo.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _tick = useI18nStore(s => s.dictsLoaded);
   return (key, params) => {
     let text = getTranslation(lang, key);
     if (params) {
