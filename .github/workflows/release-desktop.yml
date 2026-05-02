@@ -79,6 +79,12 @@ jobs:
           VITE_SENTRY_DSN:       ${{ secrets.VITE_SENTRY_DSN }}
           VITE_PLAUSIBLE_DOMAIN: ${{ secrets.VITE_PLAUSIBLE_DOMAIN }}
           VITE_PLAUSIBLE_HOST:   ${{ secrets.VITE_PLAUSIBLE_HOST }}
+          # Firma Ed25519 del auto-updater. tauri-action detecta estas vars
+          # y genera latest.json + assets .sig por bundle. Sin estas vars
+          # el build sigue funcionando pero sin firma — los clientes con
+          # pubkey configurada rechazarian el update por firma invalida.
+          TAURI_SIGNING_PRIVATE_KEY:          ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'GelatoLab ${{ github.ref_name }}'
@@ -89,6 +95,12 @@ jobs:
             **Windows**: descarga el `.msi` o `.exe` (NSIS).
             **macOS**: descarga el `.dmg` (universal Intel + Apple Silicon).
             **Linux**: descarga el `.AppImage` o `.deb`.
-          releaseDraft: true
+
+            > Si ya tienes GelatoLab instalado, no necesitas descargar nada
+            > — la app detecta esta version y te ofrece actualizar al abrirla.
+          # No-draft: el auto-updater de los clientes ya instalados consulta
+          # /releases/latest/download/latest.json — un draft nunca aparece
+          # ahi y nadie recibiria la actualizacion.
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}

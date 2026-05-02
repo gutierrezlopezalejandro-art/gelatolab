@@ -8,11 +8,10 @@ import { track } from '../lib/analytics';
 
 const VISITED_KEY = 'gelatolab-visited';
 
-// URL del Release de GitHub donde estan los instaladores. Si todavia no
-// publicaste ninguno (o tu ultimo release sigue en estado Draft), los
-// botones quedan en "proximamente". Pon RELEASES_AVAILABLE = true cuando
-// el primer release publico este disponible en /releases/latest.
-const RELEASES_URL = 'https://github.com/gutierrezlopezalejandro-art/gelatolab/releases/latest';
+// La pagina /download lista los instaladores con detección de OS, fetch a
+// la API de GitHub para version+changelog, y links directos a cada bundle.
+// Activamos los botones cuando ya hay un release publico (no draft) en
+// /releases/latest del repo.
 const RELEASES_AVAILABLE = false;
 
 function detectOS() {
@@ -97,7 +96,7 @@ export default function Landing() {
   function handleDownload(platform) {
     track('landing_download_clicked', { platform });
     if (RELEASES_AVAILABLE) {
-      window.open(RELEASES_URL, '_blank', 'noopener,noreferrer');
+      navigate('/download');
     }
     // Si no hay release todavia, el boton queda en "proximamente" via disabled.
   }

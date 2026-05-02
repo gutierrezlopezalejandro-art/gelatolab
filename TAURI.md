@@ -80,12 +80,52 @@ El usuario puede ver, copiar y mover esa carpeta como cualquier otra. Si la muev
 
 > ⚠ Sin firma de código (code-signing), Windows mostrará "publisher desconocido" la primera vez. Para evitar eso necesitas un certificado EV de Sectigo/DigiCert (~$300/año). Apple equivalente vía Apple Developer ($99/año). Esto es opcional pero recomendado para distribución comercial seria.
 
-## Auto-update (futuro)
+## Auto-update (operativo)
 
-Tauri tiene un sistema built-in de auto-update vía firmas Ed25519. Si lo quieres habilitar, hay que:
+GelatoLab usa el plugin oficial `tauri-plugin-updater` con firmas Ed25519. Cada vez que la app desktop arranca, consulta `https://github.com/gutierrezlopezalejandro-art/gelatolab/releases/latest/download/latest.json` y, si encuentra una versión más nueva, le ofrece al usuario un modal para descargar e instalar (la app se reinicia sola al terminar).
 
-1. Generar par de claves: `npm run tauri signer generate`
-2. Configurar endpoint en `tauri.conf.json` (`plugins.updater.endpoints`)
-3. Subir nuevas versiones firmadas a esa URL
+### Setup inicial — una sola vez
 
-Pendiente para una próxima iteración.
+Esta secuencia se ejecuta UNA VEZ en la máquina de desarrollo. No se repite por release.
+
+1. **Generar el par de claves Ed25519** (la privada NUNCA se commitea):
+
+   ```bash
+   npm run tauri signer generate -- -w ~/.tauri/gelatolab.key
+   ```
+
+   El comando pide una password (guardarla en un password manager — se necesita en cada build) e imprime la **clave pública** en stdout. La clave privada queda en `~/.tauri/gelatolab.key` (Windows: `%USERPROFILE%\.tauri\gelatolab.key`).
+
+2. **Pegar la clave pública en `src-tauri/tauri.conf.json`** reemplazando el placeholder `REEMPLAZAR_CON_PUBKEY_GENERADA_POR_TAURI_SIGNER` en `plugins.updater.pubkey`.
+
+3. **Subir la clave privada como secret de GitHub** (Settings → Secrets and variables → Actions):
+
+   - `TAURI_SIGNING_PRIVATE_KEY` → contenido del archivo `~/.tauri/gelatolab.key` (base64, en una sola línea)
+   - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` → la password elegida en el paso 1
+
+4. **Commitear** el cambio del `pubkey` en `tauri.conf.json` y pushear a `main`.
+
+A partir de acá, cada `git tag vX.Y.Z && git push --tags` dispara el workflow `release-desktop.yml` que:
+
+- Builda los instaladores (.msi, .exe, .dmg, .AppImage, .deb)
+- Los firma con la privada (genera `.sig` por bundle)
+- Genera `latest.json` con las URLs y firmas
+- Publica todo como Release público de GitHub (no draft)
+
+Los clientes que ya tengan la app instalada con la pubkey embebida verán el modal "Actualización disponible" la próxima vez que abran la app.
+
+### Probar que funciona
+
+1. Buildear localmente con la versión actual: `npm run tauri:build`
+2. Instalar el bundle generado.
+3. Bumpear `package.json`, `src-tauri/Cargo.toml` y `src-tauri/tauri.conf.json` a una versión mayor.
+4. Crear un tag `vX.Y.Z+1` y pushearlo. Esperar a que el workflow termine.
+5. Abrir la app instalada del paso 2 — debería aparecer el modal.
+
+### Si la firma no valida
+
+Síntoma: el plugin tira "signature mismatch" o "invalid signature".
+
+Causa típica: el `pubkey` en `tauri.conf.json` no corresponde a la `TAURI_SIGNING_PRIVATE_KEY` con la que se firmó el release. Verificar que ambas vienen del mismo `signer generate`.
+
+> ⚠ **No rotar la pubkey una vez que hay clientes instalados.** Si necesitás rotar, los clientes viejos quedan sin poder actualizar — habría que avisarles que reinstalen manualmente.

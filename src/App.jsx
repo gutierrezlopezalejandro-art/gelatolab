@@ -22,6 +22,8 @@ import { HelpAssistant } from './components/HelpAssistant';
 import { UIHighlightOverlay } from './components/UIHighlightOverlay';
 import { Logo } from './components/Logo';
 import { Onboarding } from './components/Onboarding';
+import { UpdateAvailableModal } from './components/UpdateAvailableModal';
+import { checkForUpdate } from './lib/desktopUpdate';
 import Toast           from './components/ui/Toast';
 import ConfirmModal    from './components/ui/ConfirmModal';
 
@@ -41,6 +43,7 @@ const Mobile         = lazy(() => import('./pages/Mobile'));
 const Haccp          = lazy(() => import('./pages/Haccp'));
 const Landing        = lazy(() => import('./pages/Landing'));
 const Pricing        = lazy(() => import('./pages/Pricing'));
+const Download       = lazy(() => import('./pages/Download'));
 
 const NAV_KEYS = [
   { to: '/dashboard',   key: 'dashboard' },
@@ -110,16 +113,30 @@ export default function App() {
   // — sin navbar ni footer ni onboarding. Atajo para evitar que el navbar
   // ocupe pantalla en una herramienta que se usa una mano caminando.
   const isMobileFullscreen = location.pathname.startsWith('/mobile');
-  // Landing publica: trae su propio header y footer y no necesita el chrome
-  // de la app. Evita que un bot indexe el navbar como contenido.
-  const isLanding = location.pathname === '/';
+  // Paginas publicas (marketing): traen su propio header/footer y no necesitan
+  // el chrome de la app. Evita que un bot indexe el navbar como contenido.
+  const isLanding = location.pathname === '/' || location.pathname === '/download';
   const t = useT();
   const lowStockCount = getLowStock(ingredients).length;
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [pendingUpdate, setPendingUpdate] = useState(null);
   const businessCompleted = useBusinessStore(s => s.completed);
   const fantasyName = useBusinessStore(s => s.fantasy_name);
 
   useEffect(() => { initAuth(); }, [initAuth]);
+
+  // Auto-update check (Tauri desktop only). Best-effort: si no hay red o
+  // GitHub no responde, falla en silencio. Solo se pregunta una vez por
+  // sesion — si el usuario dismiss-ea, no volvemos a molestar hasta proximo
+  // boot.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const update = await checkForUpdate();
+      if (!cancelled && update) setPendingUpdate(update);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Pageview tracking: cada cambio de pathname dispara un evento. Plausible
   // (si esta configurado y el usuario acepto cookies) lo registra como
@@ -198,23 +215,27 @@ export default function App() {
         </Suspense>
         {toast && <Toast toast={toast} />}
         {modal && <ConfirmModal modal={modal} onResolve={resolveModal} />}
+        <UpdateAvailableModal update={pendingUpdate} onDismiss={() => setPendingUpdate(null)} />
         <CloudSyncProvider />
       </ErrorBoundary>
     );
   }
 
-  // Landing publica: tambien standalone (sin navbar app), pero conserva el
-  // CookieBanner para cumplir GDPR si el visitante navega ahi primero.
+  // Paginas publicas (Landing, Download): standalone (sin navbar app), pero
+  // conservan el CookieBanner para cumplir GDPR si el visitante navega ahi
+  // primero.
   if (isLanding) {
     return (
       <ErrorBoundary>
         <Suspense fallback={<Spinner />}>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/download" element={<Download />} />
           </Routes>
         </Suspense>
         {toast && <Toast toast={toast} />}
         {modal && <ConfirmModal modal={modal} onResolve={resolveModal} />}
+        <UpdateAvailableModal update={pendingUpdate} onDismiss={() => setPendingUpdate(null)} />
         <CookieBanner />
       </ErrorBoundary>
     );
@@ -369,6 +390,7 @@ export default function App() {
       <CookieBanner />
       <HelpAssistant />
       <UIHighlightOverlay />
+      <UpdateAvailableModal update={pendingUpdate} onDismiss={() => setPendingUpdate(null)} />
     </div>
   );
 }

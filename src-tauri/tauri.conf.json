@@ -53,5 +53,14 @@
       "minimumSystemVersion": "10.15"
     }
   },
-  "plugins": {}
+  "plugins": {
+    "updater": {
+      "active": true,
+      "dialog": false,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJBOTQ0N0QyRkFBMzhFNkMKUldSc2pxUDYwa2VVdXF3eVJWQzNyRDZ4WnJ6Y2xMREZaUjBlcU55VVpGY0RZa2g2NkFvTFhRUEQK",
+      "endpoints": [
+        "https://github.com/gutierrezlopezalejandro-art/gelatolab/releases/latest/download/latest.json"
+      ]
+    }
+  }
 }
