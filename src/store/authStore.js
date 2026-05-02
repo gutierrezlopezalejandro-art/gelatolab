@@ -11,7 +11,7 @@ async function fetchProfile(userId) {
   if (!supabase || !userId) return null;
   const { data, error } = await supabase
     .from('profiles')
-    .select('role, plan, display_name')
+    .select('role, plan, plan_expires_at, display_name, stripe_customer_id, stripe_subscription_id')
     .eq('user_id', userId)
     .maybeSingle();
   if (error) return null;

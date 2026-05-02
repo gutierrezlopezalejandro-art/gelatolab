@@ -40,6 +40,7 @@ const Help           = lazy(() => import('./pages/Help'));
 const Mobile         = lazy(() => import('./pages/Mobile'));
 const Haccp          = lazy(() => import('./pages/Haccp'));
 const Landing        = lazy(() => import('./pages/Landing'));
+const Pricing        = lazy(() => import('./pages/Pricing'));
 
 const NAV_KEYS = [
   { to: '/dashboard',   key: 'dashboard' },
@@ -351,6 +352,7 @@ export default function App() {
               <Route path="/terms"       element={<Terms />} />
               <Route path="/privacy"     element={<Privacy />} />
               <Route path="/help"        element={<Help />} />
+              <Route path="/pricing"     element={<Pricing />} />
               <Route path="*"            element={<NotFound />} />
             </Routes>
           </Suspense>

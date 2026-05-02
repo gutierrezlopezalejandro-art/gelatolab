@@ -22,6 +22,8 @@ import AnalysisCharts from '../components/AnalysisCharts';
 import SearchSelect from '../components/SearchSelect';
 import { Spinner } from '../components/ui/index.jsx';
 import { NumberInput } from '../components/NumberInput';
+import { ProGate } from '../components/ProGate';
+import { FEATURES } from '../lib/entitlement';
 import { calcStats, calcDensity, calcServingTemp, getParams, resolveRecipeItems, applyEvaporation } from '../lib/icecreamCalc';
 import { useT, useIngredientName, useCategoryName, useI18nStore } from '../lib/i18n';
 import { analyzeRecipeAI } from '../lib/ai';
@@ -962,11 +964,13 @@ export default function RecipeEditor() {
         <div className="max-w-3xl space-y-4">
           {statsFull ? (
             <>
-              <LabelingPanel
-                stats={statsFull}
-                items={flattenedFull}
-                allergenOverrides={allergenOverrides}
-              />
+              <ProGate feature={FEATURES.LABELS}>
+                <LabelingPanel
+                  stats={statsFull}
+                  items={flattenedFull}
+                  allergenOverrides={allergenOverrides}
+                />
+              </ProGate>
               <AllergensEditor
                 items={flattenedFull}
                 overrides={allergenOverrides}

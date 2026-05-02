@@ -5,6 +5,8 @@ import { useBusinessStore } from '../store/businessStore';
 import { getMachine } from '../data/machines';
 import { useT, useLocale } from '../lib/i18n';
 import { track } from '../lib/analytics';
+import { ProGate } from '../components/ProGate';
+import { FEATURES } from '../lib/entitlement';
 
 const TYPES = ['cold_storage', 'freezer', 'pasteurization', 'churning', 'reception', 'cleaning', 'other'];
 const STATUS_COLOR = {
@@ -163,11 +165,13 @@ export default function Haccp() {
           <p className="text-sm text-[var(--ink3)] mt-1">{t('haccp_subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={exportCsv} disabled={filtered.length === 0}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-white border-none cursor-pointer disabled:opacity-50"
-                  style={{ background: '#0d5c6e' }}>
-            📥 {t('haccp_export_csv')}
-          </button>
+          <ProGate feature={FEATURES.HACCP_EXPORT} mode="intercept">
+            <button onClick={exportCsv} disabled={filtered.length === 0}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold text-white border-none cursor-pointer disabled:opacity-50"
+                    style={{ background: '#0d5c6e' }}>
+              📥 {t('haccp_export_csv')}
+            </button>
+          </ProGate>
         </div>
       </div>
 

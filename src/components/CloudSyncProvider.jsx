@@ -29,12 +29,18 @@ import { logError } from '../lib/errorLog';
  */
 export function CloudSyncProvider() {
   const user = useAuthStore(s => s.user);
+  const profile = useAuthStore(s => s.profile);
   const mountedRef = useRef(false);
   const unsubRef = useRef(null);
 
+  // Cloud sync is gated to Pro plans. Free users may sign in (so we know
+  // their plan / show pricing) but their stores stay local-only.
+  const plan = profile?.plan || 'free';
+  const isPro = plan === 'pro' || plan === 'admin';
+
   useEffect(() => {
-    if (!user) {
-      // Clean up realtime subscription on logout
+    if (!user || !isPro) {
+      // Clean up realtime subscription on logout or downgrade.
       if (unsubRef.current) {
         unsubRef.current();
         unsubRef.current = null;
@@ -102,11 +108,11 @@ export function CloudSyncProvider() {
 
     syncOnLogin();
     return () => { cancelled = true; };
-  }, [user?.id]);
+  }, [user?.id, isPro]);
 
   // Push to cloud on any store change (debounced per-table)
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isPro) return;
     const unsubRecipes = useRecipeStore.subscribe((state) => {
       if (mountedRef.current) { markLocalChange('recipes'); debouncedPush(user.id, 'recipes', state); }
     });
@@ -129,13 +135,13 @@ export function CloudSyncProvider() {
       unsubPlans();
       unsubInventory();
     };
-  }, [user?.id]);
+  }, [user?.id, isPro]);
 
   // Flush any pending debounced pushes when the tab is about to unload or
   // becomes hidden (mobile backgrounding). Prevents data loss when the user
   // closes the browser within the debounce window.
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isPro) return;
     const onBeforeUnload = (e) => {
       if (hasPendingPushes()) {
         flushPendingPushes();
@@ -153,7 +159,7 @@ export function CloudSyncProvider() {
       window.removeEventListener('beforeunload', onBeforeUnload);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [user?.id]);
+  }, [user?.id, isPro]);
 
   return null;
 }

@@ -13,6 +13,8 @@ import { calcStats } from '../lib/icecreamCalc';
 import { printHtml } from '../lib/printHtml';
 import { MachineVolumeWarning, PasteurizerVolumeWarning } from '../components/MachineVolumeWarning';
 import { NumberInput } from '../components/NumberInput';
+import { ProGate } from '../components/ProGate';
+import { FEATURES } from '../lib/entitlement';
 import { useBusinessStore } from '../store/businessStore';
 import { getMachine, rateBatchVolume, ratePasteurizerVolume, pickBestFit } from '../data/machines';
 
@@ -711,11 +713,13 @@ ${issuesSection}
                 <span className="font-display text-base text-[var(--ink)]">
                   {t('consolidated_ingredients')}
                 </span>
-                <button onClick={handlePrint}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-black/10
-                                   hover:bg-[var(--cream2)] transition-colors cursor-pointer bg-transparent">
-                  {t('print_list')}
-                </button>
+                <ProGate feature={FEATURES.PRINT_PRODUCTION} mode="intercept">
+                  <button onClick={handlePrint}
+                          className="text-xs px-3 py-1.5 rounded-lg border border-black/10
+                                     hover:bg-[var(--cream2)] transition-colors cursor-pointer bg-transparent">
+                    {t('print_list')}
+                  </button>
+                </ProGate>
               </div>
               <div className="overflow-x-auto">
                 <table className="tbl text-sm">

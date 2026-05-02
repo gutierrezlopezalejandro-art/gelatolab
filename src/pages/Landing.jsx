@@ -9,11 +9,11 @@ import { track } from '../lib/analytics';
 const VISITED_KEY = 'gelatolab-visited';
 
 // URL del Release de GitHub donde estan los instaladores. Si todavia no
-// publicaste ninguno, los botones de descarga seran de "proximamente".
-// Cuando publiques v1.0.0 reemplazar por:
-//   https://github.com/<user>/<repo>/releases/latest
-const RELEASES_URL = 'https://github.com/gelatolab/gelatolab/releases/latest';
-const RELEASES_AVAILABLE = false; // poner true cuando haya un release publicado
+// publicaste ninguno (o tu ultimo release sigue en estado Draft), los
+// botones quedan en "proximamente". Pon RELEASES_AVAILABLE = true cuando
+// el primer release publico este disponible en /releases/latest.
+const RELEASES_URL = 'https://github.com/gutierrezlopezalejandro-art/gelatolab/releases/latest';
+const RELEASES_AVAILABLE = false;
 
 function detectOS() {
   if (typeof navigator === 'undefined') return 'unknown';

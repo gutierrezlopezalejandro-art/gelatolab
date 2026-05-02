@@ -5,6 +5,9 @@ import { useCountryStore } from '../store/countryStore';
 import { useBusinessStore } from '../store/businessStore';
 import { useAppStore } from '../store/appStore';
 import { getBatchFreezers, getPasteurizers } from '../data/machines';
+import { useEntitlement, FEATURES, FREE_LIMITS } from '../lib/entitlement';
+import { ProBadge, ProGate } from './ProGate';
+import { UpgradeModal } from './UpgradeModal';
 import { exportBackup, importBackup, getBackupStatus } from '../lib/backup';
 import { setPin as savePin, isPinSet, lock as pinLock } from '../lib/pinLock';
 import {
@@ -162,8 +165,16 @@ export function BusinessSettingsModal({ onClose }) {
     pasteurizer_ids: Array.isArray(business.pasteurizer_ids) ? business.pasteurizer_ids : [],
   });
 
+  const ent = useEntitlement();
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
   function addMachine(id) {
     if (!id || form.machine_ids.includes(id)) return;
+    // Free plan: limit to 1 batch freezer.
+    if (!ent.can(FEATURES.MULTI_EQUIPMENT) && form.machine_ids.length >= FREE_LIMITS.equipment) {
+      setShowUpgrade(true);
+      return;
+    }
     setForm({ ...form, machine_ids: [...form.machine_ids, id] });
   }
   function removeMachine(id) {
@@ -171,6 +182,11 @@ export function BusinessSettingsModal({ onClose }) {
   }
   function addPasteurizer(id) {
     if (!id || form.pasteurizer_ids.includes(id)) return;
+    // Free plan: limit to 1 pasteurizer.
+    if (!ent.can(FEATURES.MULTI_EQUIPMENT) && form.pasteurizer_ids.length >= FREE_LIMITS.equipment) {
+      setShowUpgrade(true);
+      return;
+    }
     setForm({ ...form, pasteurizer_ids: [...form.pasteurizer_ids, id] });
   }
   function removePasteurizer(id) {
@@ -351,14 +367,20 @@ export function BusinessSettingsModal({ onClose }) {
             )}
           </div>
 
-          {/* === Backup automatico via carpeta del PC (PRIMARIO) === */}
+          {/* === Backup automatico via carpeta del PC (PRO) === */}
           <div className="border-t border-black/10 pt-4 mt-2">
             <h3 className="text-sm font-semibold text-[var(--ink)] mb-1 flex items-center gap-1.5">
-              📁 {t('folder_backup_title_short')}
+              📁 {t('folder_backup_title_short')} {!ent.can(FEATURES.FOLDER_BACKUP) && <ProBadge />}
             </h3>
             <p className="text-[11px] text-[var(--ink3)] mb-3">{t('folder_backup_sub')}</p>
 
-            {!folderSupported ? (
+            {!ent.can(FEATURES.FOLDER_BACKUP) ? (
+              <ProGate feature={FEATURES.FOLDER_BACKUP} mode="intercept">
+                <button type="button" className="btn-primary text-xs">
+                  📁 {t('folder_backup_connect')}
+                </button>
+              </ProGate>
+            ) : !folderSupported ? (
               <div className="text-[11px] rounded-lg p-3 bg-[#fff8e1] text-[#8a6d00] border border-[#ffe082]">
                 ⚠ {t('folder_backup_unsupported')}
               </div>
@@ -443,6 +465,8 @@ export function BusinessSettingsModal({ onClose }) {
           </button>
         </div>
       </div>
+      <UpgradeModal open={showUpgrade} featureKey={FEATURES.MULTI_EQUIPMENT}
+                    onClose={() => setShowUpgrade(false)} />
     </div>
   );
 }

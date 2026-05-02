@@ -13,6 +13,9 @@ import { useT } from '../lib/i18n';
 import { track } from '../lib/analytics';
 import { printRecipesReport } from '../lib/recipeReport';
 import { useBusinessStore } from '../store/businessStore';
+import { ProGate } from '../components/ProGate';
+import { FEATURES, useEntitlement } from '../lib/entitlement';
+import { UpgradeModal } from '../components/UpgradeModal';
 
 const TYPE_TAB_KEYS = [
   { k: 'todos',   i18nKey: 'all',       emoji: '🍨' },
@@ -59,6 +62,13 @@ export default function Recipes() {
   const [showWizard,    setShowWizard] = useState(false);
   const [showNewMenu,   setShowNewMenu] = useState(false);
   const [showCompare,   setShowCompare] = useState(false);
+  const [showUpgrade,   setShowUpgrade] = useState(false);
+
+  const ent = useEntitlement();
+  function handleNewClick() {
+    if (ent.recipeLimitReached) { setShowUpgrade(true); return; }
+    setShowNewMenu(true);
+  }
 
   function handlePickTemplate(tpl) {
     // Strip template-only fields and let the store assign a new id + dates.
@@ -115,8 +125,13 @@ export default function Recipes() {
           />
           <button data-tour="recipe-new-btn"
                   className="btn-primary inline-flex items-center gap-1.5"
-                  onClick={() => setShowNewMenu(true)}>
+                  onClick={handleNewClick}>
             <span className="text-base leading-none">＋</span> {t('new_recipe')}
+            {!ent.isPro && (
+              <span className="text-[10px] opacity-80 ml-1 font-mono">
+                {ent.recipeCount}/{ent.recipeLimit}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -221,23 +236,27 @@ export default function Recipes() {
       {selectedIds.length > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[var(--ink)] text-white rounded-full shadow-2xl px-5 py-3 flex items-center gap-3 max-w-[90vw]">
           <span className="text-sm font-semibold">{t('report_selected', { n: selectedIds.length })}</span>
-          <button
-            type="button"
-            onClick={handleGenerateReport}
-            className="text-xs font-bold px-4 py-1.5 rounded-full bg-white text-[var(--ink)] hover:bg-[var(--cream)] cursor-pointer border-none transition-colors"
-          >
-            📄 {t('report_generate')}
-          </button>
-          <button
-            data-tour="compare-btn"
-            type="button"
-            onClick={() => { setShowCompare(true); track('recipes_compared', { count: selectedIds.length }); }}
-            disabled={selectedIds.length < 2}
-            className="text-xs font-bold px-4 py-1.5 rounded-full bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-            title={selectedIds.length < 2 ? t('compare_need_two') : t('compare_btn_tooltip')}
-          >
-            ⚖️ {t('compare_btn')}
-          </button>
+          <ProGate feature={FEATURES.PRINT_PRODUCTION} mode="intercept">
+            <button
+              type="button"
+              onClick={handleGenerateReport}
+              className="text-xs font-bold px-4 py-1.5 rounded-full bg-white text-[var(--ink)] hover:bg-[var(--cream)] cursor-pointer border-none transition-colors"
+            >
+              📄 {t('report_generate')}
+            </button>
+          </ProGate>
+          <ProGate feature={FEATURES.RECIPE_COMPARE} mode="intercept">
+            <button
+              data-tour="compare-btn"
+              type="button"
+              onClick={() => { setShowCompare(true); track('recipes_compared', { count: selectedIds.length }); }}
+              disabled={selectedIds.length < 2}
+              className="text-xs font-bold px-4 py-1.5 rounded-full bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+              title={selectedIds.length < 2 ? t('compare_need_two') : t('compare_btn_tooltip')}
+            >
+              ⚖️ {t('compare_btn')}
+            </button>
+          </ProGate>
           <button
             type="button"
             onClick={clearSelection}
@@ -246,6 +265,9 @@ export default function Recipes() {
           >×</button>
         </div>
       )}
+
+      <UpgradeModal open={showUpgrade} featureKey={FEATURES.RECIPE_LIMIT}
+                    onClose={() => setShowUpgrade(false)} />
 
       {showCompare && selectedIds.length >= 2 && (
         <RecipeComparisonModal
