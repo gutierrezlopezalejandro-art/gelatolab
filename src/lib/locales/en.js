@@ -935,6 +935,8 @@ export default {
     tour_plan_body: 'Pick a date and add the recipes you will produce that day with their liters. The app calculates a consolidated ingredient list you need to buy or pull from storage.',
     tour_production_title: 'Production',
     tour_production_body: 'Confirm the produced batch. Inventory is deducted, the label with legal seals is generated and the record is kept for traceability. Print A4 process sheets for your team.',
+    tour_haccp_title: 'HACCP log',
+    tour_haccp_body: 'Record mandatory food safety checks: cold storage temperatures, pasteurization, churning, intake and cleaning. Each entry stores date, time, operator and an automatic threshold flag. Export to CSV ready for audits.',
     tour_inventory_title: 'Ingredients and Inventory',
     tour_inventory_body: 'Your ingredient base with stock, minimums, alerts. From here you also manage suppliers and cost history. You can scan barcodes to record incoming items.',
     tour_help_title: 'Help center',

@@ -994,6 +994,8 @@ export default {
     tour_plan_body: 'Eliges una fecha y agregas las recetas que vas a producir ese día con sus litros. La app calcula la lista consolidada de ingredientes que necesitas comprar o sacar de la bodega.',
     tour_production_title: 'Producción',
     tour_production_body: 'Confirmas el lote producido. Se descuenta el inventario, se genera la etiqueta con sellos legales y queda registrado para trazabilidad. Imprime hojas de proceso A4 para tu equipo.',
+    tour_haccp_title: 'Bitácora HACCP',
+    tour_haccp_body: 'Registra los chequeos sanitarios obligatorios: temperaturas de cámara, pasteurización, mantecación, recepción y limpieza. Cada chequeo queda con fecha, hora, operador y umbral automático. Exporta a CSV listo para auditoría.',
     tour_inventory_title: 'Ingredientes e Inventario',
     tour_inventory_body: 'Tu base de ingredientes con stock, mínimos, alertas. Aquí también gestionas proveedores e historial de costos. Puedes escanear códigos de barras para registrar entradas.',
     tour_help_title: 'Centro de ayuda',

@@ -1246,6 +1246,8 @@ export default {
     tour_plan_body: "Tu choisis une date et tu ajoutes les recettes que tu vas produire ce jour-là avec leurs litres. L'app calcule la liste consolidée d'ingrédients que tu dois acheter ou sortir de l'entrepôt.",
     tour_production_title: "Production",
     tour_production_body: "Tu confirmes le lot produit. L'inventaire est décompté, l'étiquette avec les sceaux légaux est générée et l'enregistrement est gardé pour la traçabilité. Imprime les fiches de processus A4 pour ton équipe.",
+    tour_haccp_title: "Registre HACCP",
+    tour_haccp_body: "Enregistre les contrôles sanitaires obligatoires : températures de chambre froide, pasteurisation, turbinage, réception et nettoyage. Chaque contrôle conserve la date, l'heure, l'opérateur et un seuil automatique. Exporte en CSV prêt pour l'audit.",
     tour_inventory_title: "Ingrédients et Inventaire",
     tour_inventory_body: "Ta base d'ingrédients avec stock, minimums, alertes. D'ici tu gères aussi les fournisseurs et l'historique des coûts. Tu peux scanner les codes-barres pour enregistrer les entrées.",
     tour_help_title: "Centre d'aide",

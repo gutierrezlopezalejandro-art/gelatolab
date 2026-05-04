@@ -45,6 +45,12 @@ function buildSteps(t) {
       body: t('tour_production_body'),
     },
     {
+      anchor: 'a[href="/haccp"], a[href="#/haccp"]',
+      emoji: '🌡️',
+      title: t('tour_haccp_title'),
+      body: t('tour_haccp_body'),
+    },
+    {
       anchor: 'a[href="/ingredients"], a[href="#/ingredients"]',
       emoji: '📦',
       title: t('tour_inventory_title'),

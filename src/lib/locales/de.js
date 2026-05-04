@@ -1246,6 +1246,8 @@ export default {
     tour_plan_body: "Wähle ein Datum und füge die Rezepte hinzu, die du an diesem Tag mit ihren Litern produzieren wirst. Die App berechnet die konsolidierte Zutatenliste, die du kaufen oder aus dem Lager holen musst.",
     tour_production_title: "Produktion",
     tour_production_body: "Du bestätigst die produzierte Charge. Das Inventar wird abgezogen, das Etikett mit gesetzlichen Siegeln wird erzeugt und für die Rückverfolgbarkeit gespeichert. Drucke A4-Prozessblätter für dein Team.",
+    tour_haccp_title: "HACCP-Protokoll",
+    tour_haccp_body: "Erfasse die vorgeschriebenen Lebensmittelsicherheits-Checks: Kühlraumtemperaturen, Pasteurisierung, Mantecación, Wareneingang und Reinigung. Jeder Eintrag wird mit Datum, Uhrzeit, Bediener und automatischer Schwellenwert-Markierung gespeichert. Export als CSV für Audits.",
     tour_inventory_title: "Zutaten und Inventar",
     tour_inventory_body: "Deine Zutatenbasis mit Bestand, Minimums, Warnungen. Hier verwaltest du auch Lieferanten und Kostenverlauf. Du kannst Barcodes scannen, um Eingänge zu erfassen.",
     tour_help_title: "Hilfe-Center",

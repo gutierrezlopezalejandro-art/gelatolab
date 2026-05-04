@@ -896,6 +896,8 @@ export default {
     tour_plan_body: 'Escolha uma data e adicione as receitas que vai produzir nesse dia com seus litros. O app calcula a lista consolidada de ingredientes que precisa comprar ou tirar do estoque.',
     tour_production_title: 'Produção',
     tour_production_body: 'Confirma o lote produzido. O estoque é descontado, o rótulo com selos legais é gerado e o registro fica para rastreabilidade. Imprime folhas de processo A4 para sua equipe.',
+    tour_haccp_title: 'Registro HACCP',
+    tour_haccp_body: 'Registre os controles sanitários obrigatórios: temperaturas de câmara fria, pasteurização, batimento, recepção e limpeza. Cada controle guarda data, hora, operador e um limite automático. Exporta para CSV pronto para auditoria.',
     tour_inventory_title: 'Ingredientes e Estoque',
     tour_inventory_body: 'Sua base de ingredientes com estoque, mínimos, alertas. Aqui também gerencia fornecedores e histórico de custos. Pode escanear códigos de barras para registrar entradas.',
     tour_help_title: 'Central de ajuda',
