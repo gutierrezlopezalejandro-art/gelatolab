@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useT } from '../lib/i18n';
-import { getBusinessFields } from '../lib/countryRegulations';
+import { getBusinessFields, COUNTRIES } from '../lib/countryRegulations';
 import { useCountryStore } from '../store/countryStore';
 import { useBusinessStore } from '../store/businessStore';
 import { useAppStore } from '../store/appStore';
@@ -28,6 +28,7 @@ export function BusinessSettingsModal({ onClose }) {
   useEscapeKey(onClose);
   const business = useBusinessStore();
   const country = useCountryStore(s => s.country);
+  const setCountry = useCountryStore(s => s.setCountry);
   const { showToast, confirm } = useAppStore();
   const fileInputRef = useRef(null);
   const [backupStatus, setBackupStatus] = useState(getBackupStatus());
@@ -226,6 +227,15 @@ export function BusinessSettingsModal({ onClose }) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+          <div>
+            <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('country_label')} *</label>
+            <select className="input" value={country}
+                    onChange={e => setCountry(e.target.value)}>
+              {COUNTRIES.map(c => (
+                <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('onb_fantasy_name')} *</label>
             <input className="input" value={form.fantasy_name}
@@ -456,6 +466,10 @@ export function BusinessSettingsModal({ onClose }) {
               </div>
             </div>
           </details>
+
+          <div className="pt-4 mt-2 border-t border-black/5 text-center text-[10px] text-[var(--ink3)]">
+            GelatoLab · desarrollado y soportado por <span className="font-semibold text-[var(--ink2)]">Llanquihue Tech SpA</span>
+          </div>
         </div>
 
         <div className="px-6 py-3 border-t border-black/10 flex justify-end gap-2">

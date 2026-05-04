@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { useAppStore } from '../store/appStore';
 import { useT } from '../lib/i18n';
 import { BusinessSettingsModal } from './BusinessSettingsModal';
+import { resetVisited } from '../pages/Landing';
 
 export function UserMenu() {
   const t = useT();
@@ -37,10 +38,11 @@ export function UserMenu() {
     await signOut();
     setOpen(false);
     showToast(t('auth_signed_out'));
-    // Volvemos al dashboard (con sus datos locales). La landing se mostraria
-    // solo si limpiaron localStorage; tras logout normal el usuario sigue
-    // viendo su workspace.
-    navigate('/dashboard');
+    // Volvemos a la landing para que el usuario pueda re-loguearse o llegar
+    // a /download. Reseteamos el flag "visited" para que la landing no se
+    // auto-skipee.
+    resetVisited();
+    navigate('/');
   }
 
   if (!user) {
@@ -58,7 +60,17 @@ export function UserMenu() {
     );
   }
 
-  const initial = (user.email || '?').charAt(0).toUpperCase();
+  // Iniciales: si el email tiene patron "nombre.apellido@..." usamos la primera
+  // letra de cada parte (alejandro.gutierrezl -> AG). Si no, las dos primeras
+  // letras del local-part del email.
+  const initials = (() => {
+    const local = (user.email || '?').split('@')[0];
+    const parts = local.split(/[._-]/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return local.slice(0, 2).toUpperCase();
+  })();
 
   return (
     <div className="relative">
@@ -69,10 +81,17 @@ export function UserMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`${t('account')}: ${user.email}`}
-        className="w-8 h-8 rounded-full bg-[var(--gold)] text-white font-bold text-sm
-                   hover:ring-2 hover:ring-white/30 transition-all cursor-pointer border-none flex items-center justify-center"
+        className="flex items-center gap-1.5 px-2 py-1 rounded-lg
+                   bg-white/10 hover:bg-white/20 transition-colors cursor-pointer border-none"
       >
-        {initial}
+        <span className="w-9 h-9 rounded-full bg-[var(--gold)] text-white font-bold text-xs
+                         flex items-center justify-center tracking-wider">
+          {initials}
+        </span>
+        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"
+             className={`text-white/80 transition-transform ${open ? 'rotate-180' : ''}`}>
+          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
       {open && (
         <>

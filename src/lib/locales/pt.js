@@ -8,6 +8,7 @@ export default {
     production: 'Produção',
     ingredients: 'Ingredientes',
     brand_sub: 'Formulação de sorvetes',
+    back_to_landing: 'Voltar ao início',
 
     // Dashboard
     total_recipes: 'Total de receitas',
@@ -523,6 +524,8 @@ export default {
     auth_back_login: 'Voltar para entrar',
     auth_email_required: 'O email é obrigatório',
     auth_password_short: 'Mínimo 6 caracteres',
+    auth_password_confirm: 'Confirmar senha',
+    auth_password_mismatch: 'As senhas não coincidem',
     auth_check_email: 'Verifique seu email para confirmar a conta',
     auth_reset_sent: 'Verifique seu email',
     auth_cloud_disabled: 'Sincronização não configurada. Contate o administrador.',
@@ -897,6 +900,8 @@ export default {
     tour_inventory_body: 'Sua base de ingredientes com estoque, mínimos, alertas. Aqui também gerencia fornecedores e histórico de custos. Pode escanear códigos de barras para registrar entradas.',
     tour_help_title: 'Central de ajuda',
     tour_help_body: 'Quando tiver dúvida, este botão abre a central de ajuda com artigos por área (receitas, estoque, produção, rotulagem, IA). Cada função tem sua explicação com exemplos.',
+    tour_account_title: 'Sua conta e configurações',
+    tour_account_body: 'No alto aparecem suas iniciais quando você faz login. Clique no círculo dourado para abrir o menu com a "Configuração do negócio" (dados legais, equipamentos, país, backups) e para sair da sessão.',
     tour_skip: 'Pular tour',
     tour_prev: 'Anterior',
     tour_next: 'Próximo',

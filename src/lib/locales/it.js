@@ -9,6 +9,7 @@ export default {
     production: 'Produzione',
     ingredients: 'Ingredienti',
     brand_sub: 'Formulazione gelato',
+    back_to_landing: 'Torna alla home',
 
     // Dashboard
     total_recipes: 'Ricette totali',
@@ -166,6 +167,8 @@ export default {
     auth_back_login: 'Torna all\'accesso',
     auth_email_required: 'L\'email e richiesta',
     auth_password_short: 'Min 6 caratteri',
+    auth_password_confirm: 'Conferma password',
+    auth_password_mismatch: 'Le password non corrispondono',
     auth_check_email: 'Controlla la tua email',
     auth_reset_sent: 'Controlla la tua email',
     auth_cloud_disabled: 'Sincronizzazione non configurata.',
@@ -1247,6 +1250,8 @@ export default {
     tour_inventory_body: "La tua base di ingredienti con stock, minimi, avvisi. Da qui gestisci anche fornitori e cronologia dei costi. Puoi scansionare codici a barre per registrare entrate.",
     tour_help_title: "Centro assistenza",
     tour_help_body: "Quando hai dubbi, questo pulsante apre il centro assistenza con articoli per area (ricette, inventario, produzione, etichettatura, IA). Ogni funzione ha la sua spiegazione con esempi.",
+    tour_account_title: "Il tuo account e le impostazioni",
+    tour_account_body: "In alto appaiono le tue iniziali una volta effettuato l'accesso. Fai clic sul cerchio dorato per aprire il menu con le \"Impostazioni dell'attività\" (dati legali, attrezzature, paese, backup) e per disconnetterti.",
     tour_skip: "Salta tour",
     tour_prev: "Indietro",
     tour_next: "Avanti",

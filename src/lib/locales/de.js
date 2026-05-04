@@ -9,6 +9,7 @@ export default {
     production: 'Produktion',
     ingredients: 'Zutaten',
     brand_sub: 'Eiscreme-Rezeptur',
+    back_to_landing: 'Zurück zur Startseite',
 
     // Dashboard
     total_recipes: 'Rezepte gesamt',
@@ -166,6 +167,8 @@ export default {
     auth_back_login: 'Zurueck zur Anmeldung',
     auth_email_required: 'E-Mail erforderlich',
     auth_password_short: 'Min 6 Zeichen',
+    auth_password_confirm: 'Passwort bestätigen',
+    auth_password_mismatch: 'Passwörter stimmen nicht überein',
     auth_check_email: 'Pruefen Sie Ihre E-Mail',
     auth_reset_sent: 'Pruefen Sie Ihre E-Mail',
     auth_cloud_disabled: 'Synchronisation nicht konfiguriert.',
@@ -1247,6 +1250,8 @@ export default {
     tour_inventory_body: "Deine Zutatenbasis mit Bestand, Minimums, Warnungen. Hier verwaltest du auch Lieferanten und Kostenverlauf. Du kannst Barcodes scannen, um Eingänge zu erfassen.",
     tour_help_title: "Hilfe-Center",
     tour_help_body: "Wenn du Fragen hast, öffnet dieser Knopf das Hilfe-Center mit Artikeln nach Bereich (Rezepte, Inventar, Produktion, Etikettierung, KI). Jede Funktion hat ihre Erklärung mit Beispielen.",
+    tour_account_title: "Dein Konto und die Einstellungen",
+    tour_account_body: "Oben siehst du deine Initialen, sobald du angemeldet bist. Klicke auf den goldenen Kreis, um das Menü mit den \"Geschäftseinstellungen\" (Rechtsdaten, Geräte, Land, Backups) zu öffnen und dich abzumelden.",
     tour_skip: "Tour überspringen",
     tour_prev: "Zurück",
     tour_next: "Weiter",

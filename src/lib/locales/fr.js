@@ -9,6 +9,7 @@ export default {
     production: 'Production',
     ingredients: 'Ingredients',
     brand_sub: 'Formulation de glaces',
+    back_to_landing: "Retour à l'accueil",
 
     // Dashboard
     total_recipes: 'Total recettes',
@@ -166,6 +167,8 @@ export default {
     auth_back_login: 'Retour a la connexion',
     auth_email_required: 'L\'email est requis',
     auth_password_short: 'Min 6 caracteres',
+    auth_password_confirm: 'Confirmer le mot de passe',
+    auth_password_mismatch: 'Les mots de passe ne correspondent pas',
     auth_check_email: 'Verifiez votre email',
     auth_reset_sent: 'Verifiez votre email',
     auth_cloud_disabled: 'Synchronisation non configuree.',
@@ -1247,6 +1250,8 @@ export default {
     tour_inventory_body: "Ta base d'ingrédients avec stock, minimums, alertes. D'ici tu gères aussi les fournisseurs et l'historique des coûts. Tu peux scanner les codes-barres pour enregistrer les entrées.",
     tour_help_title: "Centre d'aide",
     tour_help_body: "En cas de doute, ce bouton ouvre le centre d'aide avec des articles par domaine (recettes, inventaire, production, étiquetage, IA). Chaque fonction a son explication avec des exemples.",
+    tour_account_title: "Ton compte et tes paramètres",
+    tour_account_body: "En haut s'affichent tes initiales une fois connecté. Clique sur le cercle doré pour ouvrir le menu avec les « Paramètres de l'entreprise » (données légales, équipements, pays, sauvegardes) et pour te déconnecter.",
     tour_skip: "Passer le tour",
     tour_prev: "Précédent",
     tour_next: "Suivant",

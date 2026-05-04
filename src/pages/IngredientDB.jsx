@@ -14,6 +14,9 @@ import { computeBlendMacros } from '../lib/icecreamCalc';
 import { useAiStore } from '../store/aiStore';
 import { AiKeyModal } from '../components/AiKeyModal';
 import { NumberInput } from '../components/NumberInput';
+import { ProGate, ProBadge } from '../components/ProGate';
+import { FEATURES, useEntitlement } from '../lib/entitlement';
+import { UpgradeModal } from '../components/UpgradeModal';
 import { StocktakeModal } from '../components/StocktakeModal';
 import { SuppliersModal } from '../components/SuppliersModal';
 
@@ -83,6 +86,9 @@ export default function IngredientDB() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [invIngredient, setInvIngredient] = useState(null); // ingredient being viewed in inventory modal
+  const [showInvUpgrade, setShowInvUpgrade] = useState(false);
+  const [showCostUpgrade, setShowCostUpgrade] = useState(false);
+  const ent = useEntitlement();
   const [pendingBarcode, setPendingBarcode] = useState(null); // shown when scan didn't match an ingredient
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');

@@ -8,7 +8,6 @@ import { supabase } from './lib/supabase';
 import { useI18nStore, useT, LANGUAGES } from './lib/i18n';
 import { trackPageview } from './lib/analytics';
 import { UserMenu } from './components/UserMenu';
-import { CountrySelector } from './components/CountrySelector';
 import { OnboardingWizard } from './components/OnboardingWizard';
 import { useBusinessStore } from './store/businessStore';
 import { CloudSyncProvider } from './components/CloudSyncProvider';
@@ -21,7 +20,6 @@ import { CookieBanner } from './components/CookieBanner';
 import { HelpAssistant } from './components/HelpAssistant';
 import { UIHighlightOverlay } from './components/UIHighlightOverlay';
 import { Logo } from './components/Logo';
-import { Onboarding } from './components/Onboarding';
 import { UpdateAvailableModal } from './components/UpdateAvailableModal';
 import { checkForUpdate } from './lib/desktopUpdate';
 import Toast           from './components/ui/Toast';
@@ -42,6 +40,7 @@ const Help           = lazy(() => import('./pages/Help'));
 const Mobile         = lazy(() => import('./pages/Mobile'));
 const Haccp          = lazy(() => import('./pages/Haccp'));
 const Landing        = lazy(() => import('./pages/Landing'));
+import { resetVisited } from './pages/Landing';
 const Pricing        = lazy(() => import('./pages/Pricing'));
 const Download       = lazy(() => import('./pages/Download'));
 
@@ -106,6 +105,7 @@ function LangSelector() {
 export default function App() {
   const { toast, modal, resolveModal } = useAppStore();
   const initAuth = useAuthStore(s => s.init);
+  const user = useAuthStore(s => s.user);
   const ingredients = useIngredientStore(s => s.ingredients);
   const navigate = useNavigate();
   const location = useLocation();
@@ -265,9 +265,27 @@ export default function App() {
             )}
           </button>
 
-          <div className="flex items-center gap-2.5 py-3 pr-5 md:mr-4 md:border-r md:border-white/15 flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              // Si el usuario no esta logueado (modo "prueba"), volvemos a la
+              // landing reseteando el flag visited para que se vea la pagina
+              // publica. Si esta logueado, el logo no hace nada — el dashboard
+              // es su pantalla principal.
+              if (!user) {
+                resetVisited();
+                navigate('/');
+              }
+            }}
+            disabled={!!user}
+            className="flex items-center gap-2.5 py-3 pr-5 md:mr-4 md:border-r md:border-white/15 flex-shrink-0
+                       bg-transparent border-none cursor-pointer disabled:cursor-default
+                       hover:opacity-90 transition-opacity"
+            aria-label={user ? 'GelatoLab' : t('back_to_landing')}
+            title={user ? '' : t('back_to_landing')}
+          >
             <Logo size={32} variant="dark" />
-            <div>
+            <div className="text-left">
               <div className="font-display text-[var(--cream)] text-sm leading-tight">
                 {fantasyName
                   ? <span title="GelatoLab">{fantasyName}</span>
@@ -277,7 +295,7 @@ export default function App() {
                 {fantasyName ? 'GelatoLab · ' + t('brand_sub') : t('brand_sub')}
               </div>
             </div>
-          </div>
+          </button>
 
           {/* Desktop nav (hidden on mobile) */}
           <div className="hidden md:flex gap-0 flex-1 overflow-x-auto">
@@ -321,7 +339,6 @@ export default function App() {
               ?
             </NavLink>
             <UserMenu />
-            <CountrySelector />
             <LangSelector />
           </div>
         </div>
@@ -385,7 +402,6 @@ export default function App() {
       {toast && <Toast toast={toast} />}
       {modal && <ConfirmModal modal={modal} onResolve={resolveModal} />}
       {!businessCompleted && <OnboardingWizard />}
-      <Onboarding />
       <CloudSyncProvider />
       <CookieBanner />
       <HelpAssistant />

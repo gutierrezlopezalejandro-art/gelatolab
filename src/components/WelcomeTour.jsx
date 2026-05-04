@@ -56,6 +56,12 @@ function buildSteps(t) {
       title: t('tour_help_title'),
       body: t('tour_help_body'),
     },
+    {
+      anchor: '[data-tour="user-menu"]',
+      emoji: '👤',
+      title: t('tour_account_title'),
+      body: t('tour_account_body'),
+    },
   ];
 }
 
@@ -138,29 +144,39 @@ export function WelcomeTour({ onClose }) {
 
   return (
     <>
-      {/* Overlay oscuro con un agujero opcional alrededor del ancla.
-          Para mantener simple usamos un overlay full-screen con click-outside
-          que NO cierra el tour (forzamos a Saltar/Siguiente). */}
-      <div
-        className="fixed inset-0 z-[450] pointer-events-auto"
-        style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(2px)' }}
-        aria-hidden="true"
-      />
-
-      {/* Highlight del ancla: un ring brillante cuando hay ancla. */}
-      {anchorRect && (
+      {/* Cuando NO hay ancla (paso intro de Marco), un overlay leve enfoca
+          la atencion en el modal sin tapar todo. */}
+      {!anchorRect && (
         <div
-          className="fixed z-[451] pointer-events-none rounded-lg"
-          style={{
-            top: anchorRect.top - 6,
-            left: anchorRect.left - 6,
-            width: anchorRect.width + 12,
-            height: anchorRect.height + 12,
-            boxShadow: '0 0 0 4px var(--gold), 0 0 0 9999px rgba(0,0,0,0.55)',
-            transition: 'all 0.3s ease',
-          }}
+          className="fixed inset-0 z-[450] pointer-events-auto"
+          style={{ background: 'rgba(0,0,0,0.45)' }}
           aria-hidden="true"
         />
+      )}
+
+      {/* Cuando HAY ancla: solo el highlight, que con su box-shadow extendido
+          oscurece todo menos el elemento resaltado — efecto "spotlight" sin
+          apilar overlays. Captura clicks fuera para que el usuario solo pueda
+          interactuar con el tour (Saltar/Siguiente). */}
+      {anchorRect && (
+        <>
+          <div
+            className="fixed inset-0 z-[450] pointer-events-auto"
+            aria-hidden="true"
+          />
+          <div
+            className="fixed z-[451] pointer-events-none rounded-lg"
+            style={{
+              top: anchorRect.top - 6,
+              left: anchorRect.left - 6,
+              width: anchorRect.width + 12,
+              height: anchorRect.height + 12,
+              boxShadow: '0 0 0 4px var(--gold), 0 0 0 9999px rgba(0,0,0,0.45)',
+              transition: 'all 0.3s ease',
+            }}
+            aria-hidden="true"
+          />
+        </>
       )}
 
       {/* Popover */}

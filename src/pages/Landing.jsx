@@ -30,6 +30,9 @@ export function markVisited() {
 export function hasVisited() {
   try { return localStorage.getItem(VISITED_KEY) === '1'; } catch { return false; }
 }
+export function resetVisited() {
+  try { localStorage.removeItem(VISITED_KEY); } catch { /* tolerable */ }
+}
 
 function LangSwitch() {
   const { lang, setLang } = useI18nStore();
@@ -132,22 +135,37 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero — fondo con gradient calido italiano + emojis decorativos */}
+      {/* Hero — fondo con foto difuminada de gelato. Sin emojis flotantes
+          (se vian infantiles). Padding reducido para que entre todo en un
+          viewport de 1080p sin scroll. */}
       <section className="relative overflow-hidden"
                style={{ background: 'linear-gradient(135deg, var(--cream) 0%, #fff 45%, var(--mint3) 100%)' }}>
-        {/* Decoraciones flotantes (gelati) */}
-        <div className="hidden md:block absolute top-12 left-8 text-7xl opacity-15 select-none rotate-[-12deg]" aria-hidden="true">🍨</div>
-        <div className="hidden md:block absolute bottom-16 right-12 text-7xl opacity-15 select-none rotate-[18deg]" aria-hidden="true">🍦</div>
-        <div className="hidden lg:block absolute top-24 right-32 text-5xl opacity-10 select-none rotate-[8deg]" aria-hidden="true">🥄</div>
-        <div className="hidden lg:block absolute bottom-32 left-20 text-5xl opacity-10 select-none rotate-[-6deg]" aria-hidden="true">🍋</div>
+        {/* Foto de fondo — blur leve para que se note la imagen pero el texto
+            quede legible con el velo blanco encima. */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'url(./photos/gelato-display.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(4px) saturate(1.15)',
+            transform: 'scale(1.05)',
+            opacity: 0.55,
+          }}
+          aria-hidden="true"
+        />
+        {/* Velo blanco con gradiente suave: texto centro perfectamente
+            legible, esquinas mas transparentes para que se note el fondo. */}
+        <div className="absolute inset-0 pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 70%, rgba(255,255,255,0.35) 100%)' }}
+             aria-hidden="true" />
 
-        <div className="max-w-[1100px] mx-auto px-5 py-20 md:py-28 relative">
+        <div className="max-w-[1100px] mx-auto px-5 py-12 md:py-16 relative">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full bg-white shadow-sm text-[var(--mint)] border border-[var(--mint2)] mb-6">
-              <span className="text-base" aria-hidden="true">🇮🇹</span>
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full bg-white shadow-sm text-[var(--mint)] border border-[var(--mint2)] mb-5">
               {t('landing_hero_badge')}
             </div>
-            <h1 className="font-display text-5xl md:text-7xl text-[var(--ink)] leading-[1.02] mb-6 tracking-tight">
+            <h1 className="font-display text-4xl md:text-6xl text-[var(--ink)] leading-[1.05] mb-5 tracking-tight">
               {t('landing_hero_title_1')}{' '}
               <span style={{
                 background: 'linear-gradient(135deg, var(--gold) 0%, var(--coral) 100%)',
@@ -158,28 +176,27 @@ export default function Landing() {
                 {t('landing_hero_title_2')}
               </span>
             </h1>
-            <p className="text-xl text-[var(--ink2)] leading-relaxed mb-10 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-[var(--ink2)] leading-relaxed mb-7 max-w-2xl mx-auto">
               {t('landing_hero_sub')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <button onClick={handleTryFree}
-                      className="text-base font-bold px-8 py-3.5 rounded-xl bg-[var(--ink)] text-[var(--cream)] hover:opacity-90 cursor-pointer border-none transition-all hover:scale-[1.02] shadow-md">
+                      className="text-base font-bold px-7 py-3 rounded-xl bg-[var(--ink)] text-[var(--cream)] hover:opacity-90 cursor-pointer border-none transition-all hover:scale-[1.02] shadow-md">
                 {t('landing_cta_primary')} →
               </button>
               <button onClick={handleSignIn}
-                      className="text-base font-semibold px-8 py-3.5 rounded-xl bg-white text-[var(--ink)] border-2 border-black/10 hover:border-[var(--mint2)] cursor-pointer transition-colors">
+                      className="text-base font-semibold px-7 py-3 rounded-xl bg-white text-[var(--ink)] border-2 border-black/10 hover:border-[var(--mint2)] cursor-pointer transition-colors">
                 {t('landing_cta_secondary')}
               </button>
             </div>
-            <p className="text-sm text-[var(--ink3)] mt-5">{t('landing_no_card')}</p>
 
             {/* Strip de stats */}
-            <div className="mt-12 inline-flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm bg-white/60 backdrop-blur rounded-2xl px-6 py-3 shadow-sm border border-black/5">
+            <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm bg-white/70 backdrop-blur rounded-2xl px-5 py-2.5 shadow-sm border border-black/5">
               <Stat n="50+" label={t('landing_stat_recipes')} />
               <span className="text-black/15 hidden md:inline">·</span>
-              <Stat n="8" label={t('landing_stat_languages')} />
+              <Stat n="6" label={t('landing_stat_languages')} />
               <span className="text-black/15 hidden md:inline">·</span>
-              <Stat n="3" label={t('landing_stat_countries')} />
+              <Stat n="11" label={t('landing_stat_countries')} />
               <span className="text-black/15 hidden md:inline">·</span>
               <Stat n="100%" label={t('landing_stat_offline')} />
             </div>
@@ -250,11 +267,128 @@ export default function Landing() {
           <p className="text-base text-[var(--ink2)] text-center mb-14 max-w-xl mx-auto">
             {t('landing_how_sub')}
           </p>
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
             <Step n="1" emoji="📝" title={t('landing_step_1_title')} body={t('landing_step_1_body')} />
-            <Step n="2" emoji="📊" title={t('landing_step_2_title')} body={t('landing_step_2_body')} />
-            <Step n="3" emoji="🍨" title={t('landing_step_3_title')} body={t('landing_step_3_body')} />
-            <Step n="4" emoji="🖨️" title={t('landing_step_4_title')} body={t('landing_step_4_body')} />
+            <Step n="2" emoji="📦" title={t('landing_step_2_title')} body={t('landing_step_2_body')} />
+            <Step n="3" emoji="📊" title={t('landing_step_3_title')} body={t('landing_step_3_body')} />
+            <Step n="4" emoji="🍨" title={t('landing_step_4_title')} body={t('landing_step_4_body')} />
+            <Step n="5" emoji="🖨️" title={t('landing_step_5_title')} body={t('landing_step_5_body')} />
+          </div>
+        </div>
+      </section>
+
+      {/* Conoce a Marco — ficha del asistente IA que acompaña dentro de la
+          app. Avatar + 3 ejemplos de pregunta-respuesta + lista de capacidades.
+          Diferenciador clave: GelatoLab no es solo formulación, también es
+          un maestro virtual que responde en lenguaje natural. */}
+      <section className="bg-gradient-to-br from-[var(--cream)] to-[var(--mint3)] py-20">
+        <div className="max-w-[1100px] mx-auto px-5">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-white text-[var(--mint)] border border-[var(--mint2)] mb-4">
+                {t('landing_marco_kicker')}
+              </div>
+              <h2 className="font-display text-5xl text-[var(--ink)] mb-4 leading-tight">{t('landing_marco_title')}</h2>
+              <p className="text-base text-[var(--ink2)] leading-relaxed mb-6 max-w-md">{t('landing_marco_sub')}</p>
+              <div className="bg-white/60 rounded-2xl p-5 border border-[var(--mint2)]/40 backdrop-blur-sm">
+                <h3 className="font-semibold text-sm text-[var(--ink)] mb-3 uppercase tracking-wider">{t('landing_marco_features_title')}</h3>
+                <ul className="space-y-2 text-sm text-[var(--ink2)]">
+                  <li className="flex gap-2"><span className="text-[var(--mint)] flex-shrink-0">✓</span><span>{t('landing_marco_f1')}</span></li>
+                  <li className="flex gap-2"><span className="text-[var(--mint)] flex-shrink-0">✓</span><span>{t('landing_marco_f2')}</span></li>
+                  <li className="flex gap-2"><span className="text-[var(--mint)] flex-shrink-0">✓</span><span>{t('landing_marco_f3')}</span></li>
+                  <li className="flex gap-2"><span className="text-[var(--mint)] flex-shrink-0">✓</span><span>{t('landing_marco_f4')}</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="relative">
+              {/* Card chat con Marco — tres burbujas estilizadas alternando
+                  pregunta del usuario y respuesta de Marco. */}
+              <div className="bg-white rounded-3xl shadow-2xl p-6 border-2 border-[var(--mint)]/20">
+                <div className="flex items-center gap-3 mb-5 pb-4 border-b border-black/5">
+                  <img src="./marco-avatar.webp" alt="Marco" className="w-14 h-14 rounded-full object-cover border-2 border-[var(--mint2)]" />
+                  <div>
+                    <div className="font-display text-lg text-[var(--ink)]">Marco</div>
+                    <div className="text-xs text-[var(--mint)] flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[var(--mint)] inline-block" />
+                      Disponible 24/7
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3.5">
+                  <ChatBubble role="user" text={t('landing_marco_q1_q')} />
+                  <ChatBubble role="marco" text={t('landing_marco_q1_a')} />
+                  <ChatBubble role="user" text={t('landing_marco_q2_q')} />
+                  <ChatBubble role="marco" text={t('landing_marco_q2_a')} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Galeria de sabores — foto centrada de gelatos en cups + 4 chips
+          de estilos abajo (Helado / Gelato / Sorbete / Paleta). Sin tiles
+          de gradiente que se veian infantiles. */}
+      <section className="bg-white border-y border-black/10 py-20">
+        <div className="max-w-[1100px] mx-auto px-5">
+          <div className="text-center mb-10">
+            <div className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[var(--coral2)] text-[var(--coral)] mb-4">
+              {t('landing_flavors_kicker')}
+            </div>
+            <h2 className="font-display text-4xl text-[var(--ink)] mb-3">{t('landing_flavors_title')}</h2>
+            <p className="text-base text-[var(--ink2)] max-w-2xl mx-auto">{t('landing_flavors_sub')}</p>
+          </div>
+
+          {/* Foto centrada — tamaño grande para que sea el hero visual */}
+          <div className="relative rounded-3xl overflow-hidden shadow-xl max-w-[900px] mx-auto aspect-[16/9] mb-10">
+            <img
+              src="./photos/gelato-flavors.jpg"
+              alt="Variedad de gelatos artesanales servidos en copas de vidrio: pistacho, chocolate, frutilla, mango, vainilla y avellana"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Chips de estilos: tipografia limpia, sin gradientes infantiles */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            <StyleChip emoji="🍦" name={t('landing_flavor_style_helado')} />
+            <StyleChip emoji="🍨" name={t('landing_flavor_style_gelato')} />
+            <StyleChip emoji="🍋" name={t('landing_flavor_style_sorbete')} />
+            <StyleChip emoji="🍡" name="Paleta" />
+          </div>
+
+          <p className="text-center text-sm text-[var(--ink3)] italic max-w-xl mx-auto">
+            {t('landing_flavors_footnote')}
+          </p>
+        </div>
+      </section>
+
+      {/* Comunidad — seccion "patagonia". Layout 2 columnas: foto del lago
+          Llanquihue + volcan Osorno a la izquierda, mensaje a la derecha.
+          Sin foto de fondo, contraste limpio. */}
+      <section className="py-20"
+               style={{ background: 'linear-gradient(135deg, var(--ink) 0%, #1a2e1a 100%)' }}>
+        <div className="max-w-[1100px] mx-auto px-5">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
+              <img src="./photos/lifestyle-couple.jpg"
+                   alt="Pareja disfrutando gelato artesanal frente al lago Llanquihue con el volcán Osorno de fondo"
+                   className="w-full h-full object-cover"
+                   loading="lazy" />
+            </div>
+            <div className="text-white">
+              <div className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full bg-white/10 backdrop-blur text-[var(--gold)] border border-[var(--gold)]/40 mb-5">
+                {t('landing_community_kicker')}
+              </div>
+              <h2 className="font-display text-3xl md:text-4xl mb-5 leading-tight">
+                {t('landing_community_title')}
+              </h2>
+              <p className="text-base leading-relaxed text-white/85">
+                {t('landing_community_body')}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -263,11 +397,17 @@ export default function Landing() {
           v1.x: GelatoLab conoce el equipo concreto del usuario y adapta
           recomendaciones, avisos y registros HACCP a ese modelo. */}
       <section className="max-w-[1100px] mx-auto px-5 py-20">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <h2 className="font-display text-4xl text-[var(--ink)] mb-3">{t('landing_equip_title')}</h2>
           <p className="text-base text-[var(--ink2)] max-w-2xl mx-auto">{t('landing_equip_sub')}</p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="rounded-2xl overflow-hidden shadow-xl mb-10 max-w-[900px] mx-auto aspect-[16/9]">
+          <img src="./photos/conos.png"
+               alt="Cuatro conos de gelato artesanal en una heladería profesional"
+               className="w-full h-full object-cover"
+               loading="lazy" />
+        </div>
+        <div className="grid md:grid-cols-2 gap-6 max-w-[900px] mx-auto">
           <FeatureCard
             emoji="🛠"
             title={t('landing_equip_1_title')}
@@ -275,103 +415,11 @@ export default function Landing() {
             accent="mint"
           />
           <FeatureCard
-            emoji="🇨🇱"
-            title={t('landing_equip_2_title')}
-            body={t('landing_equip_2_body')}
-            accent="gold"
-          />
-          <FeatureCard
             emoji="🤖"
             title={t('landing_equip_3_title')}
             body={t('landing_equip_3_body')}
             accent="coral"
           />
-        </div>
-      </section>
-
-      {/* Mockups visuales — 3 capturas estilizadas con numeros reales para
-          mostrar tangiblemente lo que hace la app. No son screenshots porque
-          requeririan montar dev server; son representaciones SVG/HTML. */}
-      <section className="max-w-[1100px] mx-auto px-5 py-20">
-        <h2 className="font-display text-4xl text-center mb-3">{t('landing_mock_title')}</h2>
-        <p className="text-base text-[var(--ink2)] text-center mb-12 max-w-xl mx-auto">{t('landing_mock_sub')}</p>
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Mock 1: Balance con sus indicadores */}
-          <MockCard title={t('landing_mock_1_title')} desc={t('landing_mock_1_desc')}>
-            <div className="space-y-2 text-xs">
-              <BalanceRow label="Grasa" value="9.8%" status="ok" range="6 - 12%" />
-              <BalanceRow label="Azúcar" value="18.2%" status="ok" range="16 - 22%" />
-              <BalanceRow label="MSNF" value="10.1%" status="ok" range="9 - 12%" />
-              <BalanceRow label="Sólidos" value="38.4%" status="warn" range="36 - 44%" />
-              <BalanceRow label="FPD" value="-2.7°C" status="ok" range="-2 a -3°C" />
-              <BalanceRow label="PAC" value="194" status="ok" range="180 - 220" />
-              <div className="mt-3 pt-3 border-t border-black/5 flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[var(--mint3)] text-[var(--mint)] text-xs font-bold">✓</span>
-                <span className="font-semibold text-[var(--mint)]">Balanceada</span>
-              </div>
-            </div>
-          </MockCard>
-
-          {/* Mock 2: Etiqueta chilena con sellos ALTO EN */}
-          <MockCard title={t('landing_mock_2_title')} desc={t('landing_mock_2_desc')}>
-            <div className="border-2 border-black rounded-md p-3 bg-white">
-              <div className="text-center font-display text-base font-bold">Helado vainilla</div>
-              <div className="text-center text-[10px] text-[var(--ink3)] mb-2">Lote LOTE-2026-0014</div>
-              <div className="flex justify-center gap-1.5 mb-2">
-                <Sello>ALTO EN<br/>AZÚCARES</Sello>
-                <Sello>ALTO EN<br/>GRASAS<br/>SATURADAS</Sello>
-              </div>
-              <div className="text-[9px] text-[var(--ink3)] text-center font-mono">
-                Min. de Salud · Ley 20.606
-              </div>
-              <div className="mt-2 pt-2 border-t border-black/10 text-[10px]">
-                <div className="flex justify-between"><span>Energía</span><span className="font-mono">232 kcal</span></div>
-                <div className="flex justify-between"><span>Azúcar total</span><span className="font-mono">19.4 g</span></div>
-                <div className="flex justify-between"><span>Sodio</span><span className="font-mono">42 mg</span></div>
-              </div>
-            </div>
-          </MockCard>
-
-          {/* Mock 3: Comparación cross-recipes */}
-          <MockCard title={t('landing_mock_3_title')} desc={t('landing_mock_3_desc')}>
-            <table className="w-full text-[10px]">
-              <thead>
-                <tr className="border-b border-black/10">
-                  <th className="text-left pb-1.5 font-semibold">Métrica</th>
-                  <th className="text-right pb-1.5 font-semibold">Vainilla</th>
-                  <th className="text-right pb-1.5 font-semibold">Light</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-black/5">
-                  <td className="py-1">Energía</td>
-                  <td className="text-right py-1 tabular-nums" style={{ background: 'var(--coral2)', color: 'var(--coral)' }}>232</td>
-                  <td className="text-right py-1 tabular-nums" style={{ background: 'var(--mint3)', color: 'var(--mint)', fontWeight: 700 }}>168</td>
-                </tr>
-                <tr className="border-b border-black/5">
-                  <td className="py-1">Azúcar</td>
-                  <td className="text-right py-1 tabular-nums" style={{ background: 'var(--coral2)', color: 'var(--coral)' }}>19.4</td>
-                  <td className="text-right py-1 tabular-nums" style={{ background: 'var(--mint3)', color: 'var(--mint)', fontWeight: 700 }}>11.2</td>
-                </tr>
-                <tr className="border-b border-black/5">
-                  <td className="py-1">Grasa sat.</td>
-                  <td className="text-right py-1 tabular-nums" style={{ background: 'var(--coral2)', color: 'var(--coral)' }}>5.8</td>
-                  <td className="text-right py-1 tabular-nums" style={{ background: 'var(--mint3)', color: 'var(--mint)', fontWeight: 700 }}>2.1</td>
-                </tr>
-                <tr>
-                  <td className="py-1">Sodio</td>
-                  <td className="text-right py-1 tabular-nums">42</td>
-                  <td className="text-right py-1 tabular-nums">38</td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="mt-3 flex items-center gap-2 text-[10px] text-[var(--ink3)]">
-              <span className="inline-block w-2.5 h-2.5 rounded" style={{ background: 'var(--mint3)' }}></span>
-              <span>Mejor</span>
-              <span className="inline-block w-2.5 h-2.5 rounded ml-2" style={{ background: 'var(--coral2)' }}></span>
-              <span>Peor</span>
-            </div>
-          </MockCard>
         </div>
       </section>
 
@@ -459,7 +507,6 @@ export default function Landing() {
       {/* Tecnologia — fondo oscuro con accent gold */}
       <section className="relative overflow-hidden py-20"
                style={{ background: 'linear-gradient(135deg, var(--ink) 0%, #2d2419 100%)' }}>
-        <div className="absolute top-10 right-10 text-9xl opacity-5 select-none" aria-hidden="true">🇮🇹</div>
         <div className="max-w-[900px] mx-auto px-5 text-center relative">
           <h2 className="font-display text-4xl text-white mb-4">{t('landing_tech_title')}</h2>
           <p className="text-base text-white/75 leading-relaxed mb-8 max-w-xl mx-auto">
@@ -488,34 +535,47 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA final con fondo de color */}
-      <section className="relative overflow-hidden py-20"
+      {/* CTA final con foto de vitrina GelatoLab + texto + boton */}
+      <section className="py-20"
                style={{ background: 'linear-gradient(135deg, var(--mint3) 0%, #fff 60%, var(--cream2) 100%)' }}>
-        <div className="hidden md:block absolute top-8 left-12 text-6xl opacity-20 select-none rotate-[-10deg]" aria-hidden="true">🍦</div>
-        <div className="hidden md:block absolute bottom-8 right-12 text-6xl opacity-20 select-none rotate-[12deg]" aria-hidden="true">🍨</div>
-        <div className="max-w-[800px] mx-auto px-5 text-center relative">
-          <h2 className="font-display text-4xl mb-4">{t('landing_final_title')}</h2>
-          <p className="text-base text-[var(--ink2)] mb-8 max-w-xl mx-auto">{t('landing_final_body')}</p>
-          <button onClick={handleTryFree}
-                  className="text-base font-bold px-8 py-3.5 rounded-xl bg-[var(--mint)] text-white hover:opacity-90 cursor-pointer border-none transition-all hover:scale-[1.02] shadow-md">
-            {t('landing_cta_primary')} →
-          </button>
-          <p className="text-sm text-[var(--ink3)] mt-4">{t('landing_no_card')}</p>
+        <div className="max-w-[1100px] mx-auto px-5">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
+              <img src="./photos/helados.png"
+                   alt="Vitrina de helados artesanales con cartel GelatoLab"
+                   className="w-full h-full object-cover"
+                   loading="lazy" />
+            </div>
+            <div>
+              <h2 className="font-display text-3xl md:text-4xl mb-4">{t('landing_final_title')}</h2>
+              <p className="text-base text-[var(--ink2)] mb-8 max-w-md">{t('landing_final_body')}</p>
+              <button onClick={handleTryFree}
+                      className="text-base font-bold px-8 py-3.5 rounded-xl bg-[var(--mint)] text-white hover:opacity-90 cursor-pointer border-none transition-all hover:scale-[1.02] shadow-md">
+                {t('landing_cta_primary')} →
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-black/10 bg-white">
-        <div className="max-w-[1100px] mx-auto px-5 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-[var(--ink3)]">
-          <div className="flex items-center gap-2">
-            <Logo size={24} />
-            <span>© {new Date().getFullYear()} GelatoLab</span>
+        <div className="max-w-[1100px] mx-auto px-5 py-8 text-sm text-[var(--ink3)]">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Logo size={24} />
+              <span>© {new Date().getFullYear()} GelatoLab</span>
+            </div>
+            <nav className="flex flex-wrap gap-6">
+              <a href="mailto:contacto@gelatolab.app" className="hover:text-[var(--ink)] transition-colors">contacto@gelatolab.app</a>
+              <Link to="/help" className="hover:text-[var(--ink)] transition-colors">{t('help_title')}</Link>
+              <Link to="/terms" className="hover:text-[var(--ink)] transition-colors">{t('legal_terms_title')}</Link>
+              <Link to="/privacy" className="hover:text-[var(--ink)] transition-colors">{t('legal_privacy_title')}</Link>
+            </nav>
           </div>
-          <nav className="flex flex-wrap gap-6">
-            <Link to="/help" className="hover:text-[var(--ink)] transition-colors">{t('help_title')}</Link>
-            <Link to="/terms" className="hover:text-[var(--ink)] transition-colors">{t('legal_terms_title')}</Link>
-            <Link to="/privacy" className="hover:text-[var(--ink)] transition-colors">{t('legal_privacy_title')}</Link>
-          </nav>
+          <div className="mt-6 pt-6 border-t border-black/5 text-center text-xs text-[var(--ink3)]">
+            Desarrollado y soportado por <span className="font-semibold text-[var(--ink2)]">Llanquihue Tech SpA</span> · Patagonia, Chile
+          </div>
         </div>
       </footer>
     </div>
@@ -592,6 +652,15 @@ function Stat({ n, label }) {
   );
 }
 
+function StyleChip({ emoji, name }) {
+  return (
+    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--cream)] border border-black/10 text-sm font-medium text-[var(--ink)] shadow-sm">
+      <span aria-hidden="true">{emoji}</span>
+      {name}
+    </span>
+  );
+}
+
 function GlossaryItem({ term, def }) {
   return (
     <div className="flex items-baseline gap-3">
@@ -624,6 +693,49 @@ function MockCard({ title, desc, children }) {
       </div>
       <h4 className="font-display text-lg text-[var(--ink)] mb-1">{title}</h4>
       <p className="text-sm text-[var(--ink2)] leading-relaxed">{desc}</p>
+    </div>
+  );
+}
+
+function FlavorTile({ emoji, name, style, gradFrom, gradTo }) {
+  // Tile cuadrado con gradiente que representa un sabor de helado/gelato.
+  // El emoji y el nombre van encima del gradiente. Diseño pensado para
+  // sobrevivir sin assets propios (sin fotos) y reemplazarse por <img>
+  // cuando el equipo capture fotos profesionales.
+  const isDark = ['#3b2417', '#2e1a0d', '#7a4628', '#3b2370', '#d94a5e'].includes(gradFrom);
+  return (
+    <div
+      className="rounded-2xl overflow-hidden shadow-md aspect-square flex flex-col items-center justify-center p-4 text-center transition-transform hover:scale-[1.03]"
+      style={{
+        background: `linear-gradient(135deg, ${gradFrom} 0%, ${gradTo} 100%)`,
+        color: isDark ? '#fff' : 'var(--ink)',
+      }}
+    >
+      <div className="text-5xl mb-3 drop-shadow-sm" aria-hidden="true">{emoji}</div>
+      <div className="font-display text-base leading-tight mb-1.5">{name}</div>
+      <div className="text-[10px] uppercase tracking-widest opacity-80 font-mono">{style}</div>
+    </div>
+  );
+}
+
+function ChatBubble({ role, text }) {
+  // Burbuja de chat estilo iMessage/WhatsApp para la sección Marco.
+  // role: 'user' (alineada a la derecha, fondo gris claro) o 'marco' (a
+  // la izquierda, fondo verde mint con borde — color de marca).
+  if (role === 'user') {
+    return (
+      <div className="flex justify-end">
+        <div className="max-w-[85%] rounded-2xl rounded-tr-md bg-[var(--cream2)] px-4 py-2.5 text-sm text-[var(--ink)] leading-relaxed">
+          {text}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex justify-start">
+      <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-[var(--mint3)] border border-[var(--mint2)] px-4 py-2.5 text-sm text-[var(--ink)] leading-relaxed">
+        {text}
+      </div>
     </div>
   );
 }

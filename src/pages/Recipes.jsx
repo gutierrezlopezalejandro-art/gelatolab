@@ -65,12 +65,25 @@ export default function Recipes() {
   const [showUpgrade,   setShowUpgrade] = useState(false);
 
   const ent = useEntitlement();
+
+  // Modo demo: si el usuario no inicio sesion, todas las acciones que
+  // modifican datos (crear, borrar, duplicar) ofrecen ir a /auth en vez de
+  // ejecutarse. Cuando el usuario crea cuenta, recupera todas las acciones
+  // con la confirmacion estandar.
+  async function promptSignInOrCancel() {
+    const ok = await confirm(t('anon_action_blocked'));
+    if (ok) navigate('/auth');
+    return ok;
+  }
+
   function handleNewClick() {
+    if (ent.isAnonymous) { promptSignInOrCancel(); return; }
     if (ent.recipeLimitReached) { setShowUpgrade(true); return; }
     setShowNewMenu(true);
   }
 
   function handlePickTemplate(tpl) {
+    if (ent.isAnonymous) { promptSignInOrCancel(); return; }
     // Strip template-only fields and let the store assign a new id + dates.
     const { id: _ignore, category: _c, description: _d, ...payload } = tpl;
     const created = create(payload);
@@ -81,6 +94,7 @@ export default function Recipes() {
   }
 
   async function handleDelete(id) {
+    if (ent.isAnonymous) { promptSignInOrCancel(); return; }
     const recipe = recipes.find(r => r.id === id);
     const ok = await confirm(t('confirm_delete', { name: recipe?.name }));
     if (ok) {
@@ -90,6 +104,7 @@ export default function Recipes() {
   }
 
   function handleDuplicate(id) {
+    if (ent.isAnonymous) { promptSignInOrCancel(); return; }
     const dup = duplicate(id);
     if (dup) showToast(t('recipe_duplicated'));
   }

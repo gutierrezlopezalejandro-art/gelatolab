@@ -8,6 +8,7 @@ import { getLowStock } from '../store/inventoryStore';
 import { useT, useI18nStore, useIngredientName, useLocale } from '../lib/i18n';
 import { BackupReminder } from '../components/BackupReminder';
 import { WelcomeTour, hasSeenTour } from '../components/WelcomeTour';
+import { useBusinessStore } from '../store/businessStore';
 import { useEffect, useState } from 'react';
 
 const TYPE_KEY = { helado: 'ice_cream', gelato: 'gelato', sorbete: 'sorbet' };
@@ -57,17 +58,20 @@ export default function Dashboard() {
   const lang       = useI18nStore(s => s.lang);
   const locale     = useLocale();
   const navigate   = useNavigate();
-  // Tour de bienvenida: solo se muestra la primera vez. El usuario puede
-  // cerrarlo o marcar "no volver a mostrar" — el flag vive en localStorage.
+  // Tour de bienvenida (Marco): solo se muestra la primera vez. El usuario
+  // puede cerrarlo o marcar "no volver a mostrar" — el flag vive en
+  // localStorage. Espera a que el OnboardingWizard de configuración del
+  // negocio (pais, nombre fantasia) este completo para no superponerse —
+  // el wizard usa overlay propio y darken background, y dos modales
+  // simultaneos hacian la pantalla ilegible.
+  const businessCompleted = useBusinessStore(s => s.completed);
   const [showTour, setShowTour] = useState(false);
   useEffect(() => {
-    if (!hasSeenTour()) {
-      // Pequeno delay para que el navbar termine de renderizar y el tour
-      // pueda anclarse correctamente a los NavLinks.
-      const timer = setTimeout(() => setShowTour(true), 600);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+    if (!businessCompleted) return;     // espera a que termine la config inicial
+    if (hasSeenTour()) return;           // ya lo vio antes
+    const timer = setTimeout(() => setShowTour(true), 600);
+    return () => clearTimeout(timer);
+  }, [businessCompleted]);
   const recipes    = useRecipeStore(s => s.recipes);
   const ingredients = useIngredientStore(s => s.ingredients);
   const prodLog    = useProductionStore(s => s.log);

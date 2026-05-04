@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>GelatoLab — Folleto de onboarding</title>
+<style>
+  /* ============================================================
+     Folleto A4 doble cara — Diseño print-ready.
+     Para usar: abrir en Chrome → Ctrl+P → Guardar como PDF.
+     Configurar: márgenes "Ninguno", color "Activado", escala 100%.
+     ============================================================ */
+
+  :root {
+    --ink: #2a1f17;
+    --ink2: #5a4a3a;
+    --ink3: #8a7a6a;
+    --cream: #fbf6ed;
+    --cream2: #f3ebde;
+    --gold: #e8b920;
+    --mint: #4a8a6e;
+    --mint3: #d8ebe0;
+    --coral: #c46a52;
+  }
+
+  @page { size: A4; margin: 0; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--ink);
+    background: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    padding: 18mm 16mm;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  h1, h2, h3, h4 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; }
+
+  /* ====== Página 1 — Frente ====== */
+  .p1 {
+    background:
+      radial-gradient(ellipse at top right, var(--mint3) 0%, transparent 50%),
+      linear-gradient(180deg, var(--cream) 0%, white 100%);
+  }
+
+  .p1 .header {
+    border-bottom: 3px solid var(--gold);
+    padding-bottom: 8mm;
+    margin-bottom: 8mm;
+  }
+  .p1 .brand {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 36pt;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .p1 .brand em {
+    color: var(--gold);
+    font-style: normal;
+  }
+  .p1 .tagline {
+    font-size: 14pt;
+    color: var(--ink2);
+    margin-top: 2mm;
+    font-weight: 500;
+  }
+  .p1 .course-tag {
+    display: inline-block;
+    margin-top: 4mm;
+    font-size: 10pt;
+    color: var(--mint);
+    background: var(--mint3);
+    padding: 2mm 4mm;
+    border-radius: 100px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .p1 .pitch {
+    font-size: 11pt;
+    line-height: 1.55;
+    color: var(--ink2);
+    margin-bottom: 10mm;
+    padding: 6mm;
+    background: var(--cream2);
+    border-left: 4px solid var(--mint);
+    border-radius: 2px;
+  }
+
+  .p1 .features-title {
+    font-size: 14pt;
+    margin-bottom: 5mm;
+    color: var(--ink);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4mm;
+    margin-bottom: 8mm;
+  }
+  .feature {
+    background: white;
+    border: 1.5px solid var(--cream2);
+    border-radius: 4mm;
+    padding: 4mm;
+  }
+  .feature-icon { font-size: 16pt; line-height: 1; margin-bottom: 2mm; }
+  .feature-title { font-size: 10pt; font-weight: 700; margin-bottom: 2mm; line-height: 1.2; }
+  .feature-body { font-size: 8.5pt; line-height: 1.4; color: var(--ink2); }
+
+  .compare-title {
+    font-size: 14pt;
+    margin-bottom: 4mm;
+    color: var(--ink);
+  }
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+  }
+  .compare th, .compare td {
+    text-align: left;
+    padding: 3mm 4mm;
+    border-bottom: 1px solid var(--cream2);
+  }
+  .compare th {
+    background: var(--ink);
+    color: var(--cream);
+    font-weight: 600;
+    font-size: 9pt;
+    letter-spacing: 0.3px;
+  }
+  .compare td:first-child {
+    color: var(--ink3);
+    text-decoration: line-through;
+  }
+  .compare td:last-child { color: var(--ink); font-weight: 500; }
+
+  /* ====== Página 2 — Reverso ====== */
+  .p2 {
+    background: linear-gradient(180deg, white 0%, var(--cream) 100%);
+  }
+
+  .p2 .h2 {
+    font-size: 22pt;
+    margin-bottom: 6mm;
+    color: var(--ink);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 3mm;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 16mm 1fr;
+    gap: 4mm;
+    margin-bottom: 6mm;
+    align-items: start;
+  }
+  .step-num {
+    width: 14mm;
+    height: 14mm;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--ink);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 18pt;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step-content h4 {
+    font-size: 12pt;
+    margin-bottom: 2mm;
+  }
+  .step-content p {
+    font-size: 10pt;
+    line-height: 1.5;
+    color: var(--ink2);
+  }
+  .step-content .highlight {
+    color: var(--mint);
+    font-weight: 700;
+  }
+
+  .plans {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    margin-top: 4mm;
+    margin-bottom: 6mm;
+  }
+  .plans th {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 2.5mm 3mm;
+    text-align: left;
+    font-size: 8.5pt;
+    letter-spacing: 0.3px;
+  }
+  .plans th.center { text-align: center; }
+  .plans td { padding: 2mm 3mm; border-bottom: 1px solid var(--cream2); }
+  .plans td.center { text-align: center; font-weight: 700; }
+  .plans .check { color: var(--mint); font-size: 11pt; }
+  .plans .dash { color: var(--ink3); }
+
+  .discount-banner {
+    background: var(--mint);
+    color: white;
+    padding: 4mm 5mm;
+    border-radius: 3mm;
+    font-size: 10pt;
+    line-height: 1.4;
+    margin-bottom: 6mm;
+  }
+  .discount-banner b { color: var(--gold); }
+
+  .help-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3mm;
+    margin-bottom: 5mm;
+  }
+  .help-item {
+    background: white;
+    border: 1px solid var(--cream2);
+    border-radius: 3mm;
+    padding: 4mm;
+    font-size: 9pt;
+    line-height: 1.4;
+  }
+  .help-item strong { display: block; margin-bottom: 1.5mm; color: var(--ink); }
+
+  .footer {
+    border-top: 2px solid var(--gold);
+    padding-top: 4mm;
+    text-align: center;
+    font-size: 8.5pt;
+    color: var(--ink3);
+    line-height: 1.5;
+  }
+  .footer .brand-small {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 11pt;
+    color: var(--ink);
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== PÁGINA 1 ===================== -->
+<section class="page p1">
+
+  <header class="header">
+    <div class="brand">Gelato<em>Lab</em></div>
+    <div class="tagline">El laboratorio de helado profesional</div>
+    <div class="course-tag">Una herramienta del [NOMBRE DEL CURSO]</div>
+  </header>
+
+  <p class="pitch">
+    GelatoLab convierte una receta de helado en un proceso profesional: balancea
+    PAC, POD, FPD y los demás parámetros técnicos del estilo italiano, planifica
+    y controla la producción con hojas A4 imprimibles, gestiona el inventario
+    con descuento automático, registra los controles HACCP para trazabilidad
+    completa, y genera etiquetas nutricionales conforme a la normativa de Chile,
+    Perú, México, Argentina, Uruguay, Colombia, Brasil, Canadá, Ecuador,
+    Estados Unidos y Unión Europea. Funciona sin internet, en tu computadora,
+    en 8 idiomas.
+  </p>
+
+  <h2 class="features-title">Lo que hace por ti</h2>
+
+  <div class="features-grid">
+
+    <div class="feature">
+      <div class="feature-icon">🧪</div>
+      <div class="feature-title">Balanceo técnico automático</div>
+      <p class="feature-body">
+        Evalúa cada receta contra los rangos óptimos según el tipo y subtipo.
+        El botón Auto-balance propone ajustes en gramos para corregir lo que
+        esté fuera de rango.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🏷</div>
+      <div class="feature-title">Etiquetas con sellos LATAM, USA y UE</div>
+      <p class="feature-body">
+        Configura tu país y la app aplica la normativa local: octógonos
+        chilenos, peruanos, mexicanos, argentinos, uruguayos, colombianos;
+        lupa brasileña y canadiense; semáforo ecuatoriano; Nutrition Facts
+        de EE.UU.; Reg. UE 1169.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">📋</div>
+      <div class="feature-title">Planificación y control de producción</div>
+      <p class="feature-body">
+        Planifica los lotes por fecha y la app calcula la lista consolidada
+        de ingredientes a usar. Imprime una hoja A4 por receta con gramaje
+        real, pasos de proceso y casillas de firma para tu equipo.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">📦</div>
+      <div class="feature-title">Inventario y costos</div>
+      <p class="feature-body">
+        Stock por ingrediente con alertas de mínimos. Descuento automático
+        al confirmar una producción. Costo por kg, costo de receta y reportes.
+        Múltiples proveedores y códigos de barras por ingrediente.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">✅</div>
+      <div class="feature-title">HACCP y trazabilidad</div>
+      <p class="feature-body">
+        Registra controles de pasteurización, mantecación, cámaras frías,
+        recepción y limpieza con umbrales auto-derivados. Histórico filtrable
+        por tipo y fecha. Exporta a CSV para auditorías sanitarias.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">Asistente Marco con IA</div>
+      <p class="feature-body">
+        Un maestro virtual que te guía por la app, responde dudas técnicas
+        y propone correcciones a tus recetas. Sin manuales.
+      </p>
+    </div>
+
+  </div>
+
+  <h2 class="compare-title">GelatoLab vs Excel</h2>
+  <table class="compare">
+    <thead><tr><th>Lo que hacías antes</th><th>Con GelatoLab</th></tr></thead>
+    <tbody>
+      <tr><td>Calcular PAC y POD a mano</td><td>Cálculo automático con cada cambio</td></tr>
+      <tr><td>Hojas Excel diferentes por persona</td><td>Una receta única, sincronizada</td></tr>
+      <tr><td>Etiquetas en Word, sellos copy-paste</td><td>Etiqueta legal generada en 1 click</td></tr>
+      <tr><td>Inventario en cuaderno</td><td>Stock con alertas de reposición</td></tr>
+      <tr><td>Hoja de proceso escrita a mano</td><td>A4 imprimible por lote planificado</td></tr>
+    </tbody>
+  </table>
+
+</section>
+
+<!-- ===================== PÁGINA 2 ===================== -->
+<section class="page p2">
+
+  <h2 class="h2">Cómo empezar en 3 pasos</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h4>Descarga la app o úsala desde el navegador</h4>
+      <p>
+        <strong class="highlight">Sin instalar nada:</strong> entra a
+        <strong>gelatolab.app</strong> desde Chrome o Safari. La app funciona
+        igual dentro del navegador.<br>
+        <strong class="highlight">App de escritorio (recomendado):</strong>
+        entra a <strong>gelatolab.app/#/download</strong>. Funciona sin
+        internet y se actualiza sola.
+      </p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h4>Crea tu cuenta gratis</h4>
+      <p>
+        Click en <strong>Probar gratis</strong>. Solo email y password, sin
+        tarjeta. Vas a recibir un mail para confirmar — abre el link y listo.
+      </p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h4>Tu primera receta en 5 minutos</h4>
+      <p>
+        Click en <strong>Recetas → + Nueva receta → Asistente</strong>. Eliges
+        tipo (gelato, helado o sorbete) y subtipo (pistacho, chocolate, fresa).
+        La app sugiere una base balanceada. Click en <strong>Guardar</strong> y
+        después en <strong>Hoja de proceso</strong> para imprimir el A4.
+      </p>
+    </div>
+  </div>
+
+  <h2 class="h2">Plan Free vs Pro</h2>
+  <table class="plans">
+    <thead>
+      <tr>
+        <th>Funcionalidad</th>
+        <th class="center">Free</th>
+        <th class="center">Pro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Hasta 10 recetas locales</td><td class="center check">✓</td><td class="center">∞</td></tr>
+      <tr><td>Auto-balance + análisis técnico</td><td class="center check">✓</td><td class="center check">✓</td></tr>
+      <tr><td>Marco IA básico</td><td class="center check">✓</td><td class="center check">✓</td></tr>
+      <tr><td>Backup ZIP manual</td><td class="center check">✓</td><td class="center check">✓</td></tr>
+      <tr><td>Sincronización entre dispositivos</td><td class="center dash">—</td><td class="center check">✓</td></tr>
+      <tr><td>Multi-equipo (varios mantecadores)</td><td class="center dash">—</td><td class="center check">✓</td></tr>
+      <tr><td>Inventario y costos</td><td class="center dash">—</td><td class="center check">✓</td></tr>
+      <tr><td>HACCP completo + export CSV</td><td class="center dash">—</td><td class="center check">✓</td></tr>
+      <tr><td>Etiquetado nutricional + sellos LATAM</td><td class="center dash">—</td><td class="center check">✓</td></tr>
+      <tr><td>Planificación y control de producción A4</td><td class="center dash">—</td><td class="center check">✓</td></tr>
+      <tr><td>Comparación entre recetas</td><td class="center dash">—</td><td class="center check">✓</td></tr>
+    </tbody>
+  </table>
+
+  <div class="discount-banner">
+    Como alumno de <b>[NOMBRE DEL MAESTRO]</b> tienes un descuento especial.
+    Pídele el código a tu maestro al inscribirte.
+  </div>
+
+  <h2 class="h2" style="font-size: 16pt;">Si necesitas ayuda</h2>
+  <div class="help-grid">
+    <div class="help-item">
+      <strong>📚 Ayuda en la app</strong>
+      Icono <strong>?</strong> arriba a la derecha. Guías paso a paso por función.
+    </div>
+    <div class="help-item">
+      <strong>🤖 Asistente Marco</strong>
+      Pregúntale en lenguaje natural. Está abajo a la derecha en cada pantalla.
+    </div>
+    <div class="help-item">
+      <strong>✉ Soporte directo</strong>
+      hola@gelatolab.app
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand-small">GelatoLab — Hecho por heladeros, para heladeros.</div>
+    Cumple normativas de etiquetado de Chile, Perú, México, Argentina, Uruguay,
+    Colombia, Brasil, Canadá, Ecuador, EE.UU. y Unión Europea · gelatolab.app
+  </div>
+
+</section>
+
+</body>
+</html>

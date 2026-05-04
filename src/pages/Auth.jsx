@@ -14,6 +14,7 @@ export default function Auth() {
   const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'reset'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -38,6 +39,10 @@ export default function Auth() {
       } else if (mode === 'signup') {
         if (password.length < 6) {
           showToast(t('auth_password_short'), 'error');
+          return;
+        }
+        if (password !== passwordConfirm) {
+          showToast(t('auth_password_mismatch'), 'error');
           return;
         }
         if (!acceptTerms) {
@@ -120,6 +125,27 @@ export default function Auth() {
                 required
                 minLength={6}
               />
+            </div>
+          )}
+
+          {mode === 'signup' && (
+            <div>
+              <label htmlFor="auth-password-confirm" className="text-xs font-medium text-[var(--ink2)] block mb-1">
+                {t('auth_password_confirm')}
+              </label>
+              <input
+                id="auth-password-confirm"
+                type="password"
+                className="input"
+                value={passwordConfirm}
+                onChange={e => setPasswordConfirm(e.target.value)}
+                autoComplete="new-password"
+                required
+                minLength={6}
+              />
+              {passwordConfirm.length > 0 && password !== passwordConfirm && (
+                <p className="text-[10px] text-[var(--coral)] mt-1">{t('auth_password_mismatch')}</p>
+              )}
             </div>
           )}
 
