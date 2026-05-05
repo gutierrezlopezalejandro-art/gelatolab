@@ -12,7 +12,7 @@ const VISITED_KEY = 'gelatolab-visited';
 // la API de GitHub para version+changelog, y links directos a cada bundle.
 // Activamos los botones cuando ya hay un release publico (no draft) en
 // /releases/latest del repo.
-const RELEASES_AVAILABLE = false;
+const RELEASES_AVAILABLE = true;
 
 function detectOS() {
   if (typeof navigator === 'undefined') return 'unknown';
