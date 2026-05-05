@@ -48,6 +48,7 @@ export function UserMenu() {
   if (!user) {
     return (
       <button
+        data-tour="user-menu"
         onClick={() => navigate('/auth')}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold
                    bg-white/10 hover:bg-white/20 text-white/80 hover:text-white

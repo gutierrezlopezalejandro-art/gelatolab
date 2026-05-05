@@ -86,9 +86,10 @@ export function WelcomeTour({ onClose }) {
   useEscapeKey(handleClose);
 
   // Posiciona el popover respecto al ancla (si hay) o centrado.
-  // Reintentamos hasta 600ms porque algunos elementos (UserMenu) pueden
-  // tardar en montarse dentro del navbar, y un querySelector inmediato
-  // devuelve null antes de que React termine de renderizar.
+  // Al cambiar de paso siempre limpiamos el rect viejo para evitar que el
+  // highlight quede pegado al ancla anterior. Si el elemento no aparece en
+  // el primer intento (caso UserMenu, que tarda unos ms en montar),
+  // reintentamos hasta 600ms.
   useLayoutEffect(() => {
     if (!step.anchor) {
       setAnchorRect(null);
@@ -107,14 +108,22 @@ export function WelcomeTour({ onClose }) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
     }
 
-    function tryFind() {
-      if (cancelled) return;
-      const el = document.querySelector(step.anchor);
-      if (el) { applyRect(el); return; }
-      if (++attempts < 10) setTimeout(tryFind, 60);
-      else setAnchorRect(null);
+    // Intento sincrono inmediato. Si encuentra el ancla, no flickea.
+    const first = document.querySelector(step.anchor);
+    if (first) {
+      applyRect(first);
+    } else {
+      // No encontrado: limpiamos el rect viejo (popup al centro) y empezamos
+      // a reintentar.
+      setAnchorRect(null);
+      function tryFind() {
+        if (cancelled) return;
+        const el = document.querySelector(step.anchor);
+        if (el) { applyRect(el); return; }
+        if (++attempts < 10) setTimeout(tryFind, 60);
+      }
+      setTimeout(tryFind, 60);
     }
-    tryFind();
 
     // Recalcular si el viewport cambia (resize, orientación), así el
     // highlight sigue al elemento.
