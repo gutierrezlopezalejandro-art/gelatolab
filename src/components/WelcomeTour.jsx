@@ -86,22 +86,47 @@ export function WelcomeTour({ onClose }) {
   useEscapeKey(handleClose);
 
   // Posiciona el popover respecto al ancla (si hay) o centrado.
+  // Reintentamos hasta 600ms porque algunos elementos (UserMenu) pueden
+  // tardar en montarse dentro del navbar, y un querySelector inmediato
+  // devuelve null antes de que React termine de renderizar.
   useLayoutEffect(() => {
     if (!step.anchor) {
       setAnchorRect(null);
       return;
     }
-    const el = document.querySelector(step.anchor);
-    if (!el) {
-      setAnchorRect(null);
-      return;
+    let cancelled = false;
+    let attempts = 0;
+
+    function applyRect(el) {
+      const rect = el.getBoundingClientRect();
+      setAnchorRect({
+        top: rect.top, left: rect.left, width: rect.width, height: rect.height,
+      });
+      // Scroll suave si no se ve verticalmente. Usamos inline:'nearest' para
+      // no provocar shifts horizontales con elementos del lado derecho.
+      el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
     }
-    const rect = el.getBoundingClientRect();
-    setAnchorRect({
-      top: rect.top, left: rect.left, width: rect.width, height: rect.height,
-    });
-    // Scroll suave hasta el ancla si no se ve.
-    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+    function tryFind() {
+      if (cancelled) return;
+      const el = document.querySelector(step.anchor);
+      if (el) { applyRect(el); return; }
+      if (++attempts < 10) setTimeout(tryFind, 60);
+      else setAnchorRect(null);
+    }
+    tryFind();
+
+    // Recalcular si el viewport cambia (resize, orientación), así el
+    // highlight sigue al elemento.
+    function onResize() {
+      const el = document.querySelector(step.anchor);
+      if (el) {
+        const r = el.getBoundingClientRect();
+        setAnchorRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+      }
+    }
+    window.addEventListener('resize', onResize);
+    return () => { cancelled = true; window.removeEventListener('resize', onResize); };
   }, [stepIdx]);
 
   useEffect(() => {
