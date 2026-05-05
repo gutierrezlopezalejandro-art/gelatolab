@@ -76,6 +76,11 @@ export default function Landing() {
   const navigate = useNavigate();
   const user = useAuthStore(s => s.user);
 
+  // IMPORTANTE: todos los hooks deben ir ANTES del early return de
+  // shouldRedirect, sino React tira "rendered fewer hooks" (#300) cuando
+  // la sesión cambia (login/logout) y hace re-render.
+  const detectedOS = useMemo(() => detectOS(), []);
+
   // Si el usuario ya esta logueado, manda directo al dashboard sin ver
   // landing. Idem si vuelve y ya marco "visited".
   const shouldRedirect = user || hasVisited();
@@ -103,7 +108,6 @@ export default function Landing() {
     }
     // Si no hay release todavia, el boton queda en "proximamente" via disabled.
   }
-  const detectedOS = useMemo(() => detectOS(), []);
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--cream)' }}>
