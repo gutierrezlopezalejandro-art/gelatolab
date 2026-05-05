@@ -78,31 +78,71 @@ function writeCache(data) {
   } catch { /* tolerable */ }
 }
 
+// Fallback determinista: construye los assets esperados a partir de la
+// version del bundle (__APP_VERSION__). Se usa cuando la API de GitHub
+// no responde (rate limit anonimo de 60/h, network down, etc.) y asi
+// los usuarios siempre pueden descargar.
+function buildFallbackRelease() {
+  const v = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '';
+  if (!v) return null;
+  const base = `https://github.com/gutierrezlopezalejandro-art/gelatolab/releases/download/v${v}`;
+  const expected = [
+    `GelatoLab_${v}_x64-setup.exe`,
+    `GelatoLab_${v}_x64_en-US.msi`,
+    `GelatoLab_${v}_x64_es-ES.msi`,
+    `GelatoLab_${v}_universal.dmg`,
+    `GelatoLab_${v}_amd64.AppImage`,
+    `GelatoLab_${v}_amd64.deb`,
+  ];
+  const assets = expected.map(name => {
+    const cls = classifyAsset(name);
+    if (!cls) return null;
+    return { name, url: `${base}/${name}`, size: 0, ...cls };
+  }).filter(Boolean);
+  return {
+    version: v,
+    name: `GelatoLab v${v}`,
+    publishedAt: '',
+    notes: '',
+    htmlUrl: RELEASES_PAGE,
+    assets,
+    fallback: true,
+  };
+}
+
 async function fetchLatestRelease() {
   const cached = readCache();
   if (cached) return cached;
-  const r = await fetch(RELEASES_API, { headers: { Accept: 'application/vnd.github+json' } });
-  if (!r.ok) throw new Error(`GitHub API ${r.status}`);
-  const json = await r.json();
-  const data = {
-    version: json.tag_name?.replace(/^v/, '') || '',
-    name: json.name || '',
-    publishedAt: json.published_at || '',
-    notes: json.body || '',
-    htmlUrl: json.html_url || RELEASES_PAGE,
-    assets: (json.assets || []).map(a => {
-      const cls = classifyAsset(a.name);
-      if (!cls) return null;
-      return {
-        name: a.name,
-        url: a.browser_download_url,
-        size: a.size,
-        ...cls,
-      };
-    }).filter(Boolean),
-  };
-  writeCache(data);
-  return data;
+  try {
+    const r = await fetch(RELEASES_API, { headers: { Accept: 'application/vnd.github+json' } });
+    if (!r.ok) throw new Error(`GitHub API ${r.status}`);
+    const json = await r.json();
+    const data = {
+      version: json.tag_name?.replace(/^v/, '') || '',
+      name: json.name || '',
+      publishedAt: json.published_at || '',
+      notes: json.body || '',
+      htmlUrl: json.html_url || RELEASES_PAGE,
+      assets: (json.assets || []).map(a => {
+        const cls = classifyAsset(a.name);
+        if (!cls) return null;
+        return {
+          name: a.name,
+          url: a.browser_download_url,
+          size: a.size,
+          ...cls,
+        };
+      }).filter(Boolean),
+    };
+    writeCache(data);
+    return data;
+  } catch (e) {
+    // API rate-limited o sin red — usamos el fallback determinista para no
+    // dejar al usuario sin links de descarga.
+    const fb = buildFallbackRelease();
+    if (fb) return fb;
+    throw e;
+  }
 }
 
 function LangSwitch() {
