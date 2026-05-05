@@ -468,7 +468,7 @@ export function BusinessSettingsModal({ onClose }) {
           </details>
 
           <div className="pt-4 mt-2 border-t border-black/5 text-center text-[10px] text-[var(--ink3)]">
-            GelatoLab · desarrollado y soportado por <span className="font-semibold text-[var(--ink2)]">Llanquihue Tech SpA</span>
+            GelatoLab v{__APP_VERSION__} · desarrollado y soportado por <span className="font-semibold text-[var(--ink2)]">Llanquihue Tech SpA</span>
           </div>
         </div>
 

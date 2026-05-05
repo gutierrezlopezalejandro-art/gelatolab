@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import basicSsl from '@vitejs/plugin-basic-ssl';
+import pkg from './package.json' with { type: 'json' };
 
 // HTTPS opcional via env var. iOS Safari requiere HTTPS para getUserMedia,
 // asi que cuando vayas a probar el escaner desde el iPhone usa:
@@ -10,6 +11,11 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 const useHttps = String(process.env.VITE_HTTPS || '').trim() === '1';
 
 export default defineConfig({
+  // Expone la version del package.json como constante en el bundle.
+  // Asi la UI puede mostrar "v1.0.4" sin importar el archivo en runtime.
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   plugins: [react(), ...(useHttps ? [basicSsl()] : [])],
   server: {
     host: true, // escuchar en todas las interfaces (LAN)
