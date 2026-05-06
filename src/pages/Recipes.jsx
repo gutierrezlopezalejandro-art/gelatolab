@@ -139,24 +139,27 @@ export default function Recipes() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+      {/* Header — stack vertical en mobile, lado a lado en sm+. Antes el
+          search se ahogaba en max-w-[200px] junto al botón "+ Nueva receta",
+          y en mobile la fila quedaba apretada con dos elementos competiendo
+          por el ancho. Ahora cada uno tiene su espacio. */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="font-display text-4xl text-[var(--ink)]">{t('recipes')}</h1>
           <p className="text-sm text-[var(--ink2)] mt-1">{t('click_to_edit')}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <label htmlFor="recipes-search" className="sr-only">{t('search_recipes')}</label>
           <input
             id="recipes-search"
             type="search"
-            className="input max-w-[200px]"
+            className="input w-full sm:max-w-[200px]"
             placeholder={t('search_recipes')}
             value={q}
             onChange={e => setQ(e.target.value)}
           />
           <button data-tour="recipe-new-btn"
-                  className="btn-primary inline-flex items-center gap-1.5"
+                  className="btn-primary inline-flex items-center justify-center gap-1.5 w-full sm:w-auto"
                   onClick={handleNewClick}>
             <span className="text-base leading-none">＋</span> {t('new_recipe')}
             {!ent.isPro && (

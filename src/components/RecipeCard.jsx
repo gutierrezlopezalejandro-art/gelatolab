@@ -105,23 +105,29 @@ export default function RecipeCard({ recipe, ingredients, onEdit, onDuplicate, o
           </div>
         )}
 
-        {/* Tech chips */}
+        {/* Tech chips — En mobile (≤640px) los 3 chips numéricos (grasa, az,
+            FPD) son ilegibles en text-[10px] y no dejan espacio horizontal
+            para la información esencial. Los ocultamos y la barra de
+            composición de arriba ya transmite los porcentajes visualmente.
+            El chip "Ajuste" (rojo, cuando verdict==='bad') sí queda visible
+            en todos los breakpoints porque es accionable — el usuario debe
+            saber que la receta necesita rebalancearse. */}
         {s && (
           <div className="flex flex-wrap gap-1 mb-3">
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full
+            <span className="hidden sm:inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full
                              bg-[var(--mint3)] text-[#0d3d22]">
               {t('total_fat')} {(s.pGrasa * 100).toFixed(1)}%
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full
+            <span className="hidden sm:inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full
                              bg-[var(--gold2)] text-[#5c3d00]">
               {t('total_sugar')} {(s.pAzucar * 100).toFixed(1)}%
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full
+            <span className="hidden sm:inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full
                              bg-[var(--teal2)] text-[#073a47]">
               FPD {s.fpd.toFixed(2)}°C
             </span>
             {verdict === 'bad' && (
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full
+              <span className="text-xs sm:text-[10px] font-semibold px-2 py-1 sm:py-0.5 rounded-full
                                bg-[var(--coral2)] text-[var(--coral)]">
                 {t('adjustment')}
               </span>
