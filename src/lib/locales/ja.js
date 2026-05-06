@@ -248,6 +248,8 @@ export default {
     production_plan: '製造計画',
     plan_subtitle: '日付ごとに生産を計画し、レシピごとの推定数量を確認します。',
     help_search_placeholder: 'ヘルプを検索…',
+    dash_max: '最大',
+    haccp_record_first: '最初の測定を記録',
     help_search_count: '{total}件中{shown}件の記事',
     help_articles_total: '件の記事',
     auth_password_hint: '6文字以上',

@@ -247,7 +247,13 @@ export default function Dashboard() {
       <div className="card p-5 mb-6">
         <div className="flex items-baseline justify-between mb-3 flex-wrap gap-2">
           <h3 className="font-display text-base text-[var(--ink)]">{t('dash_production_trend')}</h3>
-          <span className="text-[10px] text-[var(--ink3)] uppercase tracking-widest">{t('dash_last_14_days')}</span>
+          <div className="flex items-baseline gap-3 text-[10px] text-[var(--ink3)] uppercase tracking-widest">
+            {/* Escala visible: cuál es el máximo de la última quincena. Antes
+                la altura de las barras no tenía referencia y un usuario no
+                sabía si "5 L" era mucho o poco para el contexto. */}
+            {maxDailyLiters > 0 && <span>{t('dash_max')}: {maxDailyLiters.toFixed(1)} L</span>}
+            <span>{t('dash_last_14_days')}</span>
+          </div>
         </div>
         {dailyLiters.every(b => b.liters === 0) ? (
           <p className="text-xs text-[var(--ink3)] text-center py-6">{t('dash_no_production_yet')}</p>
@@ -404,8 +410,14 @@ export default function Dashboard() {
                     <span className="font-semibold text-[var(--ink)]">{count}</span>
                   </div>
                   <div className="h-2 bg-[var(--cream2)] rounded overflow-hidden">
+                    {/* min 4% de ancho cuando hay al menos 1 receta para que
+                        la barra sea visible aunque el porcentaje sea muy bajo
+                        (ej. Sorbete con 2/32 = 6.25% antes era casi invisible). */}
                     <div className="h-full rounded transition-all duration-700"
-                         style={{ width: `${(count / total) * 100}%`, background: color }} />
+                         style={{
+                           width: count === 0 ? '0%' : `${Math.max((count / total) * 100, 4)}%`,
+                           background: color,
+                         }} />
                   </div>
                 </div>
               );

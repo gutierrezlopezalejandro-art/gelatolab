@@ -279,7 +279,21 @@ export default function Haccp() {
 
       {/* List grouped by date */}
       {grouped.length === 0 ? (
-        <div className="card p-8 text-center text-sm text-[var(--ink3)]">{t('haccp_empty')}</div>
+        <div className="card p-8 text-center">
+          <div className="text-4xl mb-3" aria-hidden="true">🧪</div>
+          <p className="text-sm text-[var(--ink2)] mb-4">{t('haccp_empty')}</p>
+          <button
+            onClick={() => {
+              // Foco en el primer campo del form de Quick-add para que el
+              // usuario sepa exactamente dónde registrar su primera medición.
+              document.getElementById('haccp-type')?.focus();
+              document.querySelector('[data-tour="haccp-form"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            className="btn-primary"
+          >
+            {t('haccp_record_first')}
+          </button>
+        </div>
       ) : (
         grouped.map(([date, items]) => (
           <div key={date} className="card mb-4 overflow-hidden">

@@ -248,6 +248,8 @@ export default {
     production_plan: '생산 계획',
     plan_subtitle: '날짜별로 생산을 계획하고 레시피별 예상 수량을 확인하세요.',
     help_search_placeholder: '도움말 검색…',
+    dash_max: '최대',
+    haccp_record_first: '첫 측정 기록',
     help_search_count: '전체 {total}개 중 {shown}개 문서',
     help_articles_total: '개 문서',
     auth_password_hint: '최소 6자',
