@@ -82,6 +82,7 @@ export function UserMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`${t('account')}: ${user.email}`}
+        title={`${t('account')}: ${user.email}`}
         className="flex items-center gap-1.5 px-2 py-1 rounded-lg
                    bg-white/10 hover:bg-white/20 transition-colors cursor-pointer border-none"
       >

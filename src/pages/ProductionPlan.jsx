@@ -491,7 +491,7 @@ export default function ProductionPlan() {
     <div><strong>${t('date_label')}:</strong> ${date}</div>
     ${pname ? `<div><strong>${t('plan_name_label')}:</strong> ${escape(pname)}</div>` : ''}
     <div><strong>${t('total_recipes_count')}:</strong> ${enriched.length}</div>
-    <div><strong>${t('total_litros')}:</strong> ${totalLiters.toFixed(1)} L</div>
+    <div><strong>${t('total_liters_label')}:</strong> ${totalLiters.toFixed(1)} L</div>
     ${equipmentMeta}
   </div>
 </header>
@@ -502,7 +502,7 @@ ${enriched.length > 0 ? `
   <thead>
     <tr>
       <th>${t('recipe_label')}</th>
-      <th class="num">${t('litros')}</th>
+      <th class="num">${t('liters')}</th>
       <th class="num">${t('scoops')}</th>
       <th class="num">${t('cost')}</th>
       ${showAssignedCol ? `<th>${t('print_equip_assigned')}</th>` : ''}

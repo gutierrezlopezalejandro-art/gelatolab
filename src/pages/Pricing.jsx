@@ -70,7 +70,12 @@ export default function Pricing() {
 
         {/* Pro plan */}
         <div className="bg-white rounded-2xl border-2 border-[#e8b920] p-7 relative shadow-md">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#e8b920] text-[var(--ink)] text-[10px] font-bold uppercase tracking-wider">
+          {/* Badge "RECOMENDADO" — antes era bg-[#e8b920] (gold saturado)
+              que competía visualmente con el CTA "Solicitar acceso anticipado"
+              que también usa gold filled. Ahora pasa al gold pastel (gold2)
+              con texto oscuro — match con el patrón badge-acc del index.css
+              y no duplica el peso visual del CTA principal del card. */}
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[var(--gold2)] text-[#5c3d00] text-[10px] font-bold uppercase tracking-wider border border-[var(--gold)]/40">
             {t('plan_pro_recommended')}
           </div>
           <div className="flex items-baseline justify-between mb-4">

@@ -45,6 +45,10 @@ export function NumberInput({ value, onChange, fallback = 0, ...inputProps }) {
     <input
       type="number"
       inputMode="decimal"
+      // pattern defensivo para teclados iOS legacy que no respetan
+      // inputMode="decimal" sobre type="number" (Safari < 13). Browsers
+      // modernos lo ignoran sobre type=number, así que es no-op para ellos.
+      pattern="[0-9]*\.?[0-9]*"
       {...inputProps}
       value={str}
       onChange={handleChange}

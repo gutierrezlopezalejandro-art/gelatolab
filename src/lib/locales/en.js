@@ -428,6 +428,8 @@ export default {
     folder_backup_title_short: 'Automatic backup to PC folder',
     folder_backup_not_connected: 'No folder connected. Your data lives only in this browser. Connect a folder to save real JSON files to your PC on every change.',
     backup_zip_advanced: '⚙ Manual ZIP backup (advanced)',
+    backup_reminder_restore: 'Show backup reminder again',
+    backup_reminder_restored: 'Reminder re-enabled',
     backup_zip_advanced_sub: 'Download all your data as a single ZIP. Useful to move data to another machine or as a one-off snapshot.',
     folder_backup_sub: 'Connect a REAL folder on your PC. Every change to recipes, batches or inventory saves automatically as JSON. If the folder is on Drive/Dropbox/OneDrive sync, you get continuous cross-device backup.',
     folder_backup_unsupported: 'Your browser does not support this. Available in Chrome, Edge, and Opera. Meanwhile use the manual ZIP above.',
@@ -538,7 +540,7 @@ export default {
     // Consolidated plan print
     plan_name_label: 'Plan',
     total_recipes_count: 'Recipes',
-    total_litros: 'Total liters',
+    total_liters_label: 'Total liters',
     plan_recipes_section: 'Planned recipes',
     scoops: 'Scoops',
 
@@ -1473,8 +1475,6 @@ export default {
     discard_plan: 'Discard all changes to the current plan?',
     plan_discarded: 'Plan discarded',
     add_at_least_one: 'Add at least one recipe',
-    litros: 'Liters',
-    costo: 'Cost',
     no_snapshot: 'No ingredient snapshot for this batch.',
     brand_placeholder: 'Brand...',
     ing_subtitle: 'ingredients with technical parameters — values per 100g',

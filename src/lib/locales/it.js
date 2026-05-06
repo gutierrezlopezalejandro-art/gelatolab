@@ -426,8 +426,6 @@ export default {
     add_at_least_one: 'Aggiungi almeno una ricetta',
 
     // ProductionLog extras
-    litros: 'Litri',
-    costo: 'Costo',
     no_snapshot: 'Nessuno snapshot degli ingredienti per questo lotto.',
     brand_placeholder: 'Marca...',
 
@@ -933,6 +931,8 @@ export default {
     folder_backup_title_short: "Backup automatico su cartella del PC",
     folder_backup_not_connected: "Nessuna cartella connessa. I tuoi dati vivono solo in questo browser. Connettendo una cartella vengono salvati come veri file JSON sul tuo PC ad ogni modifica.",
     backup_zip_advanced: "⚙ Backup ZIP manuale (avanzato)",
+    backup_reminder_restore: 'Mostra di nuovo il promemoria di backup',
+    backup_reminder_restored: 'Promemoria riattivato',
     backup_zip_advanced_sub: "Scarica tutti i tuoi dati come un singolo ZIP. Utile per spostare i dati su un'altra macchina o come snapshot occasionale.",
     folder_backup_sub: "Connetti una cartella REALE del PC. Ogni modifica a ricette, lotti o inventario viene salvata automaticamente come JSON. Se la cartella è su Drive/Dropbox/OneDrive sincronizzato, hai backup continuo e cross-device.",
     folder_backup_unsupported: "Il tuo browser non supporta questa funzione. Disponibile su Chrome, Edge e Opera. Nel frattempo usa lo ZIP manuale qui sopra.",
@@ -985,7 +985,7 @@ export default {
     sheet_internal_doc: "Documento interno di produzione",
     recipe_process_notes: "Note di processo della ricetta",
     total_recipes_count: "Ricette",
-    total_litros: "Litri totali",
+    total_liters_label: "Litri totali",
     plan_recipes_section: "Ricette pianificate",
     plan_past_readonly: "Questa data è già passata. Puoi solo consultare e stampare; non è possibile modificare.",
     delete_plan: "Elimina piano",

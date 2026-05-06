@@ -426,8 +426,6 @@ export default {
     add_at_least_one: 'Mindestens ein Rezept hinzufuegen',
 
     // ProductionLog extras
-    litros: 'Liter',
-    costo: 'Kosten',
     no_snapshot: 'Kein Zutaten-Snapshot fuer diese Charge.',
     brand_placeholder: 'Marke...',
 
@@ -933,6 +931,8 @@ export default {
     folder_backup_title_short: "Automatisches Backup in PC-Ordner",
     folder_backup_not_connected: "Kein Ordner verbunden. Deine Daten leben nur in diesem Browser. Verbinde einen Ordner, um echte JSON-Dateien bei jeder Änderung auf deinem PC zu speichern.",
     backup_zip_advanced: "⚙ Manuelles ZIP-Backup (erweitert)",
+    backup_reminder_restore: 'Backup-Erinnerung wieder anzeigen',
+    backup_reminder_restored: 'Erinnerung reaktiviert',
     backup_zip_advanced_sub: "Lade alle deine Daten als einziges ZIP herunter. Nützlich, um Daten auf einen anderen Rechner zu übertragen oder als einmaligen Snapshot.",
     folder_backup_sub: "Verbinde einen ECHTEN Ordner auf deinem PC. Jede Änderung an Rezepten, Chargen oder Inventar wird automatisch als JSON gespeichert. Wenn der Ordner mit Drive/Dropbox/OneDrive synchronisiert ist, hast du kontinuierliches geräteübergreifendes Backup.",
     folder_backup_unsupported: "Dein Browser unterstützt diese Funktion nicht. Verfügbar in Chrome, Edge und Opera. Verwende vorerst das manuelle ZIP oben.",
@@ -985,7 +985,7 @@ export default {
     sheet_internal_doc: "Internes Produktionsdokument",
     recipe_process_notes: "Prozessnotizen des Rezepts",
     total_recipes_count: "Rezepte",
-    total_litros: "Liter gesamt",
+    total_liters_label: "Liter gesamt",
     plan_recipes_section: "Geplante Rezepte",
     plan_past_readonly: "Dieses Datum liegt in der Vergangenheit. Nur Anzeigen und Drucken — Bearbeiten ist deaktiviert.",
     delete_plan: "Plan löschen",

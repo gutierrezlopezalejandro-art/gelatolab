@@ -523,6 +523,19 @@ export function BusinessSettingsModal({ onClose }) {
                   onChange={handleImportFile}
                 />
               </div>
+              {/* H48 — Re-show backup reminder. Si el usuario cerró el banner
+                  con × en el Dashboard, queda dismissado por toda la sesión.
+                  Este botón limpia el sessionStorage para que vuelva a aparecer
+                  en la próxima visita a una pantalla autenticada. Útil cuando
+                  alguien lo cerró por error y quiere volver a tenerlo visible. */}
+              <button type="button"
+                      className="text-[11px] text-[var(--mint)] hover:underline cursor-pointer bg-transparent border-none mt-2"
+                      onClick={() => {
+                        try { sessionStorage.removeItem('__gelatolab_backup_reminder_dismissed'); } catch {}
+                        showToast(t('backup_reminder_restored'));
+                      }}>
+                ↻ {t('backup_reminder_restore')}
+              </button>
             </div>
           </details>
 

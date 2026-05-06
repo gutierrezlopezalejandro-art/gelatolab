@@ -513,13 +513,13 @@ export default function ProductionLog() {
                     </div>
                     <div className="text-center min-w-[64px]">
                       <div className="font-display text-lg text-[var(--gold)]">{totalL.toFixed(1)} L</div>
-                      <div className="text-[9px] text-[var(--cream)]/50 uppercase tracking-wide">{t('litros')}</div>
+                      <div className="text-[9px] text-[var(--cream)]/50 uppercase tracking-wide">{t('liters')}</div>
                     </div>
                     <div className="text-center min-w-[80px]">
                       <div className="font-display text-lg text-[var(--gold)]">
                         {fmtCurrency(Math.round(totalCost))}
                       </div>
-                      <div className="text-[9px] text-[var(--cream)]/50 uppercase tracking-wide">{t('costo')}</div>
+                      <div className="text-[9px] text-[var(--cream)]/50 uppercase tracking-wide">{t('cost')}</div>
                     </div>
                   </div>
                   <span className="text-base ml-1 transition-transform duration-200"

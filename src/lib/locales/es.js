@@ -440,6 +440,8 @@ export default {
     folder_backup_title_short: 'Backup automático a carpeta del PC',
     folder_backup_not_connected: 'Sin carpeta conectada. Tus datos viven solo en este navegador. Conectar una carpeta los guarda como JSONs reales en tu PC en cada cambio.',
     backup_zip_advanced: '⚙ Backup ZIP manual (avanzado)',
+    backup_reminder_restore: 'Volver a mostrar recordatorio de backup',
+    backup_reminder_restored: 'Recordatorio reactivado',
     backup_zip_advanced_sub: 'Descarga toda tu información como un ZIP único. Útil para mover datos a otro equipo o como respaldo puntual.',
     folder_backup_sub: 'Conecta una carpeta REAL del PC. Cada cambio en recetas, lotes o inventario se guarda como JSON automáticamente. Si la carpeta está en Drive/Dropbox/OneDrive sincronizado, tienes respaldo continuo y cross-device.',
     folder_backup_unsupported: 'Tu navegador no soporta esta funcion. Disponible en Chrome, Edge y Opera. Mientras tanto, usa el ZIP manual de arriba.',
@@ -552,7 +554,7 @@ export default {
     // Consolidated plan print
     plan_name_label: 'Plan',
     total_recipes_count: 'Recetas',
-    total_litros: 'Litros totales',
+    total_liters_label: 'Litros totales',
     plan_recipes_section: 'Recetas planificadas',
     scoops: 'Bolas',
 
@@ -1576,8 +1578,6 @@ export default {
     add_at_least_one: 'Agrega al menos una receta',
 
     // ProductionLog extras
-    litros: 'Litros',
-    costo: 'Costo',
     no_snapshot: 'Sin snapshot de ingredientes para este lote.',
     brand_placeholder: 'Marca...',
 
