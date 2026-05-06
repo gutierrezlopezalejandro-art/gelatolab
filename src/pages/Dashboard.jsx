@@ -6,6 +6,7 @@ import { useIngredientStore } from '../store/ingredientStore';
 import { usePlanStore } from '../store/planStore';
 import { getLowStock } from '../store/inventoryStore';
 import { useT, useI18nStore, useIngredientName, useLocale } from '../lib/i18n';
+import { useFormatters } from '../lib/format';
 // BackupReminder se renderiza desde App.jsx para que aparezca en todas las
 // pantallas autenticadas (no solo Dashboard). El riesgo de pérdida de datos
 // sin backup es transversal — un usuario que entra directo a /recipes nunca
@@ -60,6 +61,7 @@ export default function Dashboard() {
   const tIng       = useIngredientName();
   const lang       = useI18nStore(s => s.lang);
   const locale     = useLocale();
+  const { fmtCurrency } = useFormatters();
   const navigate   = useNavigate();
   // Tour de bienvenida (Marco): solo se muestra la primera vez. El usuario
   // puede cerrarlo o marcar "no volver a mostrar" — el flag vive en
@@ -198,7 +200,7 @@ export default function Dashboard() {
         />
         <StatCardWithDelta
           label={t('cost_this_month')}
-          value={`$${Math.round(mStats.cost).toLocaleString(locale)}`}
+          value={fmtCurrency(Math.round(mStats.cost))}
           delta={<Delta now={mStats.cost} prev={pStats.cost} />}
           sub={t('this_month')}
         />

@@ -27,6 +27,7 @@ import { MobileDesktopHint } from '../components/MobileDesktopHint';
 import { FEATURES } from '../lib/entitlement';
 import { calcStats, calcDensity, calcServingTemp, getParams, resolveRecipeItems, applyEvaporation } from '../lib/icecreamCalc';
 import { useT, useIngredientName, useCategoryName, useI18nStore } from '../lib/i18n';
+import { useFormatters } from '../lib/format';
 import { analyzeRecipeAI } from '../lib/ai';
 import { useAiStore } from '../store/aiStore';
 import { AiKeyModal } from '../components/AiKeyModal';
@@ -38,6 +39,7 @@ export default function RecipeEditor() {
   const navigate = useNavigate();
   const { showToast } = useAppStore();
   const t = useT();
+  const { fmtCurrency } = useFormatters();
   const tIng = useIngredientName();
   const tCat = useCategoryName();
 
@@ -259,7 +261,7 @@ export default function RecipeEditor() {
       ts    ? `${t('serving_temp')}: ${ts}°C`   : '',
       stats ? `PAC: ${(stats.pacPct * 10).toFixed(0)}` : '',
       stats ? `POD: ${(stats.podPct * 10).toFixed(0)}` : '',
-      stats ? `${t('est_cost_label')}: $${Math.round(stats.cost).toLocaleString('es-CL')}` : '',
+      stats ? `${t('est_cost_label')}: ${fmtCurrency(Math.round(stats.cost))}` : '',
     ].filter(l => l !== '').join('\n');
 
     const blob = new Blob([lines], { type: 'text/plain;charset=utf-8' });
@@ -396,7 +398,7 @@ export default function RecipeEditor() {
       otros:  f('others_pct'),
       pod:    fPAC('pod'),
       pac:    fPAC('pac'),
-      costo:  ing ? `$${Math.round(g * ing.cost_per_kg / 1000).toLocaleString('es-CL')}` : '—',
+      costo:  ing ? fmtCurrency(Math.round(g * ing.cost_per_kg / 1000)) : '—',
     };
   };
 
@@ -639,7 +641,7 @@ export default function RecipeEditor() {
                             otros: ns.otros.toFixed(1),
                             pod:   (ns.pod * 10).toFixed(1),
                             pac:   (ns.pac * 10).toFixed(1),
-                            costo: `$${Math.round(ns.cost).toLocaleString('es-CL')}`,
+                            costo: fmtCurrency(Math.round(ns.cost)),
                           };
                         }
                       }
@@ -721,7 +723,7 @@ export default function RecipeEditor() {
                       <td>{stats.otros.toFixed(1)} g</td>
                       <td className="text-[#6a3d00]">{(stats.pod * 10).toFixed(1)}</td>
                       <td className="text-[var(--teal)]">{(stats.pac * 10).toFixed(1)}</td>
-                      <td>${Math.round(stats.cost).toLocaleString('es-CL')}</td>
+                      <td>{fmtCurrency(Math.round(stats.cost))}</td>
                       <td></td>
                       <td></td>
                     </tr>
@@ -737,7 +739,7 @@ export default function RecipeEditor() {
                       <td colSpan={8} className="text-[var(--ink3)] text-[10px]">
                         {t('final_mix_note')}
                       </td>
-                      <td>${Math.round(statsFull.cost).toLocaleString('es-CL')}</td>
+                      <td>{fmtCurrency(Math.round(statsFull.cost))}</td>
                       <td></td>
                       <td></td>
                     </tr>

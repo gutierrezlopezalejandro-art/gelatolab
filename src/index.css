@@ -46,13 +46,24 @@
 
   /* Primary CTA: estilo outlined mint (igual al boton "Nueva receta" que el
      usuario eligio como referencia). Liviano, consistente con el resto de la
-     UI, hover suave a fondo crema verdoso. */
+     UI, hover suave a fondo crema verdoso. Usar para acciones in-app. */
   .btn-primary {
     @apply bg-transparent hover:bg-[var(--mint3)] text-[var(--mint)] font-semibold
            rounded-lg px-4 py-2 text-sm transition-colors cursor-pointer
            border border-[var(--mint2)];
   }
   .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+  /* Filled CTA: para acciones de conversión (Pricing Pro, signup hero,
+     landings). Más peso visual que btn-primary outline. Usa el oro de la
+     marca para evitar fragmentar la paleta con un nuevo color. */
+  .btn-primary-filled {
+    @apply bg-[var(--gold)] hover:bg-[#d4a814] text-[var(--ink)] font-bold
+           rounded-lg px-5 py-3 text-sm transition-colors cursor-pointer
+           border border-[var(--gold)] shadow-sm hover:shadow;
+  }
+  .btn-primary-filled:disabled {
     @apply opacity-50 cursor-not-allowed;
   }
   .btn-secondary {

@@ -4,6 +4,7 @@ import { useProductionStore } from '../store/productionStore';
 import { useAppStore } from '../store/appStore';
 import { useRecipeStore } from '../store/recipeStore';
 import { useT, useI18nStore, useIngredientName } from '../lib/i18n';
+import { useFormatters } from '../lib/format';
 import { EmptyState, StatCard } from '../components/ui/index.jsx';
 import { printHtml } from '../lib/printHtml';
 import { track } from '../lib/analytics';
@@ -397,6 +398,7 @@ ${procHtml}
 
 export default function ProductionLog() {
   const t = useT();
+  const { fmtCurrency } = useFormatters();
   const tIng = useIngredientName();
   const lang = useI18nStore(s => s.lang);
   const { showToast, confirm } = useAppStore();
@@ -474,7 +476,7 @@ export default function ProductionLog() {
         <div className="grid grid-cols-3 gap-4 mb-8">
           <StatCard label={t('batches_this_month')} value={monthStats.count} />
           <StatCard label={t('liters_this_month')} value={`${monthStats.liters.toFixed(1)} L`} />
-          <StatCard label={t('cost_this_month')} value={`$${Math.round(monthStats.cost).toLocaleString('es-CL')}`} />
+          <StatCard label={t('cost_this_month')} value={fmtCurrency(Math.round(monthStats.cost))} />
         </div>
       )}
 
@@ -509,7 +511,7 @@ export default function ProductionLog() {
                     </div>
                     <div className="text-center min-w-[80px]">
                       <div className="font-display text-lg text-[var(--gold)]">
-                        ${Math.round(totalCost).toLocaleString('es-CL')}
+                        {fmtCurrency(Math.round(totalCost))}
                       </div>
                       <div className="text-[9px] text-[var(--cream)]/50 uppercase tracking-wide">{t('costo')}</div>
                     </div>
@@ -556,7 +558,7 @@ export default function ProductionLog() {
                                 {parseFloat(entry.liters || 0).toFixed(1)} L
                               </span>
                               <span className="text-xs font-semibold text-[var(--mint)]">
-                                ${Math.round(entry.cost || 0).toLocaleString('es-CL')}
+                                {fmtCurrency(Math.round(entry.cost || 0))}
                               </span>
                               <button className="text-xs px-3 py-1 rounded-lg bg-[var(--teal)] text-white
                                                  hover:opacity-90 transition-colors"

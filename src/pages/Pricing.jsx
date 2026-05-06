@@ -109,8 +109,7 @@ export default function Pricing() {
               {t('pricing_ios_manage_on_web')}
             </div>
           ) : (
-            <button onClick={handleSubscribe}
-                    className="w-full font-bold px-4 py-3 rounded-lg bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none">
+            <button onClick={handleSubscribe} className="btn-primary-filled w-full">
               {t('plan_pro_cta')}
             </button>
           )}
