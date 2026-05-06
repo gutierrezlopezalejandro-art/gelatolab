@@ -578,6 +578,24 @@ ${issuesSection}
             <div className="min-w-[160px]">
               <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('select_date')}</label>
               <input type="date" className="input" value={date} onChange={e => setDate(e.target.value)} />
+              {/* Fecha verbose en es-CL: "miércoles 6 de mayo de 2026". Resuelve
+                  ambigüedad DD-MM vs MM-DD que el input nativo arrastra según
+                  locale del browser. Crítico porque planificar producción en
+                  la fecha equivocada es un error costoso en cocina. */}
+              {date && (() => {
+                // toLocaleDateString en es-CL devuelve "miércoles, 6 de mayo
+                // de 2026" en minúsculas (correcto en español, los días y
+                // meses no llevan mayúscula). Solo capitalizamos la primera
+                // letra del weekday para que arranque la frase como debe.
+                const formatted = new Date(date + 'T00:00:00').toLocaleDateString(locale, {
+                  weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+                });
+                return (
+                  <p className="text-[10px] text-[var(--ink3)] mt-1">
+                    {formatted.charAt(0).toUpperCase() + formatted.slice(1)}
+                  </p>
+                );
+              })()}
             </div>
             <div className="flex-1 min-w-[200px]">
               <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('plan_name_label')}</label>
@@ -819,12 +837,21 @@ ${issuesSection}
                 const cls = isDeleteMode
                   ? 'w-full py-2.5 rounded-lg text-sm font-semibold border cursor-pointer transition-colors bg-transparent border-[var(--coral)] text-[var(--coral)] hover:bg-[var(--coral)] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed'
                   : 'btn-primary w-full';
+                // Tooltip explicativo cuando el botón está disabled. Antes
+                // mostraba vacío y el usuario no entendía por qué no podía
+                // cliquear. Ahora le decimos exactamente qué falta.
+                const disabledReason = isPast
+                  ? t('plan_past_readonly')
+                  : confirming ? '...'
+                  : enriched.length === 0 && !hasSavedPlan ? t('plan_add_recipes_first')
+                  : '';
                 return (
                   <button
                     className={cls}
                     onClick={handleConfirm}
                     disabled={!enabled}
-                    title={isPast ? t('plan_past_readonly') : ''}
+                    title={disabledReason}
+                    aria-label={!enabled && disabledReason ? `${label} — ${disabledReason}` : label}
                   >
                     {label}
                   </button>

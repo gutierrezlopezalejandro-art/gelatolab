@@ -47,7 +47,7 @@ const NUM_FIELDS_KEYS = [
   // Formulation (default view)
   { key: 'water_pct',   labelKey: 'water_col',  suffix: '%', step: 0.1,   decimals: 1, group: 'formulation' },
   { key: 'fat_pct',     labelKey: 'fat_col',    suffix: '%', step: 0.1,   decimals: 1, group: 'formulation' },
-  { key: 'sng_pct',     labelKey: 'sng_col',    suffix: '%', step: 0.1,   decimals: 1, group: 'formulation' },
+  { key: 'sng_pct',     labelKey: 'sng_col',    suffix: '%', step: 0.1,   decimals: 1, group: 'formulation', tooltipKey: 'tooltip_sng' },
   { key: 'sugar_pct',   labelKey: 'sugar_col',  suffix: '%', step: 0.1,   decimals: 1, group: 'formulation' },
   { key: 'others_pct',  labelKey: 'others_col', suffix: '%', step: 0.1,   decimals: 1, group: 'formulation' },
   // Cocoa + grasas vegetales/hidrogenadas. Solo relevantes para chocolate
@@ -56,8 +56,8 @@ const NUM_FIELDS_KEYS = [
   { key: 'cocoa_fat_pct',    labelKey: null, label: 'Cocoa fat %',    suffix: '%', step: 0.1, decimals: 1, group: 'formulation' },
   { key: 'cocoa_solids_pct', labelKey: null, label: 'Cocoa solids %', suffix: '%', step: 0.1, decimals: 1, group: 'formulation' },
   { key: 'other_fat_pct',    labelKey: null, label: 'Other fat %',    suffix: '%', step: 0.1, decimals: 1, group: 'formulation' },
-  { key: 'pac',         labelKey: null, label: 'PAC',        step: 0.001, decimals: 3, group: 'formulation' },
-  { key: 'pod',         labelKey: null, label: 'POD',        step: 0.001, decimals: 3, group: 'formulation' },
+  { key: 'pac',         labelKey: null, label: 'PAC',        step: 0.001, decimals: 3, group: 'formulation', tooltipKey: 'tooltip_pac' },
+  { key: 'pod',         labelKey: null, label: 'POD',        step: 0.001, decimals: 3, group: 'formulation', tooltipKey: 'tooltip_pod' },
   { key: 'cost_per_kg', labelKey: null, label: '$/kg',       step: 10,    decimals: 0, group: 'formulation' },
   // Nutrition / Chilean labeling (per 100g)
   { key: 'calories',    labelKey: null, label: 'kcal/100g',  step: 1,     decimals: 0, group: 'nutrition' },
@@ -91,6 +91,7 @@ export default function IngredientDB() {
     .map(f => ({
       ...f,
       label: f.labelKey ? t(f.labelKey) + (f.suffix || '') : f.label,
+      tooltip: f.tooltipKey ? t(f.tooltipKey) : undefined,
     }));
   const store = useIngredientStore();
 
@@ -501,7 +502,12 @@ export default function IngredientDB() {
               <tr>
                 <th className="text-left">{t('name')}</th>
                 <th>{t('category')}</th>
-                {NUM_FIELDS.map(f => <th key={f.key} className="hidden sm:table-cell">{f.label}</th>)}
+                {NUM_FIELDS.map(f => (
+                  <th key={f.key} className="hidden sm:table-cell" title={f.tooltip}>
+                    {f.label}
+                    {f.tooltip && <span className="ml-1 text-[var(--ink3)] cursor-help" aria-hidden="true">ⓘ</span>}
+                  </th>
+                ))}
                 <th className="hidden sm:table-cell">{t('allergens_col')}</th>
                 <th></th>
               </tr>

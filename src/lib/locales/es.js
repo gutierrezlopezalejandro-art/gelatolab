@@ -845,7 +845,7 @@ export default {
     haccp_type_other: 'Otro',
     haccp_threshold_hint_cold_storage: 'Cámara fría: ≤ 4 °C OK, 4-7 °C alerta, > 7 °C crítico.',
     haccp_threshold_hint_freezer: 'Congelador: ≤ -18 °C OK, -18 a -15 °C alerta, > -15 °C crítico.',
-    haccp_threshold_hint_pasteurization: 'Pasteurización: ≥ 65 °C (LTLT) o ≥ 80 °C (HTST). Bajo 60 °C es crítico.',
+    haccp_threshold_hint_pasteurization: 'Pasteurización: ≥ 65 °C por 30 min (LTLT = Low Temperature Long Time, baja temperatura tiempo largo) o ≥ 80 °C por 25 seg (HTST = High Temperature Short Time, alta temperatura tiempo corto). Bajo 60 °C es crítico.',
 
     // Recipe comparison
     compare_btn: 'Comparar',
@@ -1518,6 +1518,12 @@ export default {
     water_col: 'Agua',
     fat_col: 'Grasa',
     sng_col: 'SNG',
+    tooltip_sng: 'SNG = Sólidos No Grasos. Lactosa + proteínas + minerales (sin grasa). También llamado MSNF (Milk Solids Non-Fat). Aporta cuerpo y estructura.',
+    tooltip_pac: 'PAC = Poder Anticongelante. Capacidad del azúcar/alcohol para evitar formación de cristales grandes durante el congelamiento. Más PAC = textura más suave.',
+    tooltip_pod: 'POD = Poder Edulcorante (Dulzor Relativo). Percepción de dulzor comparada con la sacarosa (POD=100). Permite balancear sin cambiar el dulzor real.',
+    tooltip_fpd: 'FPD = Freezing Point Depression. Cuántos °C baja el punto de congelación respecto al agua pura. Más FPD = helado más blando a temperatura de servicio.',
+    label_business_incomplete_warning: 'Tu etiqueta no incluirá RUT ni razón social porque no completaste los datos del negocio. En Chile, una etiqueta sin estos datos puede generar problemas con la fiscalización SAG. ¿Imprimir igual?',
+    plan_add_recipes_first: 'Agrega al menos una receta a la lista para poder confirmar la producción.',
     sugar_col: 'Azúcar',
     others_col: 'Otros',
     cost_col: 'Costo $',

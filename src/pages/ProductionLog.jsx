@@ -560,7 +560,18 @@ export default function ProductionLog() {
                               </span>
                               <button className="text-xs px-3 py-1 rounded-lg bg-[var(--teal)] text-white
                                                  hover:opacity-90 transition-colors"
-                                      onClick={() => { printLabel(entry, t, country, business, 60, recipeMap); track('label_printed', { country: country.code }); }}>
+                                      onClick={async () => {
+                                        // Guard: para etiquetas legales (Chile Ley 20.606, Brasil RDC 429,
+                                        // etc.) faltan RUT y razón social puede ser un problema con
+                                        // fiscalización SAG/ANVISA. Avisamos antes de imprimir y damos
+                                        // la opción de cancelar.
+                                        if (!business?.tax_id || !business?.legal_name) {
+                                          const ok = await confirm(t('label_business_incomplete_warning'));
+                                          if (!ok) return;
+                                        }
+                                        printLabel(entry, t, country, business, 60, recipeMap);
+                                        track('label_printed', { country: country.code });
+                                      }}>
                                 {t('label_btn')}
                               </button>
                               <button className="text-xs px-3 py-1 rounded-lg bg-[var(--mint)] text-white
