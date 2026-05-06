@@ -6,6 +6,27 @@ import { useProductionStore } from '../store/productionStore';
 import { usePlanStore } from '../store/planStore';
 import { useInventoryStore } from '../store/inventoryStore';
 import { pullFromCloud, debouncedPush, subscribeToCloud, flushPendingPushes, hasPendingPushes, pushToCloud } from '../lib/cloudSync';
+import defaultRecipes from '../data/recipes.json';
+
+// Bug v1.0.8: usuarios Pro solo veían 2 recetas (seed) tras login en vez de
+// la biblioteca completa + sus propias. Causa: pullFromCloud reemplazaba
+// useRecipeStore.setState() con el estado del cloud, que no incluye las
+// recetas seed. Para usuarios que sincronizaron por primera vez (cuenta
+// nueva), el cloud no tiene seeds → wipe de la biblioteca local.
+//
+// Fix: merge con seeds que falten en cloud. Si el cloud tiene una receta
+// con el mismo id que un seed (porque el usuario la editó/customizó),
+// gana la del cloud. Si no, traemos la seed default.
+function mergeRecipesWithSeeds(cloudState) {
+  if (!cloudState) return cloudState;
+  const cloudRecipes = cloudState.recipes || [];
+  const cloudIds = new Set(cloudRecipes.map(r => r.id));
+  const missingSeeds = defaultRecipes.filter(s => !cloudIds.has(s.id));
+  return {
+    ...cloudState,
+    recipes: [...missingSeeds, ...cloudRecipes],
+  };
+}
 
 // localStorage keys to remember when each table was last modified locally.
 // Used on login to avoid overwriting unsynced local changes with stale cloud state.
@@ -72,7 +93,7 @@ export function CloudSyncProvider() {
           return false;
         }
 
-        const appliedRecipes     = applyIfCloudNewer('recipes',     (d) => useRecipeStore.setState(d));
+        const appliedRecipes     = applyIfCloudNewer('recipes',     (d) => useRecipeStore.setState(mergeRecipesWithSeeds(d)));
         const appliedIngredients = applyIfCloudNewer('ingredients', (d) => useIngredientStore.setState(d));
         const appliedProductions = applyIfCloudNewer('productions', (d) => useProductionStore.setState(d));
         const appliedPlans       = applyIfCloudNewer('plans',       (d) => usePlanStore.setState(d));
@@ -90,7 +111,8 @@ export function CloudSyncProvider() {
           if (!data) return;
           // Realtime updates are always from cloud — apply them and refresh baseline.
           switch (table) {
-            case 'recipes':     useRecipeStore.setState(data); break;
+            // Mismo merge que en syncOnLogin para cualquier update via realtime.
+            case 'recipes':     useRecipeStore.setState(mergeRecipesWithSeeds(data)); break;
             case 'ingredients': useIngredientStore.setState(data); break;
             case 'productions': useProductionStore.setState(data); break;
             case 'plans':       usePlanStore.setState(data); break;
