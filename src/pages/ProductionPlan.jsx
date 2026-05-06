@@ -573,8 +573,12 @@ ${issuesSection}
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
         <div className="space-y-5">
-          {/* Date and plan name */}
-          <div data-tour="plan-date" className="card p-5 flex gap-4 flex-wrap items-end">
+          {/* Date and plan name. Antes era items-end (alineaba al bottom),
+              pero al agregar la fecha verbose H39 bajo el input de fecha el
+              date-column quedó más alto, y el plan name se alineaba abajo
+              dejando los dos inputs en alturas distintas. items-start los
+              mantiene al mismo nivel y la fecha verbose queda abajo. */}
+          <div data-tour="plan-date" className="card p-5 flex gap-4 flex-wrap items-start">
             <div className="min-w-[160px]">
               <label htmlFor="plan-date" className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('select_date')}</label>
               <input id="plan-date" type="date" className="input" value={date} onChange={e => setDate(e.target.value)} />
