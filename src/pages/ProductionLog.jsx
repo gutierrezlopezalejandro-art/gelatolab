@@ -305,7 +305,13 @@ function printProductionSheet(entry, t) {
   const snapshot = entry.ingredients_snapshot || [];
   const totalBatchG = snapshot.reduce((s, i) => s + (parseFloat(i.batch_g) || 0), 0);
   const procNotes = entry.proc_notes || '';
-  const escape = (s) => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  // Escapamos también " y ' porque el resultado puede ir dentro de
+  // atributos HTML en otros templates (style, alt, title). Si una receta
+  // tiene comillas en el nombre (ej. Pistachio "Bronte"), sin escapar
+  // rompe el atributo cuando se inyecta. Defensa en profundidad.
+  const escape = (s) => String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
 
   const ingredientsRows = snapshot.map(i => `
     <tr>

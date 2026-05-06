@@ -436,7 +436,12 @@ export default function App() {
         && <OnboardingWizard />}
       <CloudSyncProvider />
       <CookieBanner />
-      <HelpAssistant />
+      {/* HelpAssistant (Marco IA flotante) solo en páginas de "trabajo".
+          Lo ocultamos en /terms, /privacy, /help (redundante con la
+          página de ayuda completa), /pricing y /download — esas son
+          páginas de información o conversión donde el bubble flotante
+          intrusivo no ayuda. */}
+      {!/^\/(terms|privacy|help|pricing|download)\b/.test(location.pathname) && <HelpAssistant />}
       <UIHighlightOverlay />
       <UpdateAvailableModal update={pendingUpdate} onDismiss={() => setPendingUpdate(null)} />
     </div>

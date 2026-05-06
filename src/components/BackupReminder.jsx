@@ -85,7 +85,7 @@ export function BackupReminder() {
   return (
     <div className="rounded-xl border-l-4 p-3 mb-6 flex items-start gap-3 flex-wrap"
          style={{ background: '#fff8e1', borderColor: '#f5c842' }}>
-      <span className="text-lg leading-none">📁</span>
+      <span className="text-lg leading-none" aria-hidden="true">📁</span>
       <div className="flex-1 min-w-[240px] text-xs">
         <div className="font-semibold text-[var(--ink)] mb-0.5">
           {folderSupported ? t('backup_reminder_folder_title') : t('backup_reminder_zip_title')}
