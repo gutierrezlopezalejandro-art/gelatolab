@@ -1,3 +1,5 @@
+import { useT } from '../../lib/i18n';
+
 export function Spinner() {
   return (
     <div className="flex items-center justify-center py-20">
@@ -42,8 +44,9 @@ export function StatCard({ label, value, sub }) {
 }
 
 export function SkeletonCard({ lines = 3, className = '' }) {
+  const t = useT();
   return (
-    <div className={`card p-4 space-y-3 ${className}`} role="status" aria-label="Cargando...">
+    <div className={`card p-4 space-y-3 ${className}`} role="status" aria-label={t('loading')}>
       <div className="skeleton h-3 w-1/3" />
       {Array.from({ length: lines }).map((_, i) => (
         <div key={i} className="skeleton h-4 w-full" />
@@ -53,8 +56,9 @@ export function SkeletonCard({ lines = 3, className = '' }) {
 }
 
 export function SkeletonTable({ rows = 5, cols = 4 }) {
+  const t = useT();
   return (
-    <div className="card p-4" role="status" aria-label="Cargando tabla...">
+    <div className="card p-4" role="status" aria-label={t('loading_table')}>
       <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
         {Array.from({ length: rows * cols }).map((_, i) => (
           <div key={i} className="skeleton h-5" />

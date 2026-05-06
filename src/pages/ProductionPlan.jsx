@@ -302,7 +302,7 @@ export default function ProductionPlan() {
         setPname('');
         showToast(removed > 0 ? t('plan_and_lotes_deleted', { lotes: removed }) : t('plan_deleted'));
       } catch (e) {
-        showToast(e.message || 'Error', 'error');
+        showToast(e.message || t('error_generic'), 'error');
       }
       return;
     }

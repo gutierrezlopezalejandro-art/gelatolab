@@ -182,7 +182,7 @@ export default function IngredientDB() {
       setAiResult({ confidence: out.confidence, rationale: out.rationale });
       track('ai_ingredient_generated', { confidence: out.confidence });
     } catch (e) {
-      setAiError(e.message === 'AI_KEY_MISSING' ? t('ai_key_missing') : (e.message || 'Error'));
+      setAiError(e.message === 'AI_KEY_MISSING' ? t('ai_key_missing') : (e.message || t('error_generic')));
     } finally {
       setAiLoading(false);
     }
@@ -222,7 +222,7 @@ export default function IngredientDB() {
       } catch (e) {
         if (e.code === 'NOT_AVAILABLE') showToast(t('barcode_native_only'), 'error');
         else if (e.code === 'PERMISSION_DENIED') showToast(t('barcode_permission_denied'), 'error');
-        else if (e.code !== 'CANCELLED') showToast(e.message || 'Error', 'error');
+        else if (e.code !== 'CANCELLED') showToast(e.message || t('error_generic'), 'error');
       }
     } else {
       setShowWebScanner(true);

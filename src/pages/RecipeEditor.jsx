@@ -109,7 +109,7 @@ export default function RecipeEditor() {
       setAiAdvice(out);
       track('ai_recipe_analyzed', { type, subtype });
     } catch (e) {
-      setAiError(e.message === 'AI_KEY_MISSING' ? t('ai_key_missing') : (e.message || 'Error'));
+      setAiError(e.message === 'AI_KEY_MISSING' ? t('ai_key_missing') : (e.message || t('error_generic')));
     } finally {
       setAiLoading(false);
     }

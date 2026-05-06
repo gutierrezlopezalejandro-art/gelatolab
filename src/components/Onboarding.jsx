@@ -71,7 +71,7 @@ export function Onboarding() {
           </p>
 
           {/* Step indicator */}
-          <div className="flex justify-center gap-1.5 mb-6" role="tablist" aria-label="Progreso">
+          <div className="flex justify-center gap-1.5 mb-6" role="tablist" aria-label={t('progress_label')}>
             {steps.map((_, i) => (
               <span
                 key={i}

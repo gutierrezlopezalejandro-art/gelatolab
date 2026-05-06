@@ -44,7 +44,7 @@ export function DesktopWelcome() {
 
         <h1 className="font-display text-4xl text-[var(--ink)] mb-2 leading-tight">
           {fantasyName
-            ? <>Bienvenido a <span className="text-[var(--mint)]">{fantasyName}</span></>
+            ? <>{t('welcome_to')} <span className="text-[var(--mint)]">{fantasyName}</span></>
             : <>Gelato<em className="text-[var(--gold)] not-italic">Lab</em></>}
         </h1>
         {businessCompleted && fantasyName ? (

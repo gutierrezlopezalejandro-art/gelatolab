@@ -43,7 +43,7 @@ export function MobileDesktopHint({ pageId }) {
       </div>
       <button onClick={dismiss}
               className="text-base text-[#8a6d00] hover:text-[#5c3d00] cursor-pointer bg-transparent border-none flex-shrink-0 -mt-1"
-              aria-label="Cerrar aviso">✕</button>
+              aria-label={t('close_notice')}>✕</button>
     </div>
   );
 }

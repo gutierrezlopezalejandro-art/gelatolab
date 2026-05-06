@@ -130,7 +130,7 @@ export function BusinessSettingsModal({ onClose }) {
       showToast(t('folder_backup_connected'));
       track('folder_backup_connected', { runtime: h.__tauri ? 'tauri' : 'web' });
     } catch (e) {
-      if (e.name !== 'AbortError') showToast(e.message || 'Error', 'error');
+      if (e.name !== 'AbortError') showToast(e.message || t('error_generic'), 'error');
     } finally {
       setFolderBusy(false);
     }

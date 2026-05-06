@@ -62,7 +62,7 @@ export function BackupReminder() {
       setFolderConnected(true);
       track('backup_reminder_folder_connected');
     } catch (e) {
-      if (e.name !== 'AbortError') showToast(e.message || 'Error', 'error');
+      if (e.name !== 'AbortError') showToast(e.message || t('error_generic'), 'error');
     } finally {
       setBusy(false);
     }
@@ -76,7 +76,7 @@ export function BackupReminder() {
       track('backup_reminder_zip_exported');
       dismiss();
     } catch (e) {
-      showToast(e.message || 'Error', 'error');
+      showToast(e.message || t('error_generic'), 'error');
     } finally {
       setBusy(false);
     }

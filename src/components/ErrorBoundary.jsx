@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { logError } from '../lib/errorLog';
+import { tRaw as t } from '../lib/i18n';
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -25,25 +26,28 @@ export class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
+      // ErrorBoundary es class component — no podemos usar el hook useT.
+      // tRaw lee el idioma actual del store sin suscribirse; al renderizarse
+      // este fallback el idioma ya está cargado, así que no perdemos nada.
       return (
         <div className="card p-8 text-center max-w-lg mx-auto mt-8" role="alert">
-          <div className="text-5xl mb-4">⚠️</div>
+          <div className="text-5xl mb-4" aria-hidden="true">⚠️</div>
           <h1 className="font-display text-2xl text-[var(--coral)] mb-2">
-            Algo salió mal
+            {t('error_boundary_title')}
           </h1>
           <p className="text-sm text-[var(--ink3)] mb-6">
-            Ocurrió un error inesperado. Puedes intentar nuevamente o recargar la aplicación.
+            {t('error_boundary_body')}
           </p>
           <details className="text-left text-xs text-[var(--ink3)] bg-[var(--cream)] p-3 rounded-lg mb-6 cursor-pointer">
-            <summary className="font-semibold cursor-pointer">Detalles técnicos</summary>
+            <summary className="font-semibold cursor-pointer">{t('error_technical_details')}</summary>
             <pre className="mt-2 overflow-x-auto whitespace-pre-wrap">{String(this.state.error)}</pre>
           </details>
           <div className="flex gap-3 justify-center">
             <button className="btn-secondary" onClick={this.handleReset}>
-              Reintentar
+              {t('retry')}
             </button>
             <button className="btn-primary" onClick={this.handleReload}>
-              Recargar
+              {t('reload')}
             </button>
           </div>
         </div>

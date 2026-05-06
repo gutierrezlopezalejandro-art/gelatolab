@@ -99,6 +99,21 @@ export const useI18nStore = create(
   )
 );
 
+// Versión no-hook para contextos donde no se puede usar useT (class
+// components como ErrorBoundary, utilities, listeners fuera de React, etc.).
+// No es reactiva — usá useT en componentes funcionales para que se re-renderen
+// al cambiar idioma.
+export function tRaw(key, params) {
+  const lang = useI18nStore.getState().lang;
+  let text = getTranslation(lang, key);
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      text = text.replace(`{${k}}`, v);
+    });
+  }
+  return text;
+}
+
 // Hook reactivo: re-renderiza cuando cambia el idioma O cuando termina de
 // cargarse un diccionario async. La suscripcion a `dictsLoaded` es el truco
 // que hace que la UI se actualice cuando el chunk del idioma llega despues
