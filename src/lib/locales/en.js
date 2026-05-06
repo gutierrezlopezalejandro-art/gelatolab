@@ -110,6 +110,8 @@ export default {
     help_title: 'Help',
     help_subtitle: 'Step-by-step guides, technical glossary and country regulations',
     help_search_placeholder: 'Search help…',
+    help_search_count: '{shown} of {total} articles',
+    help_articles_total: 'articles available',
     help_no_results: 'No matching articles',
     help_select_article: 'Pick an article from the menu',
 

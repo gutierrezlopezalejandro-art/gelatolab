@@ -116,6 +116,8 @@ export default {
     help_title: 'Ayuda',
     help_subtitle: 'Guías paso a paso, glosario técnico y normativa por país',
     help_search_placeholder: 'Buscar en la ayuda…',
+    help_search_count: '{shown} de {total} artículos',
+    help_articles_total: 'artículos disponibles',
     help_no_results: 'Sin artículos que coincidan',
     help_select_article: 'Elige un artículo del menú',
 

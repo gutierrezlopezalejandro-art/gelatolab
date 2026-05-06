@@ -654,6 +654,8 @@ export default {
     help_title: "Aiuto",
     help_subtitle: "Guide passo passo, glossario tecnico e normative per paese",
     help_search_placeholder: "Cerca nell'aiuto…",
+    help_search_count: '{shown} di {total} articoli',
+    help_articles_total: 'articoli disponibili',
     help_no_results: "Nessun articolo corrispondente",
     help_select_article: "Scegli un articolo dal menu",
     dash_plan_today: "Pianifica oggi",

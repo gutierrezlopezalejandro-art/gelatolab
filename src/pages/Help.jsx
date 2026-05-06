@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { HELP_CATEGORIES, HELP_ARTICLES } from '../data/helpContent';
 import { useT } from '../lib/i18n';
 
@@ -11,6 +11,20 @@ export default function Help() {
   const t = useT();
   const [activeId, setActiveId] = useState(HELP_ARTICLES[0]?.id);
   const [query, setQuery] = useState('');
+  const searchRef = useRef(null);
+
+  // Atajo "/" para enfocar buscador (igual patrón que IngredientDB).
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key !== '/') return;
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   // Filter articles by free-text query against title, intro, and section bodies.
   const matchedIds = useMemo(() => {
@@ -47,15 +61,37 @@ export default function Help() {
         <p className="text-sm text-[var(--ink2)] mt-1">{t('help_subtitle')}</p>
       </div>
 
-      <label htmlFor="help-search" className="sr-only">{t('help_search_placeholder')}</label>
-      <input
-        id="help-search"
-        type="search"
-        className="input mb-5"
-        placeholder={t('help_search_placeholder')}
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-      />
+      {/* Buscador prominente con icono + clear + count. Antes era un input
+          chico ("input mb-5") que se perdía debajo del título. Ahora ocupa
+          full-width con padding generoso y feedback de cantidad. */}
+      <div className="relative mb-2">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink3)] pointer-events-none text-base" aria-hidden="true">🔍</span>
+        <label htmlFor="help-search" className="sr-only">{t('help_search_placeholder')}</label>
+        <input
+          ref={searchRef}
+          id="help-search"
+          type="search"
+          className="input w-full pl-10 pr-10 text-base py-3"
+          placeholder={t('help_search_placeholder')}
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => { setQuery(''); searchRef.current?.focus(); }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none text-xl leading-none w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/5"
+            aria-label={t('clear_search')}
+            title={t('clear_search')}
+          >×</button>
+        )}
+      </div>
+      <p className="text-[10px] text-[var(--ink3)] mb-5" aria-live="polite">
+        {query
+          ? t('help_search_count', { shown: matchedIds.size, total: HELP_ARTICLES.length })
+          : <>{HELP_ARTICLES.length} {t('help_articles_total')} · <kbd className="bg-black/8 px-1 rounded text-[10px]">/</kbd> {t('shortcut_focus_search')}</>
+        }
+      </p>
 
       <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6">
         {/* TOC sidebar */}

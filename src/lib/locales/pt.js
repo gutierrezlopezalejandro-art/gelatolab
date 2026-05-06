@@ -1687,6 +1687,8 @@ export default {
     help_title: "Ajuda",
     help_subtitle: "Guias passo a passo, glossário técnico e normas por país",
     help_search_placeholder: "Buscar na ajuda…",
+    help_search_count: '{shown} de {total} artigos',
+    help_articles_total: 'artigos disponíveis',
     help_no_results: "Nenhum artigo correspondente",
     help_select_article: "Escolha um artigo no menu",
     dash_plan_today: "Planejar hoje",
