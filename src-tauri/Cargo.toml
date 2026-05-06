@@ -20,6 +20,10 @@ tauri-plugin-dialog = "2.0"
 tauri-plugin-os = "2.0"
 tauri-plugin-updater = "2.0"
 tauri-plugin-process = "2.0"
+# File-backed key-value store. Used as a fallback for the Supabase auth
+# session because WebView2's localStorage gets wiped on some NSIS reinstalls
+# / auto-updates, which logs the user out unexpectedly.
+tauri-plugin-store = "2.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

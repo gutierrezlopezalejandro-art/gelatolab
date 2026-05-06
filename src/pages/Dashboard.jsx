@@ -6,7 +6,10 @@ import { useIngredientStore } from '../store/ingredientStore';
 import { usePlanStore } from '../store/planStore';
 import { getLowStock } from '../store/inventoryStore';
 import { useT, useI18nStore, useIngredientName, useLocale } from '../lib/i18n';
-import { BackupReminder } from '../components/BackupReminder';
+// BackupReminder se renderiza desde App.jsx para que aparezca en todas las
+// pantallas autenticadas (no solo Dashboard). El riesgo de pérdida de datos
+// sin backup es transversal — un usuario que entra directo a /recipes nunca
+// vería el recordatorio si solo viviera en Dashboard.
 import { WelcomeTour, hasSeenTour } from '../components/WelcomeTour';
 import { useBusinessStore } from '../store/businessStore';
 import { useEffect, useState } from 'react';
@@ -150,7 +153,6 @@ export default function Dashboard() {
 
   return (
     <div>
-      <BackupReminder />
       <div className="mb-6 flex items-baseline justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-display text-4xl text-[var(--ink)]">{t('dashboard')}</h1>

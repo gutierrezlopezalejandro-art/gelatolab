@@ -101,16 +101,15 @@ export default function AnalysisPanel({
 
   const fpdRange  = getFpdRange(type);
   const fpdRating = rateFpd(s.fpd, type);
-  // Metodo PRINCIPAL: cruce con %FW objetivo segun el tipo (estilo ICC4 /
-  // GelatoPassport). Mas fisico, basado en cuanta agua esta congelada.
-  //   Helado (americano): 75% FW
-  //   Gelato (italiano):  69% FW
-  //   Sorbete:            55% FW (mas blando, sin lacteos)
-  const targetFwPct = type === 'sorbete' ? 55 : type === 'gelato' ? 69 : 75;
-  const tsCalc    = tempForFrozenPct(s, targetFwPct);
-  // Metodo SECUNDARIO/legacy: tabla Corvitto sobre PAC. Util como referencia
-  // cruzada para el formulador acostumbrado al sistema italiano.
-  const tsCorvitto = calcServingTemp(s);
+  // Temperatura de servicio = T° a la que el % objetivo del agua está
+  // congelada, leído de la curva ICC4. Misma fórmula para los 3 tipos,
+  // sólo cambia el target % frozen (75 helado/sorbete, 69 gelato).
+  const targetFwPct = type === 'gelato' ? 69 : 75;
+  const tsCalc    = calcServingTemp(s, type);
+  // tsCorvitto se mantiene como alias del mismo cálculo para no romper
+  // referencias en el resto del componente; ambos valores ahora coinciden
+  // por diseño (el viejo método tabla-PAC fue reemplazado).
+  const tsCorvitto = tsCalc;
   const tsDesired = servingTemp;
   const deviation = (tsCalc != null && tsDesired != null) ? (tsDesired - tsCalc) : null;
   const devAbs    = deviation != null ? Math.abs(deviation) : null;

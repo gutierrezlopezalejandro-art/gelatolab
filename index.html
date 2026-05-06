@@ -68,12 +68,19 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      // Register SW only in production to avoid stale-chunk issues with Vite HMR.
-      // On localhost we actively unregister any leftover SW from previous sessions.
+      // Service worker registration:
+      //   - Web prod (gelatolab.app): register, sirve offline + faster reloads.
+      //   - Localhost dev: unregister, evita stale-chunk con Vite HMR.
+      //   - Tauri desktop: unregister + limpiar caches. La app ya tiene el
+      //     bundle local en el binario, no hay beneficio offline. Y los SW
+      //     viejos de versiones previas v1.0.6 cacheaban chunks que despues
+      //     no existian al actualizar => pantalla blanca. Eliminandolo aqui,
+      //     cualquier user que actualice de >=v1.0.7 queda limpio.
       (function () {
         if (!('serviceWorker' in navigator)) return;
         var isLocal = ['localhost', '127.0.0.1'].indexOf(location.hostname) !== -1;
-        if (isLocal) {
+        var isTauri = !!(window.__TAURI_INTERNALS__ || window.__TAURI__);
+        if (isLocal || isTauri) {
           navigator.serviceWorker.getRegistrations().then(function (regs) {
             regs.forEach(function (r) { r.unregister(); });
           });

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useT, useIngredientName } from '../lib/i18n';
 import { useIngredientStore } from '../store/ingredientStore';
 import { useInventoryStore } from '../store/inventoryStore';
@@ -29,6 +30,7 @@ const MODES = {
 export default function Mobile() {
   const t = useT();
   const tIng = useIngredientName();
+  const navigate = useNavigate();
   const ingredients = useIngredientStore(s => s.ingredients);
   const recordMovement = useInventoryStore(s => s.record);
   const { showToast } = useAppStore();
@@ -115,9 +117,17 @@ export default function Mobile() {
   if (!mode) {
     return (
       <div className="min-h-screen flex flex-col" style={{ background: 'var(--cream)' }}>
-        <header className="bg-[var(--ink)] text-white px-4 py-4">
-          <h1 className="font-display text-xl">{businessName || 'GelatoLab'}</h1>
-          <p className="text-xs text-white/70 mt-0.5">📦 {t('mobile_warehouse_title')}</p>
+        <header className="bg-[var(--ink)] text-white px-4 py-3 flex items-center gap-3">
+          <button onClick={() => navigate('/dashboard')}
+                  className="text-2xl bg-transparent border-none text-white cursor-pointer flex items-center justify-center w-10 h-10 rounded-lg hover:bg-white/10 transition-colors"
+                  aria-label={t('back_to_landing')}
+                  title={t('back_to_landing')}>
+            ←
+          </button>
+          <div className="flex-1">
+            <h1 className="font-display text-xl">{businessName || 'GelatoLab'}</h1>
+            <p className="text-xs text-white/70 mt-0.5">📦 {t('mobile_warehouse_title')}</p>
+          </div>
         </header>
 
         <main className="flex-1 p-5 space-y-4">

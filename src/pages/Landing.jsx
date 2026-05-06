@@ -2,9 +2,26 @@ import { useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Logo } from '../components/Logo';
+import { DesktopWelcome } from '../components/DesktopWelcome';
 import { useT, useI18nStore, LANGUAGES } from '../lib/i18n';
 import { useState } from 'react';
 import { track } from '../lib/analytics';
+
+// Detecta contexto Tauri (app de escritorio). En desktop la landing publica
+// es ruido — el usuario ya descargo e instalo, no necesita marketing — asi
+// que renderizamos una pantalla A2 con login/registro/sin-cuenta en su lugar.
+//
+// Para testing sin compilar Tauri: forzar con ?simulate=tauri en la URL
+// o `sessionStorage.setItem('__simulate_tauri', '1')`. Persiste el reload.
+function isTauriDesktop() {
+  if (typeof window === 'undefined') return false;
+  if (window.__TAURI_INTERNALS__ || window.__TAURI__) return true;
+  try {
+    if (new URLSearchParams(window.location.search).get('simulate') === 'tauri') return true;
+    if (sessionStorage.getItem('__simulate_tauri') === '1') return true;
+  } catch { /* tolerable */ }
+  return false;
+}
 
 const VISITED_KEY = 'gelatolab-visited';
 
@@ -80,16 +97,22 @@ export default function Landing() {
   // shouldRedirect, sino React tira "rendered fewer hooks" (#300) cuando
   // la sesión cambia (login/logout) y hace re-render.
   const detectedOS = useMemo(() => detectOS(), []);
+  const isTauri = useMemo(() => isTauriDesktop(), []);
 
   // Si el usuario ya esta logueado, manda directo al dashboard sin ver
-  // landing. Idem si vuelve y ya marco "visited".
-  const shouldRedirect = user || hasVisited();
+  // landing. Idem si vuelve y ya marco "visited" (web only — en Tauri
+  // siempre mostramos algo: dashboard si logueado, welcome A2 si no).
+  const shouldRedirect = user || (!isTauri && hasVisited());
   useEffect(() => {
     if (shouldRedirect) navigate('/dashboard', { replace: true });
   }, [shouldRedirect, navigate]);
   // Mientras se ejecuta el navigate, no pintamos la landing para evitar el
   // flash de contenido.
   if (shouldRedirect) return null;
+
+  // En Tauri sin sesion: mostramos pantalla de bienvenida simple en vez
+  // de la landing publica de marketing.
+  if (isTauri) return <DesktopWelcome />;
 
   function handleTryFree() {
     track('landing_cta_try_free');

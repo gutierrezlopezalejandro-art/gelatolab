@@ -1,0 +1,7 @@
+/* InfoPlist.strings - English
+   Localized strings for Info.plist permission prompts.
+   The default value in Info.plist is in Spanish (CFBundleDevelopmentRegion=es).
+   This file overrides it when the device language is English. */
+
+NSCameraUsageDescription = "GelatoLab uses the camera to scan ingredient barcodes.";
+CFBundleDisplayName = "GelatoLab";

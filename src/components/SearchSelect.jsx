@@ -1,11 +1,17 @@
 import { useState, useRef, useEffect, useMemo, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useT } from '../lib/i18n';
 
 export default function SearchSelect({
   options = [], value, onChange,
-  placeholder = 'Buscar…', className = '',
+  placeholder, className = '',
   disabled = false,
 }) {
+  const t = useT();
+  // Si el caller no pasa placeholder, default i18n. Antes era `'Buscar…'`
+  // hardcoded, lo que dejaba el componente en español incluso para usuarios
+  // EN/PT/etc. cuando se omitía la prop.
+  const effectivePlaceholder = placeholder ?? t('search_placeholder');
   const [open,    setOpen]    = useState(false);
   const [query,   setQuery]   = useState('');
   const [active,  setActive]  = useState(0);
@@ -149,7 +155,7 @@ export default function SearchSelect({
         aria-haspopup="listbox"
       >
         <span className={selected ? 'text-[var(--ink)]' : 'text-[var(--ink3)]'}>
-          {selected ? selected.label : placeholder}
+          {selected ? selected.label : effectivePlaceholder}
         </span>
         <span className="text-[var(--ink3)] text-xs ml-2" style={{
           transform: open ? 'rotate(180deg)' : 'rotate(0)',
@@ -181,7 +187,8 @@ export default function SearchSelect({
               ref={inputRef}
               type="text"
               className="input text-sm py-1.5"
-              placeholder="Escribir para buscar…"
+              placeholder={t('search_inside_dropdown')}
+              aria-label={t('search_inside_dropdown')}
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -195,12 +202,12 @@ export default function SearchSelect({
               className="px-3 py-2 text-sm text-[var(--ink3)] hover:bg-[var(--cream)] cursor-pointer"
               onClick={() => handleSelect('')}
             >
-              — {placeholder} —
+              — {effectivePlaceholder} —
             </div>
 
             {filtered.length === 0 && (
               <div className="px-3 py-4 text-sm text-[var(--ink3)] text-center">
-                Sin resultados para "{query}"
+                {t('search_no_results', { query })}
               </div>
             )}
 

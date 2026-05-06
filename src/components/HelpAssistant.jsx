@@ -587,6 +587,9 @@ function GuideView({ guide, t, onBack, onClose, navigate, location }) {
   // Cuando el usuario hace click en "Ver en pantalla" en un paso especifico,
   // se dispara el highlight del selector del paso. Funciona si el usuario ya
   // esta en la pantalla correcta (el overlay reintenta por 2s).
+  // Cerramos el panel de Marco para que no tape el elemento que se esta
+  // resaltando — sino el usuario ve "Ver en pantalla" pero la pantalla
+  // queda detras del panel.
   function handleStepHighlight() {
     if (!step.highlightSelector) return;
     track('step_highlight_clicked', { guide: guide.id, step: step.num });
@@ -594,6 +597,7 @@ function GuideView({ guide, t, onBack, onClose, navigate, location }) {
       step.highlightSelector,
       step.highlightMessage || step.body
     );
+    setOpen(false);
   }
 
   return (

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+    Privacy Manifest para GelatoLab iOS
+    Requerido por Apple desde mayo 2024 (App Store Connect rechaza apps sin
+    este archivo). Declara qué datos recolecta la app y por qué accede a
+    ciertas APIs sensibles ("Required Reason APIs").
+
+    Documentación oficial:
+    https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+
+    GelatoLab es local-first: los datos del usuario (recetas, ingredientes,
+    lotes, HACCP) viven en el dispositivo. La sincronización a la nube
+    (Supabase) es opcional. No hacemos tracking cross-app, no usamos IDFA,
+    no compartimos datos con redes publicitarias.
+-->
+<plist version="1.0">
+<dict>
+    <!-- ========== TRACKING ==========
+         NSPrivacyTracking = false: no rastreamos al usuario a través de
+         apps o sitios web de otras empresas. Plausible (analytics que usamos)
+         es privacy-respecting: no usa cookies, no IDFA, no fingerprinting. -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+    <!-- ========== DATOS RECOLECTADOS ========== -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <!-- Email: para crear cuenta y autenticarse en Supabase. Linked al
+             usuario, NO usado para tracking, propósito = funcionalidad de
+             la app (auth + sync entre dispositivos). -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeEmailAddress</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+        <!-- User Content: recetas, ingredientes, lotes de producción,
+             registros HACCP, configuración del negocio. Sincronizados a
+             Supabase si el usuario tiene sesión activa. Linked, no tracking,
+             solo funcionalidad. -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeOtherUserContent</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+        <!-- Crash data y diagnostic data (si activamos Sentry en el futuro):
+             actualmente comentado porque no usamos Sentry en producción.
+             Descomentar cuando agreguemos. -->
+        <!--
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeCrashData</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+        -->
+    </array>
+
+    <!-- ========== REQUIRED REASON APIs ==========
+         APIs que Apple considera sensibles y requieren declaración explícita.
+         Códigos definidos en https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <!-- UserDefaults: Capacitor y zustand usan UserDefaults / NSUserDefaults
+             para persistir preferencias y estado de stores entre sesiones.
+             CA92.1 = "Read and write information that is only accessible to
+             the app itself, including the app's bundle identifier". -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+
+        <!-- File Timestamp: Capacitor Filesystem plugin lee mtime al persistir
+             archivos. C617.1 = "Display file timestamps to the user". -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>C617.1</string>
+            </array>
+        </dict>
+
+        <!-- Disk Space: la app verifica espacio disponible antes de cachear
+             imágenes/datos. E174.1 = "Display the available disk space to the
+             user". -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>E174.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

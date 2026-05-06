@@ -1,6 +1,7 @@
 import { useT } from '../lib/i18n';
 import { useEscapeKey } from '../lib/hooks';
 import { track } from '../lib/analytics';
+import { shouldHidePricingUI } from '../lib/platform';
 
 /**
  * Generic "this is a Pro feature" modal. Renders only when `open` is true.
@@ -16,6 +17,7 @@ export function UpgradeModal({ open, featureKey, onClose }) {
   if (!open) return null;
 
   const featureLabel = t(`upgrade_feature_${featureKey}`);
+  const hidePricing = shouldHidePricingUI();
 
   function goPricing() {
     track('upgrade_modal_cta', { feature: featureKey });
@@ -46,17 +48,28 @@ export function UpgradeModal({ open, featureKey, onClose }) {
           {t('upgrade_intro', { feature: featureLabel })}
         </p>
         <p className="text-xs text-[var(--ink3)] leading-relaxed mb-5">
-          {t('upgrade_pitch')}
+          {hidePricing ? t('upgrade_ios_pitch') : t('upgrade_pitch')}
         </p>
         <div className="flex gap-2 justify-end">
-          <button onClick={onClose}
-                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-white border border-black/10 hover:bg-black/5 cursor-pointer">
-            {t('upgrade_dismiss')}
-          </button>
-          <button onClick={goPricing}
-                  className="text-sm font-bold px-4 py-2 rounded-lg bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none">
-            {t('upgrade_cta')} →
-          </button>
+          {hidePricing ? (
+            // Apple compliance: en iOS no hay CTA que lleve a payment ni
+            // mensaje promocional con link/precio. Solo botón de cerrar.
+            <button onClick={onClose}
+                    className="text-sm font-bold px-4 py-2 rounded-lg bg-[var(--ink)] text-white hover:opacity-90 cursor-pointer border-none">
+              {t('ok')}
+            </button>
+          ) : (
+            <>
+              <button onClick={onClose}
+                      className="text-sm font-semibold px-4 py-2 rounded-lg bg-white border border-black/10 hover:bg-black/5 cursor-pointer">
+                {t('upgrade_dismiss')}
+              </button>
+              <button onClick={goPricing}
+                      className="text-sm font-bold px-4 py-2 rounded-lg bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none">
+                {t('upgrade_cta')} →
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

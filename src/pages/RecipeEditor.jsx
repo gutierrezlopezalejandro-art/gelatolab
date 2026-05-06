@@ -23,6 +23,7 @@ import SearchSelect from '../components/SearchSelect';
 import { Spinner } from '../components/ui/index.jsx';
 import { NumberInput } from '../components/NumberInput';
 import { ProGate } from '../components/ProGate';
+import { MobileDesktopHint } from '../components/MobileDesktopHint';
 import { FEATURES } from '../lib/entitlement';
 import { calcStats, calcDensity, calcServingTemp, getParams, resolveRecipeItems, applyEvaporation } from '../lib/icecreamCalc';
 import { useT, useIngredientName, useCategoryName, useI18nStore } from '../lib/i18n';
@@ -69,6 +70,17 @@ export default function RecipeEditor() {
   const [dirty,      setDirty]      = useState(false);
   const [saving,     setSaving]     = useState(false);
   const [activeTab,  setActiveTab]  = useState('formulacion');
+
+  // En mobile (≤640px) las tabs secundarias estan ocultas. Forzamos
+  // activeTab='formulacion' para que la pagina nunca quede en blanco
+  // si el usuario estaba en otra tab y achica la ventana.
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 640px)');
+    function sync() { if (mql.matches) setActiveTab('formulacion'); }
+    sync();
+    mql.addEventListener('change', sync);
+    return () => mql.removeEventListener('change', sync);
+  }, []);
   const [showBalance, setShowBalance] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showPinPrompt, setShowPinPrompt] = useState(false);
@@ -394,13 +406,21 @@ export default function RecipeEditor() {
 
   return (
     <div>
+      <MobileDesktopHint pageId="recipe-editor" />
+      {/* h1 oculto: el nombre de la receta es un input editable, no un heading
+          tradicional. Para landmarks/SEO/screen-readers necesitamos un h1
+          presente en el DOM. Esta pantalla antes no tenía ningún h1. */}
+      <h1 className="sr-only">{name || t('untitled_recipe')}</h1>
       {/* ═══════════════════ Header (2 filas) ═══════════════════ */}
       <div data-tour="recipe-header" className="card p-4 mb-6 space-y-3">
         {/* Fila 1: navegacion + nombre + acciones (Balancear, Historial, Guardar) */}
         <div className="flex items-center gap-3 flex-wrap">
           <button className="btn-secondary" onClick={() => navigate('/recipes')}>← {t('back_recipes')}</button>
+          <label htmlFor="recipe-name-input" className="sr-only">{t('recipe_name')}</label>
           <input
+            id="recipe-name-input"
             data-tour="recipe-name"
+            aria-label={t('recipe_name')}
             className="border-none bg-transparent font-display text-2xl text-[var(--ink)]
                        outline-none flex-1 min-w-[180px] border-b-2 border-black/10
                        focus:border-[var(--mint2)] px-1 py-0.5 transition-colors"
@@ -522,8 +542,13 @@ export default function RecipeEditor() {
         </div>
       </div>
 
-      {/* ═══════════════════ Tabs ═══════════════════ */}
-      <div data-tour="recipe-tabs" className="flex border-b-2 border-black/10 mb-6">
+      {/* ═══════════════════ Tabs ═══════════════════
+          En mobile (≤640px) ocultamos las tabs secundarias y solo
+          mostramos Formulación. Las tabs de análisis (curva, valores
+          nutricionales, análisis IA) son densas en datos y no se ven
+          bien en pantalla chica — el usuario ya recibe el aviso
+          MobileDesktopHint sugiriendo usar desktop para ver todo. */}
+      <div data-tour="recipe-tabs" className="hidden sm:flex border-b-2 border-black/10 mb-6">
         {tabs.map(([k, lbl]) => (
           <button
             key={k}

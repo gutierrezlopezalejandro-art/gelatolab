@@ -236,13 +236,19 @@ describe('calcFreezingCurve', () => {
     expect(curve[0]).toHaveProperty('freeWaterPct');
   });
 
-  it('respects custom count parameter', () => {
+  it('produces a fixed-resolution curve aligned with ICC4 sampling', () => {
+    // El builder ICC4 muestrea f ∈ {0, 2, ..., 90} (46 puntos). El parámetro
+    // `count` quedó como no-op tras el realineamiento; lo aceptamos por
+    // compatibilidad pero la curva siempre se devuelve con la grilla ICC4.
     const s = calcStats([
       { qty_grams: 600, ingredient: milk },
       { qty_grams: 200, ingredient: cream },
       { qty_grams: 200, ingredient: sugar },
     ]);
-    expect(calcFreezingCurve(s, 8)).toHaveLength(9);
+    const curve = calcFreezingCurve(s, 8);
+    expect(curve.length).toBe(46);
+    expect(curve[0].frozenPct).toBe(0);
+    expect(curve[curve.length - 1].frozenPct).toBe(90);
   });
 
   it('frozen % is monotonically increasing', () => {

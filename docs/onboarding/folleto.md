@@ -7,7 +7,7 @@ Este es el contenido editorial del folleto que va a entregar el maestro a sus al
 - Para imprimir directo: abre `folleto.html` en Chrome → Ctrl+P → Guardar como PDF
 - Versión editable: este archivo (`folleto.md`)
 
-Sustituye `[NOMBRE DEL CURSO]` y `[NOMBRE DEL MAESTRO]` antes de imprimir.
+Personalizado para el Curso de Gelato Italiano de Vladimir Dubovik.
 
 ---
 
@@ -18,7 +18,7 @@ Sustituye `[NOMBRE DEL CURSO]` y `[NOMBRE DEL MAESTRO]` antes de imprimir.
 > **GelatoLab**
 > El laboratorio de helado profesional
 >
-> *Una herramienta del [NOMBRE DEL CURSO]*
+> *Una herramienta del Curso de Gelato Italiano*
 
 ## Pitch (un párrafo)
 
@@ -103,7 +103,7 @@ Una vez dentro:
 | Planificación y control de producción A4 | — | ✓ |
 | Comparación entre recetas | — | ✓ |
 
-**Como alumno de [NOMBRE DEL MAESTRO], tienes un descuento especial.** Pídele el código a tu maestro al inscribirte.
+**Como alumno de Vladimir Dubovik, tienes un descuento especial.** Pídele el código a tu maestro al inscribirte.
 
 ## Si necesitas ayuda
 

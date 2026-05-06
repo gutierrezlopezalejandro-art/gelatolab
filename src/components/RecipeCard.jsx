@@ -29,13 +29,29 @@ export default function RecipeCard({ recipe, ingredients, onEdit, onDuplicate, o
     s.agua / s.T, s.grasa / s.T, s.azucar / s.T, s.sng / s.T, s.otros / s.T,
   ] : [];
 
+  // El card entero abre la receta. Para teclado/lector de pantalla:
+  // role+tabIndex+onKeyDown lo hacen activable con Enter/Espacio. Los botones
+  // internos (checkbox, edit, duplicate, delete) hacen stopPropagation así que
+  // no se dispara el onClick del card cuando el usuario interactúa con ellos.
+  const handleCardKey = (e) => {
+    if (e.target !== e.currentTarget) return; // ignora eventos burbujeados
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onEdit(recipe.id);
+    }
+  };
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={recipe.name || t('untitled_recipe')}
       className={`bg-white rounded-xl border cursor-pointer
                  transition-all duration-200 hover:-translate-y-1 hover:shadow-lg
+                 focus-visible:outline-2 focus-visible:outline-[var(--mint)] focus-visible:outline-offset-2
                  flex flex-col overflow-hidden group relative
                  ${selected ? 'border-[var(--mint)] ring-2 ring-[var(--mint3)]' : 'border-black/10 hover:border-[var(--mint2)]'}`}
       onClick={() => onEdit(recipe.id)}
+      onKeyDown={handleCardKey}
     >
       {/* Checkbox para seleccion multiple (visible al hover o cuando esta seleccionada) */}
       {onToggleSelect && (
@@ -73,7 +89,7 @@ export default function RecipeCard({ recipe, ingredients, onEdit, onDuplicate, o
         </div>
 
         <h3 className="font-display text-base text-[var(--ink)] leading-snug mb-1">
-          {recipe.name || 'Sin nombre'}
+          {recipe.name || t('untitled_recipe')}
         </h3>
 
         <p className="text-[11px] text-[var(--ink3)] mb-3">
@@ -127,8 +143,11 @@ export default function RecipeCard({ recipe, ingredients, onEdit, onDuplicate, o
           </div>
         )}
 
-        {/* Actions - visible on hover */}
-        <div className="flex gap-2 mt-auto pt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Actions - visible on hover (desktop) y siempre en mobile/tablet
+            donde no hay hover real. También al hacer focus-within con teclado.
+            Antes solo mostraban en hover, lo que dejaba inalcanzables las
+            acciones para usuarios touch y teclado. */}
+        <div className="flex gap-2 mt-auto pt-3 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 max-md:opacity-100 transition-opacity">
           <button
             className="btn-secondary text-xs py-1 px-3"
             onClick={e => { e.stopPropagation(); onEdit(recipe.id); }}

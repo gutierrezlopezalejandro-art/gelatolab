@@ -8,9 +8,11 @@ import { supabase } from './lib/supabase';
 import { useI18nStore, useT, LANGUAGES } from './lib/i18n';
 import { trackPageview } from './lib/analytics';
 import { UserMenu } from './components/UserMenu';
+import { isBarcodeAvailable } from './lib/barcode';
 import { OnboardingWizard } from './components/OnboardingWizard';
 import { useBusinessStore } from './store/businessStore';
 import { CloudSyncProvider } from './components/CloudSyncProvider';
+import { BackupReminder } from './components/BackupReminder';
 import { Spinner } from './components/ui/index.jsx';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { NotFound } from './components/NotFound';
@@ -325,6 +327,22 @@ export default function App() {
 
           {/* Help + User menu + Country + Language selectors */}
           <div className="ml-auto md:ml-3 flex-shrink-0 flex items-center gap-2">
+            {/* Acceso rapido al escaner — visible si la plataforma soporta
+                camara (mobile nativo via Capacitor, o web con getUserMedia).
+                Click navega a /ingredients con flag para auto-disparar el
+                scanner sin que el usuario tenga que cliquear "Escanear" ahi.
+                Es el shortcut clave para el workflow mobile. */}
+            {isBarcodeAvailable() && (
+              <button
+                type="button"
+                onClick={() => navigate('/ingredients?scan=1')}
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-base cursor-pointer transition-colors border-none bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
+                aria-label={t('barcode_scan_btn')}
+                title={t('barcode_scan_btn')}
+              >
+                📷
+              </button>
+            )}
             <NavLink
               to="/help"
               className={({ isActive }) =>
@@ -372,6 +390,12 @@ export default function App() {
       </nav>
 
       <main id="main-content" className="max-w-[1280px] mx-auto px-4 py-6" role="main">
+        {/* Banner transversal de recordatorio de backup. Antes solo aparecía
+            en Dashboard, lo que dejaba al usuario que entra directo a
+            /recipes o /production sin verlo. El propio componente decide
+            cuándo mostrarse (no logueado / dismissed / carpeta conectada =
+            null). */}
+        <BackupReminder />
         <ErrorBoundary>
           <Suspense fallback={<Spinner />}>
             <Routes>
@@ -401,7 +425,15 @@ export default function App() {
 
       {toast && <Toast toast={toast} />}
       {modal && <ConfirmModal modal={modal} onResolve={resolveModal} />}
-      {!businessCompleted && <OnboardingWizard />}
+      {/* OnboardingWizard solo aparece DESPUÉS de loguearse y SOLO si el
+          usuario aún no completó la configuración de negocio. Antes
+          aparecía sobre la pantalla de auth (al cliquear "Iniciar sesión"
+          en DesktopWelcome veías el wizard antes que el formulario de
+          login), lo cual era confuso e ilógico. */}
+      {!businessCompleted
+        && location.pathname !== '/auth'
+        && location.pathname !== '/reset-password'
+        && <OnboardingWizard />}
       <CloudSyncProvider />
       <CookieBanner />
       <HelpAssistant />

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useIngredientStore } from '../store/ingredientStore';
 import { useInventoryStore } from '../store/inventoryStore';
 import { useAppStore } from '../store/appStore';
@@ -19,6 +20,7 @@ import { FEATURES, useEntitlement } from '../lib/entitlement';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { StocktakeModal } from '../components/StocktakeModal';
 import { SuppliersModal } from '../components/SuppliersModal';
+import { MobileDesktopHint } from '../components/MobileDesktopHint';
 
 const CAT_COLORS = {
   'Lacteo': '#1a5c3a', 'Azucar': '#b8860b', 'Fruta': '#2e7d52',
@@ -30,6 +32,11 @@ const CAT_COLORS = {
 const EMPTY_FORM = {
   name: '', category: '', cost_per_kg: 0,
   water_pct: 0, fat_pct: 0, sng_pct: 0, sugar_pct: 0, others_pct: 0, pod: 0, pac: 0,
+  // Cocoa + non-dairy fat breakdown for accurate Hardness Factor.
+  // ICC4 cuenta para HF: cocoa fat ×0.9, cocoa solids ×1.8, other fat ×1.4.
+  // "Other fat" = grasas vegetales/hidrogenadas (coco, palma, margarina);
+  // milk fat y egg fat NO se incluyen aquí. Default 0.
+  cocoa_fat_pct: 0, cocoa_solids_pct: 0, other_fat_pct: 0,
   calories: 0, protein: 0, satfat: 0, trans_fat: 0, sodium_mg: 0, sugars: 0, added_sugars: 0,
   cholesterol_mg: 0, vitamind_mcg: 0, calcium_mg: 0, iron_mg: 0, potassium_mg: 0,
   subingredients: [], // [{ ingredient_id, pct }] — si esta poblado, los macros se calculan
@@ -43,6 +50,12 @@ const NUM_FIELDS_KEYS = [
   { key: 'sng_pct',     labelKey: 'sng_col',    suffix: '%', step: 0.1,   decimals: 1, group: 'formulation' },
   { key: 'sugar_pct',   labelKey: 'sugar_col',  suffix: '%', step: 0.1,   decimals: 1, group: 'formulation' },
   { key: 'others_pct',  labelKey: 'others_col', suffix: '%', step: 0.1,   decimals: 1, group: 'formulation' },
+  // Cocoa + grasas vegetales/hidrogenadas. Solo relevantes para chocolate
+  // o ingredientes con grasa no-láctea no-cocoa (coco, palma, margarina).
+  // Default 0; lácteos y yema NO van aquí — su grasa va sólo a fat_pct.
+  { key: 'cocoa_fat_pct',    labelKey: null, label: 'Cocoa fat %',    suffix: '%', step: 0.1, decimals: 1, group: 'formulation' },
+  { key: 'cocoa_solids_pct', labelKey: null, label: 'Cocoa solids %', suffix: '%', step: 0.1, decimals: 1, group: 'formulation' },
+  { key: 'other_fat_pct',    labelKey: null, label: 'Other fat %',    suffix: '%', step: 0.1, decimals: 1, group: 'formulation' },
   { key: 'pac',         labelKey: null, label: 'PAC',        step: 0.001, decimals: 3, group: 'formulation' },
   { key: 'pod',         labelKey: null, label: 'POD',        step: 0.001, decimals: 3, group: 'formulation' },
   { key: 'cost_per_kg', labelKey: null, label: '$/kg',       step: 10,    decimals: 0, group: 'formulation' },
@@ -198,6 +211,22 @@ export default function IngredientDB() {
     }
   }
 
+  // Auto-trigger del scanner cuando llega el flag ?scan=1 desde el shortcut
+  // del navbar. Limpiamos el query asi al refrescar no vuelve a abrir.
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('scan') === '1' && isBarcodeAvailable()) {
+      handleScan();
+      // Limpia ?scan=1 sin recargar la pagina ni triggerear navigate del Router.
+      params.delete('scan');
+      const next = location.pathname + (params.toString() ? '?' + params.toString() : '');
+      navigate(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
+
   function handleScannedCode(code) {
     track('barcode_scanned');
     const match = findIngredientByBarcode(allIngredients, code);
@@ -344,6 +373,7 @@ export default function IngredientDB() {
   // ── Render ────────────────────────────────────────────────
   return (
     <div>
+      <MobileDesktopHint pageId="ingredient-db" />
       {/* Page header */}
       <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
         <div>
@@ -352,36 +382,43 @@ export default function IngredientDB() {
             {t('ing_subtitle')}
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Botones de accion. En mobile (≤640px) Escanear es el protagonista
+            (es la feature clave de mobile: usar la camara del telefono para
+            escanear códigos de barras de ingredientes). El resto de acciones
+            (Nuevo ingrediente sigue visible; Conteo, Proveedores, Excel
+            export/import) se ocultan porque no aportan en pantalla chica. */}
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           {isBarcodeAvailable() && (
             <button
               onClick={handleScan}
-              className="btn-primary"
+              className="btn-primary w-full sm:w-auto text-base sm:text-sm py-3 sm:py-2 font-bold"
               title={t('barcode_scan_tooltip')}
             >
               📷 {t('barcode_scan_btn')}
             </button>
           )}
-          <button data-tour="ingredient-add-btn" className="btn-primary" onClick={() => setShowModal(true)}>
+          <button data-tour="ingredient-add-btn"
+                  className="btn-primary w-full sm:w-auto"
+                  onClick={() => setShowModal(true)}>
             {t('add_ingredient_btn')}
           </button>
-          <button className="btn-primary" onClick={() => setShowStocktake(true)}
+          <button className="btn-primary hidden sm:inline-flex" onClick={() => setShowStocktake(true)}
                   title={t('stk_btn_tooltip')}>
             🧮 {t('stk_btn')}
           </button>
-          <button className="btn-primary" onClick={() => setShowSuppliers(true)}
+          <button className="btn-primary hidden sm:inline-flex" onClick={() => setShowSuppliers(true)}
                   title={t('suppliers_btn_tooltip')}>
             🚚 {t('suppliers_btn')}
           </button>
           <button
             onClick={exportXLSX}
-            className="px-4 py-2 rounded-lg text-sm font-semibold text-white border-none cursor-pointer"
+            className="hidden sm:inline-flex px-4 py-2 rounded-lg text-sm font-semibold text-white border-none cursor-pointer"
             style={{ background: '#0d5c6e' }}
           >
             {t('export_excel')}
           </button>
           <label
-            className="px-4 py-2 rounded-lg text-sm font-semibold text-white cursor-pointer"
+            className="hidden sm:inline-flex px-4 py-2 rounded-lg text-sm font-semibold text-white cursor-pointer"
             style={{ background: '#b8860b' }}
           >
             {t('import_excel')}
@@ -430,8 +467,11 @@ export default function IngredientDB() {
         </span>
       </div>
 
-      {/* View tabs (which column group to show) */}
-      <div className="flex gap-1 mb-3 flex-wrap" role="tablist">
+      {/* View tabs (which column group to show). Ocultas en mobile porque
+          ahi solo mostramos las columnas Nombre y Categoria — los grupos
+          de columnas tecnicas (formulacion/nutricion/inventario) no se ven
+          en pantalla chica de todas formas. */}
+      <div className="hidden sm:flex gap-1 mb-3 flex-wrap" role="tablist">
         {VIEW_TABS.map(tab => (
           <button
             key={tab.id}
@@ -461,8 +501,8 @@ export default function IngredientDB() {
               <tr>
                 <th className="text-left">{t('name')}</th>
                 <th>{t('category')}</th>
-                {NUM_FIELDS.map(f => <th key={f.key}>{f.label}</th>)}
-                <th>{t('allergens_col')}</th>
+                {NUM_FIELDS.map(f => <th key={f.key} className="hidden sm:table-cell">{f.label}</th>)}
+                <th className="hidden sm:table-cell">{t('allergens_col')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -552,7 +592,7 @@ export default function IngredientDB() {
                       const isPrice = key === 'cost_per_kg';
 
                       return (
-                        <td key={key}>
+                        <td key={key} className="hidden sm:table-cell">
                           {isEd ? (
                             <NumberInput
                               autoFocus
@@ -588,7 +628,7 @@ export default function IngredientDB() {
                     })}
 
                     {/* Allergens (read-only chips) */}
-                    <td>
+                    <td className="hidden sm:table-cell">
                       <div className="flex flex-wrap gap-1 justify-center">
                         {(ingredient.allergens || []).map(a => (
                           <span key={a}
@@ -617,10 +657,12 @@ export default function IngredientDB() {
                         </button>
                         {ingredient.is_custom && (
                           <button
-                            className="text-black/20 hover:text-[var(--coral)] transition-colors text-xs ml-1"
+                            className="text-[var(--ink3)] hover:text-[var(--coral)] transition-colors text-base ml-1 leading-none"
                             onClick={() => handleDelete(ingredient)}
+                            aria-label={t('delete_ingredient_aria', { name: ingredient.name })}
+                            title={t('delete')}
                           >
-                            x
+                            ×
                           </button>
                         )}
                       </div>

@@ -14,7 +14,7 @@ import { track } from '../lib/analytics';
 import { printRecipesReport } from '../lib/recipeReport';
 import { useBusinessStore } from '../store/businessStore';
 import { ProGate } from '../components/ProGate';
-import { FEATURES, useEntitlement } from '../lib/entitlement';
+import { FEATURES, useEntitlement, isSeedRecipe, FREE_VISIBLE_SEED_IDS } from '../lib/entitlement';
 import { UpgradeModal } from '../components/UpgradeModal';
 
 const TYPE_TAB_KEYS = [
@@ -110,13 +110,27 @@ export default function Recipes() {
   }
 
   // Filtrado local
-  const filtered = recipes.filter(r => {
+  const allFiltered = recipes.filter(r => {
     const matchType = filter === 'todos' || r.type === filter;
     const matchQ    = !q || r.name.toLowerCase().includes(q.toLowerCase());
     const matchTags = activeTags.length === 0
       || activeTags.every(tag => Array.isArray(r.tags) && r.tags.includes(tag));
     return matchType && matchQ && matchTags;
   });
+
+  // Visibilidad por plan: free users sólo ven recetas seed específicas
+  // (definidas en FREE_VISIBLE_SEED_IDS — actualmente Vainilla Clásica
+  // y Gelato Pistachio di Bronte). Sus propias recetas siempre se muestran.
+  // Pro ve todo. El resto se oculta detrás de un upsell card abajo.
+  const userCreated = allFiltered.filter(r => !isSeedRecipe(r));
+  const seed        = allFiltered.filter(r => isSeedRecipe(r));
+  const seedVisible = ent.isPro
+    ? seed
+    : seed.filter(r => FREE_VISIBLE_SEED_IDS.has(r.id));
+  const seedHiddenCount = seed.length - seedVisible.length;
+  // Mostramos primero las del usuario y después las de biblioteca, así un
+  // free user con recetas propias ve las suyas arriba.
+  const filtered = [...userCreated, ...seedVisible];
 
   const counts = TYPE_TAB_KEYS.reduce((acc, tab) => {
     acc[tab.k] = tab.k === 'todos' ? recipes.length : recipes.filter(r => r.type === tab.k).length;
@@ -231,20 +245,42 @@ export default function Recipes() {
           )}
         />
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-5">
-          {filtered.map(r => (
-            <RecipeCard
-              key={r.id}
-              recipe={r}
-              ingredients={ingredients}
-              selected={selectedIds.includes(r.id)}
-              onToggleSelect={() => toggleSelect(r.id)}
-              onEdit={id => navigate(`/recipes/${id}`)}
-              onDuplicate={handleDuplicate}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-5">
+            {filtered.map(r => (
+              <RecipeCard
+                key={r.id}
+                recipe={r}
+                ingredients={ingredients}
+                selected={selectedIds.includes(r.id)}
+                onToggleSelect={() => toggleSelect(r.id)}
+                onEdit={id => navigate(`/recipes/${id}`)}
+                onDuplicate={handleDuplicate}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+
+          {/* Upsell: hay recetas de la biblioteca que el plan Free no muestra. */}
+          {seedHiddenCount > 0 && (
+            <div className="mt-6 rounded-2xl border border-[var(--gold)] bg-gradient-to-br from-[var(--cream)] to-[var(--gold2)] p-6 text-center">
+              <div className="text-3xl mb-2" aria-hidden="true">🔒</div>
+              <h3 className="font-display text-xl text-[var(--ink)] mb-1">
+                {t('recipes_locked_title', { n: seedHiddenCount })}
+              </h3>
+              <p className="text-sm text-[var(--ink2)] mb-4 max-w-md mx-auto">
+                {t('recipes_locked_sub')}
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowUpgrade(true)}
+                className="btn-primary"
+              >
+                {t('recipes_locked_cta')}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Action bar flotante para generar reporte / comparar varias recetas */}

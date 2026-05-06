@@ -1,22 +1,80 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useAppStore } from '../store/appStore';
 import { useT } from '../lib/i18n';
 import { Logo } from '../components/Logo';
+import { authStorage } from '../lib/authStorage';
+
+// "Recordarme" — solo guardamos el email para pre-rellenarlo. La contraseña
+// NUNCA se persiste: hacerlo en localStorage equivalía a texto plano expuesto
+// a XSS y extensiones del navegador, sin valor real (Supabase ya mantiene la
+// sesión activa via refresh token).
+const REMEMBER_KEY = 'gelatolab.remember_me';
+const REMEMBER_EMAIL_KEY = 'gelatolab.saved_email';
+// Limpieza one-shot de instalaciones previas que sí guardaban la contraseña.
+const LEGACY_REMEMBER_PASS_KEY = 'gelatolab.saved_password';
+
+// Lee el modo inicial del query string (?mode=signup|reset|login). Esto
+// permite que botones externos (DesktopWelcome, links de marketing) abran
+// directo en signup sin que el usuario tenga que cliquear "crear cuenta"
+// dentro del form.
+function readInitialMode(search) {
+  try {
+    const m = new URLSearchParams(search).get('mode');
+    if (m === 'signup' || m === 'reset' || m === 'login') return m;
+  } catch { /* tolerable */ }
+  return 'login';
+}
+
+// Mapea errores crudos de Supabase a claves i18n con mensaje accionable en es.
+// Supabase devuelve mensajes en inglés sin contexto ("Invalid login credentials")
+// que para un heladero chileno no comunican qué hacer. Este mapper traduce y
+// sugiere acción. Si no hay match, fallback genérico.
+function authErrorKey(err) {
+  const msg = (err?.message || '').toLowerCase();
+  if (/invalid (login )?credentials|invalid email or password/.test(msg)) return 'auth_err_bad_credentials';
+  if (/rate limit|too many/.test(msg)) return 'auth_err_too_many';
+  if (/already registered|user exists/.test(msg)) return 'auth_err_email_exists';
+  if (/invalid email/.test(msg)) return 'auth_err_email_invalid';
+  if (/network|fetch/.test(msg)) return 'auth_err_network';
+  return 'auth_err_generic';
+}
 
 export default function Auth() {
   const t = useT();
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useAppStore();
   const { signIn, signUp, signInWithGoogle, resetPassword, hasCloud } = useAuthStore();
 
-  const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'reset'
+  const [mode, setMode] = useState(() => readInitialMode(location.search)); // 'login' | 'signup' | 'reset'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // On mount, hydrate the form from the saved "Recordarme" state. We only
+  // pre-fill in login mode — sign-up should always start blank, and reset
+  // doesn't need a password. La contraseña NO se hidrata aunque viniera
+  // guardada de una versión vieja: la borramos para limpiar el rastro.
+  useEffect(() => {
+    // Limpieza one-shot de la clave legacy que sí guardaba la contraseña.
+    // Cualquier dispositivo que quedó actualizado a esta versión va a perder
+    // la contraseña guardada en localStorage en su próximo login (esto es
+    // intencional, ese era exactamente el problema).
+    authStorage.removeItem(LEGACY_REMEMBER_PASS_KEY).catch(() => {});
+
+    if (mode !== 'login') return;
+    const savedFlag = authStorage.getItem(REMEMBER_KEY);
+    if (savedFlag !== '1') return;
+    const savedEmail = authStorage.getItem(REMEMBER_EMAIL_KEY) || '';
+    if (savedEmail) setEmail(savedEmail);
+    setRememberMe(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -33,7 +91,17 @@ export default function Auth() {
     try {
       if (mode === 'login') {
         const { error } = await signIn(email.trim(), password);
-        if (error) return showToast(error.message, 'error');
+        if (error) return showToast(t(authErrorKey(error)), 'error');
+        // Persistimos solo la preferencia "Recordarme" + el email. La
+        // contraseña no se guarda — Supabase ya maneja la sesión via
+        // refresh token persistido por su SDK.
+        if (rememberMe) {
+          await authStorage.setItem(REMEMBER_KEY, '1');
+          await authStorage.setItem(REMEMBER_EMAIL_KEY, email.trim());
+        } else {
+          await authStorage.removeItem(REMEMBER_KEY);
+          await authStorage.removeItem(REMEMBER_EMAIL_KEY);
+        }
         showToast(t('auth_signed_in'));
         navigate('/dashboard');
       } else if (mode === 'signup') {
@@ -50,12 +118,12 @@ export default function Auth() {
           return;
         }
         const { error } = await signUp(email.trim(), password);
-        if (error) return showToast(error.message, 'error');
+        if (error) return showToast(t(authErrorKey(error)), 'error');
         showToast(t('auth_check_email'));
         setMode('login');
       } else if (mode === 'reset') {
         const { error } = await resetPassword(email.trim());
-        if (error) return showToast(error.message, 'error');
+        if (error) return showToast(t(authErrorKey(error)), 'error');
         showToast(t('auth_reset_sent'));
         setMode('login');
       }
@@ -67,7 +135,7 @@ export default function Auth() {
   async function handleGoogle() {
     if (!hasCloud) return showToast(t('auth_cloud_disabled'), 'error');
     const { error } = await signInWithGoogle();
-    if (error) showToast(error.message, 'error');
+    if (error) showToast(t(authErrorKey(error)), 'error');
   }
 
   return (
@@ -122,9 +190,18 @@ export default function Auth() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                aria-describedby={mode === 'signup' ? 'auth-password-hint' : undefined}
                 required
                 minLength={6}
               />
+              {mode === 'signup' && (
+                <p
+                  id="auth-password-hint"
+                  className={`text-[10px] mt-1 ${password.length >= 6 ? 'text-[var(--mint)]' : 'text-[var(--ink3)]'}`}
+                >
+                  {password.length >= 6 ? '✓ ' : ''}{t('auth_password_hint')}
+                </p>
+              )}
             </div>
           )}
 
@@ -147,6 +224,25 @@ export default function Auth() {
                 <p className="text-[10px] text-[var(--coral)] mt-1">{t('auth_password_mismatch')}</p>
               )}
             </div>
+          )}
+
+          {mode === 'login' && (
+            <label className="flex items-center gap-2 text-xs text-[var(--ink2)] cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+                className="cursor-pointer"
+              />
+              <span>{t('auth_remember_me')}</span>
+              <span
+                className="text-[10px] text-[var(--ink3)]"
+                title={t('auth_remember_me_warning')}
+                aria-label={t('auth_remember_me_warning')}
+              >
+                ⓘ
+              </span>
+            </label>
           )}
 
           {mode === 'signup' && (

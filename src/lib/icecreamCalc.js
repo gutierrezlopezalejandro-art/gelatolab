@@ -1,9 +1,29 @@
 // ============================================================
-// icecreamCalc.js — Motor de calculo para formulacion de helados
+// icecreamCalc.js — Motor de cálculo para formulación de helados
 //
-// Formulas del Demo GelatoPassport (polinomial FPD) combinadas
-// con el sistema de rating de Heladeria (Corvitto/escuela italiana)
+// Modelo de congelación alineado con IceCreamCalc 4 (ICC4):
+//   - FPD via polinomio cuártico de ICC4 sobre concentración de PAC
+//     en agua + corrección por MSNF (-2.37 g de descenso por g/100g).
+//   - Curva de congelación discreta: para cada % de agua congelada
+//     (0..90% en pasos de 2%), se computa la T° correspondiente
+//     considerando que PAC y MSNF se concentran en el agua remanente.
+//   - Temperatura de servicio = T° a la que un % objetivo del agua
+//     está congelada (75% para helado/sorbete, 69% para gelato).
+//   - Hardness Factor (HF) modela el efecto endurecedor de las grasas
+//     (cocoa fat ×0.9 + cocoa solids ×1.8 + otras grasas ×1.4). Como
+//     GelatoLab no diferencia cocoa-fat de fat general, aproximamos
+//     HF = fat × 1.4. Esto introduce un sesgo pequeño en chocolates.
 // ============================================================
+
+// Polinomio cuártico de ICC4 (Recipe.cs:A): °C de descenso del punto
+// de congelación dado x = gramos de PAC equivalentes por 100 g de agua.
+function _iccA(x) {
+  return 1.8e-9 * x * x * x * x
+       - 1.5486e-6 * x * x * x
+       + 0.0004066439 * x * x
+       + 0.0429570733 * x
+       + 0.1564927407;
+}
 
 // ── Composicion de blends (sub-ingredientes) ────────────────
 // Calcula los macros de un ingrediente compuesto como suma ponderada de sus
@@ -17,6 +37,12 @@ const BLEND_PCT_FIELDS = [
   'water_pct', 'fat_pct', 'sng_pct', 'sugar_pct', 'others_pct',
   'protein', 'satfat', 'trans_fat', 'sugars', 'added_sugars',
   'lactose', 'fibers', 'polyols', 'totcarbo', 'salt', 'msnf', 'stabiliser',
+  // Cocoa-specific fat/solids + non-dairy non-cocoa fats. Used for the
+  // Hardness Factor in freezing-curve calculations (ICC4 Recipe.cs:1452).
+  // Importante: ICC4 NO cuenta milk fat ni egg fat en HF — todos esos
+  // están con HF=0 en su DB. Solo cocoa y "other fat" (grasas vegetales
+  // o hidrogenadas, raras en helado artesanal) contribuyen.
+  'cocoa_fat_pct', 'cocoa_solids_pct', 'other_fat_pct',
 ];
 const BLEND_PER100_FIELDS = ['calories', 'sodium_mg', 'cholesterol_mg', 'vitamind_mcg', 'calcium_mg', 'iron_mg', 'potassium_mg'];
 const BLEND_CORVITTO_FIELDS = ['pod', 'pac'];
@@ -66,11 +92,10 @@ export function applyEvaporation(stats, evaporationPct = 0) {
   const podPct = (stats.pod / newT) * 1000;
   const pacConc = waterFrac > 0 ? pacPct / waterFrac : 0;
   const msnfPct = (stats.msnf / newT) * 100;
+  // FPD alineado con ICC4: -A(pacConc) + MSNF term.
   let fpd = 0;
   if (pacConc > 0 && waterPct > 0) {
-    fpd = (-9e-5) * Math.pow(pacConc, 2)
-        - 0.0612 * pacConc
-        + msnfPct * (-2.37) / waterPct;
+    fpd = -_iccA(pacConc) - 2.37 * msnfPct / waterPct;
   }
   return {
     ...stats,
@@ -137,6 +162,7 @@ export function calcStats(items) {
   let stabiliser = 0, calories = 0, protein = 0;
   let trans_fat = 0, sodium_mg = 0, added_sugars = 0;
   let cholesterol_mg = 0, vitamind_mcg = 0, calcium_mg = 0, iron_mg = 0, potassium_mg = 0;
+  let cocoa_fat = 0, cocoa_solids = 0, other_fat = 0;
 
   for (const { qty_grams, ingredient } of items) {
     if (!ingredient || !qty_grams || qty_grams <= 0) continue;
@@ -178,6 +204,15 @@ export function calcStats(items) {
     calcium_mg     += g * (parseFloat(ingredient.calcium_mg)     || 0) / 100;
     iron_mg        += g * (parseFloat(ingredient.iron_mg)        || 0) / 100;
     potassium_mg   += g * (parseFloat(ingredient.potassium_mg)   || 0) / 100;
+    // Cocoa fat (cocoa butter) and cocoa solids (non-fat cocoa). Used by
+    // the Hardness Factor in calcFreezingCurve to model correctly how
+    // chocolate-rich recipes feel firmer than equivalent-PAC dairy ones.
+    cocoa_fat      += g * (parseFloat(ingredient.cocoa_fat_pct)    || 0) / 100;
+    cocoa_solids   += g * (parseFloat(ingredient.cocoa_solids_pct) || 0) / 100;
+    // "Other fat" para HF: grasas no lácteas no cocoa (coco, palma,
+    // hidrogenadas). Por defecto 0; se llena explícitamente solo cuando
+    // un ingrediente la tenga.
+    other_fat      += g * (parseFloat(ingredient.other_fat_pct)    || 0) / 100;
   }
 
   const pGrasa   = T > 0 ? grasa   / T : 0;
@@ -213,11 +248,10 @@ export function calcStats(items) {
   // Porque: pacPct = pac_acum/T*1000 = getSumPAC_demo/T*100
   const pacConc = waterFrac > 0 ? pacPct / waterFrac : 0;
 
+  // FPD = -A(pacConc) - 2.37 × MSNF/water (ICC4 Recipe.cs:1450).
   let fpd = 0;
   if (pacConc > 0 && waterPct > 0) {
-    fpd = (-9e-5) * Math.pow(pacConc, 2)
-        - 0.0612 * pacConc
-        + msnfPct * (-2.37) / waterPct;
+    fpd = -_iccA(pacConc) - 2.37 * msnfPct / waterPct;
   }
 
   return {
@@ -229,70 +263,129 @@ export function calcStats(items) {
     satfat, salt, sugars, stabiliser, calories,
     trans_fat, sodium_mg, added_sugars,
     cholesterol_mg, vitamind_mcg, calcium_mg, iron_mg, potassium_mg,
+    cocoa_fat, cocoa_solids, other_fat,
     msnfPct, waterPct, waterFrac,
     costPer100g: T > 0 ? (cost / T) * 100 : 0,
   };
 }
 
-// ── Fraccion de hielo a una temperatura ─────────────────────
-// Formula Demo: IF = (1.105*waterFrac) / (1 + 0.8765/ln(offset+1))
-// offset = |temp| - |FPD|  (cuantos grados por debajo del FPD)
-export function calcIceFraction(waterFrac, fpd, tempC) {
-  if (!fpd || fpd === 0 || !waterFrac) return 0;
-  const offset = Math.abs(tempC) - Math.abs(fpd);
-  if (offset <= 0) return 0;
-  const lnVal = Math.log(offset + 1);
-  if (lnVal === 0) return 0;
-  return (1.105 * waterFrac) / (1 + 0.8765 / lnVal);
-}
+// ── Curva de congelación ICC4 ──────────────────────────────
+// Réplica directa del builder en Recipe.cs:1487+.
+// Para cada % de agua congelada f ∈ {0, 2, ..., 90}:
+//   unfrozenWater = totalWater × (1 - f/100)
+//   pacConc       = (PAC_total / unfrozenWater) × 100  (g por 100 g agua libre)
+//   T             = -A(pacConc) - 2.37 × MSNF / unfrozenWater
+//
+// ICC4 además construye una segunda curva ("hardness") usando PAC - HF.
+// HF refleja el endurecimiento por grasas. La temperatura de servicio en
+// ICC4 es el promedio de ambas curvas en el target. Reproducimos ese
+// promedio con HF aproximado a fat × 1.4 (todas las grasas tratadas como
+// "otra grasa", error pequeño excepto en chocolates con cacao alto).
+export function calcFreezingCurve(stats, _count) {
+  if (!stats || !stats.agua || stats.agua <= 0) return [];
+  const totalWater = stats.agua;
+  const totalMass  = stats.T;
+  if (totalMass <= 0) return [];
+  const PAC = stats.pac * 10; // PAC en escala interna ICC4 (display = pac * 10)
+  if (PAC <= 0) return [];
+  const MSNF = stats.msnf || 0;
+  // Hardness Factor exactamente como ICC4 (Recipe.cs:1452):
+  //   HF = CocoaFat × 0.9 + CocoaSolids × 1.8 + OtherFat × 1.4
+  // OtherFat es un campo SEPARADO en ICC4, no derivado de TotalFat.
+  // Importante: en la DB de ICC4 los lácteos y la yema de huevo tienen
+  // HF = 0 (su grasa NO se cuenta para hardness — su comportamiento
+  // térmico es muy distinto al de cocoa o grasas hidrogenadas/vegetales).
+  // Solo recetas con chocolate o coco/palma tienen HF significativo.
+  const cocoaFat    = stats.cocoa_fat    || 0;
+  const cocoaSolids = stats.cocoa_solids || 0;
+  const otherFat    = stats.other_fat    || 0;
+  const HF = cocoaFat * 0.9 + cocoaSolids * 1.8 + otherFat * 1.4;
+  const PAC_HF = Math.max(0, PAC - HF);
 
-// ── % de agua congelada ─────────────────────────────────────
-export function calcFrozenWaterPct(waterFrac, fpd, tempC) {
-  if (!waterFrac || waterFrac === 0) return 0;
-  const iceFrac = calcIceFraction(waterFrac, fpd, tempC);
-  return (iceFrac / waterFrac) * 100;
-}
-
-// ── Curva de congelamiento ────────────────────────────────
-// Devuelve por cada punto: temp, frozenPct (% del agua congelada),
-// icePct (% de masa total que es hielo) y freeWaterPct (% de masa total que
-// es agua liquida remanente). Inspirado en IceCreamCalc 4: %FW/HF, Ice%, FreeW%.
-export function calcFreezingCurve(stats, count = 28) {
-  if (!stats || !stats.fpd || stats.fpd === 0) return [];
   const points = [];
-  for (let n = 0; n <= count; n++) {
-    const temp = stats.fpd - n;
-    const iceFrac = n === 0 ? 0 : calcIceFraction(stats.waterFrac, stats.fpd, temp);
-    const frozenPct = n === 0 ? 0 : (iceFrac / stats.waterFrac) * 100;
-    const icePct = iceFrac * 100;
-    const freeWaterPct = Math.max(0, (stats.waterFrac - iceFrac)) * 100;
+  for (let f = 0; f <= 90; f += 2) {
+    const frozenWater = totalWater * (f / 100);
+    const unfrozenWater = totalWater - frozenWater;
+    if (unfrozenWater <= 0) break;
+    const pacConcMain = (PAC    / unfrozenWater) * 100;
+    const pacConcHard = (PAC_HF / unfrozenWater) * 100;
+    const msnfTerm    = -2.37 * MSNF / unfrozenWater;
+    const tMain = -_iccA(pacConcMain) + msnfTerm;
+    const tHard = -_iccA(pacConcHard) + msnfTerm;
+    // Temperatura efectiva = promedio de ambas curvas (Recipe.cs:1463).
+    const temp = (tMain + tHard) / 2;
+    const icePct = (frozenWater / totalMass) * 100;
+    const freeWaterPct = (unfrozenWater / totalMass) * 100;
     points.push({
-      temp:           parseFloat(temp.toFixed(2)),
-      frozenPct:      parseFloat(frozenPct.toFixed(2)),
-      icePct:         parseFloat(icePct.toFixed(2)),
-      freeWaterPct:   parseFloat(freeWaterPct.toFixed(2)),
+      temp:         parseFloat(temp.toFixed(2)),
+      frozenPct:    f,
+      icePct:       parseFloat(icePct.toFixed(2)),
+      freeWaterPct: parseFloat(freeWaterPct.toFixed(2)),
     });
   }
   return points;
 }
 
-// ── Temperatura para alcanzar un %FW objetivo ───────────────
-// Dado un % de agua congelada (HF) deseado, devuelve la temperatura en °C
-// interpolando linealmente la curva de congelamiento.
+// ── % de agua congelada a una temperatura dada ──────────────
+// Interpola la curva ICC4 (que está parametrizada por f → T) en sentido
+// inverso para responder T → f.
+export function calcFrozenWaterPctFromStats(stats, tempC) {
+  const curve = calcFreezingCurve(stats);
+  if (!curve.length) return 0;
+  // La curva está ordenada por f creciente; T decrece con f.
+  // Si tempC > T(f=0), no hay congelación.
+  if (tempC >= curve[0].temp) return 0;
+  for (let i = 0; i < curve.length - 1; i++) {
+    const a = curve[i], b = curve[i + 1];
+    // a.temp > b.temp (T decreciente)
+    if (tempC <= a.temp && tempC >= b.temp) {
+      const span = a.temp - b.temp;
+      if (span <= 0) return a.frozenPct;
+      const r = (a.temp - tempC) / span;
+      return a.frozenPct + (b.frozenPct - a.frozenPct) * r;
+    }
+  }
+  // Más frío que el último punto: tope al 90%.
+  return curve[curve.length - 1].frozenPct;
+}
+
+// Compat: firma vieja (waterFrac, fpd, tempC). No tan precisa como la
+// versión basada en stats — solo se usa donde no hay stats disponibles.
+// Calleadores nuevos deberían usar calcFrozenWaterPctFromStats.
+export function calcFrozenWaterPct(waterFrac, fpd, tempC) {
+  if (!waterFrac || waterFrac === 0 || !fpd) return 0;
+  const offset = Math.abs(tempC) - Math.abs(fpd);
+  if (offset <= 0) return 0;
+  const iceFrac = (1.105 * waterFrac) / (1 + 0.8765 / Math.log(offset + 1));
+  return (iceFrac / waterFrac) * 100;
+}
+
+// Compat antigua. Deprecada, no se usa internamente.
+export function calcIceFraction(waterFrac, fpd, tempC) {
+  if (!fpd || fpd === 0 || !waterFrac) return 0;
+  const offset = Math.abs(tempC) - Math.abs(fpd);
+  if (offset <= 0) return 0;
+  return (1.105 * waterFrac) / (1 + 0.8765 / Math.log(offset + 1));
+}
+
+// ── Temperatura para alcanzar un % de agua congelada objetivo ──
+// Inversa de la curva ICC4 evaluada por interpolación lineal.
 export function tempForFrozenPct(stats, targetFwPct) {
-  const curve = calcFreezingCurve(stats, 60);
+  const curve = calcFreezingCurve(stats);
   if (!curve.length) return null;
   for (let i = 0; i < curve.length - 1; i++) {
     const a = curve[i], b = curve[i + 1];
     if (a.frozenPct <= targetFwPct && b.frozenPct >= targetFwPct) {
-      const r = (targetFwPct - a.frozenPct) / (b.frozenPct - a.frozenPct || 1);
+      const span = b.frozenPct - a.frozenPct;
+      if (span <= 0) return parseFloat(a.temp.toFixed(2));
+      const r = (targetFwPct - a.frozenPct) / span;
       return parseFloat((a.temp + (b.temp - a.temp) * r).toFixed(2));
     }
   }
   return null;
 }
 
-// Targets tipicos para los marcadores de la curva (inspirado en ICC4).
+// Targets de ICC4 para los marcadores de la curva.
 export const FREEZING_TARGETS = {
   extraction: { pct: 50, label: 'Extraccion',  color: '#f9a825' },
   gelato:     { pct: 69, label: 'Servicio gelato', color: '#c0392b' },
@@ -498,7 +591,7 @@ export function analyzeRecipe(items, type, stats, opts = {}) {
   // y no por el rango por defecto que puede chocar con ella.
   const params = baseParams.map(p => {
     if (p.k !== 'pacPct' || opts.servingTemp == null) return p;
-    const targetPac = tempToPacDisplay(opts.servingTemp);
+    const targetPac = tempToPacDisplay(opts.servingTemp, stats, type);
     if (targetPac == null) return p;
     const oLo = Math.max(0, (targetPac - 10) / 10);
     const oHi = (targetPac + 10) / 10;
@@ -662,80 +755,51 @@ export function calcChileanLabelSeals(nv) {
   return { seals, count: seals.length, limits: CHILE_LIMITS_SOLID };
 }
 
-// ── Temperatura de servicio ─────────────────────────────────
-// Tabla PAC objetivo → Temperatura de servicio (sistema Corvitto)
-// PAC display = pacPct * 10 (escala donde sacarosa ~ 1000)
-//
-// Valores de "Los Secretos del Helado" (Angelo Corvitto). La tabla
-// previa estaba 1 C mas caliente en cada fila (e.g. PAC 240 → -10) lo
-// que generaba T servicio engaosamente templadas y rompia el balance
-// inverso (tempToPacDisplay). Corregido a la referencia industrial.
-const PAC_TEMP_TABLE = [
-  { pac: 200, temp: -8  },
-  { pac: 220, temp: -10 },
-  { pac: 240, temp: -11 },
-  { pac: 260, temp: -12 },
-  { pac: 280, temp: -13 },
-  { pac: 300, temp: -14 },
-  { pac: 320, temp: -15 },
-  { pac: 340, temp: -16 },
-  { pac: 360, temp: -17 },
-  { pac: 380, temp: -18 },
-];
-
-// Interpola la T° de servicio a partir del PAC total acumulado
-// pacPct = stats.pacPct (valor interno), PAC display = pacPct * 10
-export function calcServingTemp(stats) {
-  if (!stats || !stats.pacPct) return null;
-  const pacDisplay = stats.pacPct * 10;
-  if (pacDisplay <= 0) return null;
-
-  // Si esta fuera de la tabla, extrapolar linealmente
-  const table = PAC_TEMP_TABLE;
-  if (pacDisplay <= table[0].pac) {
-    // Extrapolacion por debajo: ~1°C por cada 20 PAC
-    const diff = (table[0].pac - pacDisplay) / 20;
-    return parseFloat((table[0].temp + diff).toFixed(1));
-  }
-  if (pacDisplay >= table[table.length - 1].pac) {
-    const last = table[table.length - 1];
-    const prev = table[table.length - 2];
-    const slope = (last.temp - prev.temp) / (last.pac - prev.pac);
-    return parseFloat((last.temp + slope * (pacDisplay - last.pac)).toFixed(1));
-  }
-
-  // Interpolacion lineal entre los dos puntos mas cercanos
-  for (let i = 0; i < table.length - 1; i++) {
-    if (pacDisplay >= table[i].pac && pacDisplay <= table[i + 1].pac) {
-      const t = (pacDisplay - table[i].pac) / (table[i + 1].pac - table[i].pac);
-      const temp = table[i].temp + t * (table[i + 1].temp - table[i].temp);
-      return parseFloat(temp.toFixed(1));
-    }
-  }
-  return null;
+// ── Temperatura de servicio (alineada con ICC4) ─────────────
+// Misma fórmula para los 3 tipos: invertir la curva de congelación ICC4
+// y leer la T° a la que el % objetivo del agua está congelado.
+//   - Helado / Sorbete: 75% (ICCForm.ServingTempIceCream)
+//   - Gelato:           69% (ICCForm.ServingTempGelato)
+function _servingTargetPct(type) {
+  return type === 'gelato' ? 69 : 75;
 }
 
-export { PAC_TEMP_TABLE };
+export function calcServingTemp(stats, type = 'helado') {
+  return tempForFrozenPct(stats, _servingTargetPct(type));
+}
 
-// Inversa: dada una temperatura de servicio, devuelve el PAC display objetivo
-// (para que la receta alcance esa temperatura). Usado por el balanceador para
-// que respete la T° elegida por el usuario en lugar del rango estatico.
-export function tempToPacDisplay(temp) {
+// Inversa: dada una T° de servicio deseada, encontrar el PAC objetivo
+// (en escala display). Se usa en el balanceador para respetar la T°
+// elegida por el usuario.
+//
+// Estrategia: barrer pacPct y buscar el valor que da la T° objetivo
+// con la composición actual fija. Más preciso que la tabla estática
+// porque toma en cuenta MSNF y agua reales.
+export function tempToPacDisplay(temp, stats = null, type = 'helado') {
   if (temp == null) return null;
-  const table = PAC_TEMP_TABLE;
-  for (let i = 0; i < table.length - 1; i++) {
-    const t1 = table[i].temp, t2 = table[i + 1].temp;
-    const lo = Math.min(t1, t2), hi = Math.max(t1, t2);
-    if (temp >= lo && temp <= hi) {
-      if (t2 === t1) return table[i].pac;
-      const r = (temp - t1) / (t2 - t1);
-      return table[i].pac + r * (table[i + 1].pac - table[i].pac);
-    }
+  // Sin stats: caemos al fallback heurístico Corvitto (uso esporádico).
+  if (!stats || !stats.T || !stats.agua) {
+    // Aproximación rápida: T ≈ -8 - (pacDisplay - 200) / 20
+    return Math.max(0, 200 + (-8 - temp) * 20);
   }
-  if (temp > table[0].temp) return Math.max(0, table[0].pac - (temp - table[0].temp) * 20);
-  const last = table[table.length - 1], prev = table[table.length - 2];
-  const slope = (last.pac - prev.pac) / (last.temp - prev.temp);
-  return last.pac + slope * (temp - last.temp);
+  const target = _servingTargetPct(type);
+  // Búsqueda binaria sobre PAC entre 50 y 600 (display).
+  let lo = 50, hi = 600;
+  for (let i = 0; i < 30; i++) {
+    const mid = (lo + hi) / 2;
+    // Construir un stats clonado con pac ajustado para el barrido.
+    const newPacInternal = mid / 10;
+    const probe = {
+      ...stats,
+      pac: stats.T > 0 ? (newPacInternal * stats.T / 1000) : 0,
+      pacPct: newPacInternal,
+    };
+    const t = tempForFrozenPct(probe, target);
+    if (t == null) break;
+    // Más PAC ⇒ T° más fría (más negativa). Si t > temp, faltan PAC.
+    if (t > temp) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
 }
 
 // ── Rangos de temperatura de servicio ────────────────────────

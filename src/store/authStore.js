@@ -83,6 +83,35 @@ export const useAuthStore = create((set, get) => ({
     set({ user: null, session: null, profile: null });
   },
 
+  // Borrado completo de cuenta (auth.users + tablas relacionadas via FK
+  // ON DELETE CASCADE). Cumple requisito Apple App Store (sección 5.1.1(v)).
+  // Llama a la edge function `delete-account` que usa service_role para
+  // eliminar el usuario de auth.users.
+  //
+  // Después del borrado server-side, hacemos signOut local + retornamos
+  // ok. El caller debe limpiar IndexedDB local y navegar fuera.
+  async deleteAccount() {
+    if (!supabase) return { error: { message: 'Cloud not configured' } };
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+    if (!accessToken) {
+      return { error: { message: 'Not authenticated' } };
+    }
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (error) return { error };
+      // Sign-out local y limpiar el store. Las tablas de Supabase ya se
+      // borraron via cascade.
+      await supabase.auth.signOut();
+      set({ user: null, session: null, profile: null });
+      return { data };
+    } catch (e) {
+      return { error: { message: String(e?.message || e) } };
+    }
+  },
+
   async resetPassword(email) {
     if (!supabase) return { error: { message: 'Cloud not configured' } };
     // HashRouter + Supabase: Supabase appends its token hash to the URL, so we
