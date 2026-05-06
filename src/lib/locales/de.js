@@ -341,6 +341,13 @@ export default {
     // Ingredient DB
     ingredient_database: 'Zutatendatenbank',
     search_ingredients: 'Zutaten suchen...',
+    search_ingredients_placeholder: 'Nach Name, Marke oder Kategorie suchen…',
+    clear_search: 'Suche löschen',
+    clear_filters: 'Filter löschen',
+    shortcut_focus_search: 'Suche fokussieren',
+    ingredient_count: '{count} Zutaten',
+    ingredient_count_filtered: '{shown} von {total} Zutaten',
+    no_results_filtered_desc: 'Keine Treffer für "{q}". Versuche eine andere Suche oder lösche die Filter.',
     add_ingredient_btn: 'Neue Zutat',
     import_excel: 'Excel importieren',
     export_excel: 'Excel exportieren',

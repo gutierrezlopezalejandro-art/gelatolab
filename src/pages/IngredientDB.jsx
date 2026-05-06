@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIngredientStore } from '../store/ingredientStore';
 import { useInventoryStore } from '../store/inventoryStore';
@@ -97,6 +97,23 @@ export default function IngredientDB() {
 
   const [q, setQ] = useState('');
   const [catFilter, setCat] = useState('');
+  const searchRef = useRef(null);
+
+  // Atajo "/" para enfocar el buscador (patrón GitHub/Slack). Mucho más
+  // rápido que cliquear el input cuando ya estás scrolleando entre 70+
+  // ingredientes. Solo dispara si el foco actual no está en otro input
+  // (evita robar la tecla "/" cuando el usuario escribe).
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key !== '/') return;
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [invIngredient, setInvIngredient] = useState(null); // ingredient being viewed in inventory modal
@@ -428,15 +445,38 @@ export default function IngredientDB() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div data-tour="ingredients-search" className="card p-4 mb-6 flex flex-wrap gap-3 items-center">
-        <input
-          className="input max-w-[220px]"
-          placeholder={t('search_ingredients')}
-          value={q}
-          onChange={e => setQ(e.target.value)}
-        />
-        <div className="flex flex-wrap gap-2">
+      {/* Filters — buscador prominente al tope, categorías y contador debajo.
+          Antes el input era max-w-[220px] perdido entre las categorías; con
+          70+ ingredientes el usuario scrolleaba infinitamente sin notarlo.
+          Ahora el buscador ocupa todo el ancho con icono y botón limpiar. */}
+      <div data-tour="ingredients-search" className="card p-4 mb-6">
+        {/* Search row — full-width, prominent */}
+        <div className="relative mb-3">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink3)] pointer-events-none text-base" aria-hidden="true">🔍</span>
+          <input
+            ref={searchRef}
+            type="search"
+            className="input w-full pl-10 pr-10 text-base py-3"
+            placeholder={t('search_ingredients_placeholder')}
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            aria-label={t('search_ingredients')}
+          />
+          {q && (
+            <button
+              type="button"
+              onClick={() => { setQ(''); searchRef.current?.focus(); }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none text-xl leading-none w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/5"
+              aria-label={t('clear_search')}
+              title={t('clear_search')}
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        {/* Category chips + count */}
+        <div className="flex flex-wrap gap-2 items-center">
           <button
             onClick={() => setCat('')}
             className={'text-xs px-3 py-1 rounded-full border transition-all ' +
@@ -458,14 +498,24 @@ export default function IngredientDB() {
               {tCat(c)}
             </button>
           ))}
+          <span className="ml-auto text-xs text-[var(--ink3)] whitespace-nowrap" aria-live="polite">
+            {ingredients.length === allIngredients.length
+              ? t('ingredient_count', { count: allIngredients.length })
+              : t('ingredient_count_filtered', { shown: ingredients.length, total: allIngredients.length })}
+          </span>
         </div>
-        <span className="ml-auto text-xs text-[var(--ink3)]">
+
+        {/* Edit instructions — solo visibles en desktop, ocultas en mobile
+            para no abrumar (en mobile no se editan inline las celdas). */}
+        <p className="hidden sm:block text-[10px] text-[var(--ink3)] mt-2">
           {t('edit_instruction')}
           &nbsp;·&nbsp;
           <kbd className="bg-black/8 px-1 rounded">Enter</kbd> {t('enter_save')}
           &nbsp;·&nbsp;
           <kbd className="bg-black/8 px-1 rounded">Esc</kbd> {t('esc_cancel')}
-        </span>
+          &nbsp;·&nbsp;
+          <kbd className="bg-black/8 px-1 rounded">/</kbd> {t('shortcut_focus_search')}
+        </p>
       </div>
 
       {/* View tabs (which column group to show). Ocultas en mobile porque
@@ -491,10 +541,22 @@ export default function IngredientDB() {
 
       {/* Table */}
       {ingredients.length === 0 ? (
-        <EmptyState
-          title={t('no_results')}
-          description={t('no_results_desc')}
-        />
+        <div>
+          <EmptyState
+            title={t('no_results')}
+            description={q || catFilter ? t('no_results_filtered_desc', { q: q || tCat(catFilter) }) : t('no_results_desc')}
+          />
+          {(q || catFilter) && (
+            <div className="text-center mt-4">
+              <button
+                onClick={() => { setQ(''); setCat(''); searchRef.current?.focus(); }}
+                className="btn-secondary"
+              >
+                {t('clear_filters')}
+              </button>
+            </div>
+          )}
+        </div>
       ) : (
         <div className="card overflow-x-auto">
           <table className="tbl">
