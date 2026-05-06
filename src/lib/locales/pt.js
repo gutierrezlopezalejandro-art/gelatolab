@@ -1388,6 +1388,9 @@ export default {
 
     // Common
     cancel: 'Cancelar',
+    confirm_action: 'Confirmar ação',
+    ai_key_show: 'Mostrar chave',
+    ai_key_hide: 'Ocultar chave',
     confirm: 'Confirmar',
     close: 'Fechar',
     yes: 'Sim',

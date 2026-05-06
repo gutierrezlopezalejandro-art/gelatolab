@@ -6,6 +6,7 @@ export default function SearchSelect({
   options = [], value, onChange,
   placeholder, className = '',
   disabled = false,
+  id,
 }) {
   const t = useT();
   // Si el caller no pasa placeholder, default i18n. Antes era `'Buscar…'`
@@ -146,8 +147,16 @@ export default function SearchSelect({
     <div ref={containerRef} className={`relative ${className}`}>
       {/* Trigger */}
       <div
+        id={id}
+        tabIndex={disabled ? -1 : 0}
         className={`select flex items-center justify-between ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
         onClick={disabled ? undefined : handleOpen}
+        onKeyDown={disabled ? undefined : (e) => {
+          if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            handleOpen();
+          }
+        }}
         style={{ userSelect: 'none', opacity: disabled ? 0.6 : 1, background: disabled ? '#f5f5f5' : undefined }}
         aria-disabled={disabled}
         role="combobox"

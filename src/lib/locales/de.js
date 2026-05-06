@@ -359,6 +359,9 @@ export default {
 
     // Common
     cancel: 'Abbrechen',
+    confirm_action: 'Aktion bestätigen',
+    ai_key_show: 'Schlüssel anzeigen',
+    ai_key_hide: 'Schlüssel ausblenden',
     confirm: 'Bestaetigen',
     close: 'Schliessen',
     yes: 'Ja',

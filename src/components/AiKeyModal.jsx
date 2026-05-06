@@ -35,7 +35,9 @@ export function AiKeyModal({ onClose }) {
             spellCheck={false}
           />
           <button type="button" onClick={() => setShow(s => !s)}
-            className="btn-secondary text-xs px-3" aria-label="toggle visibility">
+            className="btn-secondary text-xs px-3"
+            aria-label={show ? t('ai_key_hide') : t('ai_key_show')}
+            title={show ? t('ai_key_hide') : t('ai_key_show')}>
             {show ? '🙈' : '👁'}
           </button>
         </div>

@@ -576,8 +576,8 @@ ${issuesSection}
           {/* Date and plan name */}
           <div data-tour="plan-date" className="card p-5 flex gap-4 flex-wrap items-end">
             <div className="min-w-[160px]">
-              <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('select_date')}</label>
-              <input type="date" className="input" value={date} onChange={e => setDate(e.target.value)} />
+              <label htmlFor="plan-date" className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('select_date')}</label>
+              <input id="plan-date" type="date" className="input" value={date} onChange={e => setDate(e.target.value)} />
               {/* Fecha verbose en es-CL: "miércoles 6 de mayo de 2026". Resuelve
                   ambigüedad DD-MM vs MM-DD que el input nativo arrastra según
                   locale del browser. Crítico porque planificar producción en
@@ -598,8 +598,8 @@ ${issuesSection}
               })()}
             </div>
             <div className="flex-1 min-w-[200px]">
-              <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('plan_name_label')}</label>
-              <input className="input" placeholder={t('plan_name_placeholder')}
+              <label htmlFor="plan-name" className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('plan_name_label')}</label>
+              <input id="plan-name" className="input" placeholder={t('plan_name_placeholder')}
                      value={pname} onChange={e => setPname(e.target.value)}
                      disabled={isPast} />
             </div>

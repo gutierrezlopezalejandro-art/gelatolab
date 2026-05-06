@@ -1038,7 +1038,7 @@ export function HelpAssistant() {
                   placeholder={t('assistant_search_placeholder')}
                   value={query}
                   onChange={e => { setQuery(e.target.value); setExpandedId(null); }}
-                  className="w-full px-4 py-2.5 rounded-lg border border-black/15 bg-white text-base focus:outline-none focus:border-[var(--mint2)]"
+                  className="w-full px-4 py-2.5 rounded-lg border border-black/15 bg-white text-base focus-visible:outline-2 focus-visible:outline-[var(--mint)] focus-visible:outline-offset-1 focus:border-[var(--mint2)]"
                 />
                 {query && (
                   <p className="text-xs text-[var(--ink3)] -mt-2">
@@ -1144,7 +1144,7 @@ export function HelpAssistant() {
                                onChange={e => setChatInput(e.target.value)}
                                placeholder={t('assistant_chat_placeholder')}
                                disabled={chatBusy}
-                               className="flex-1 px-3.5 py-2 rounded-lg border border-black/15 bg-white text-sm focus:outline-none focus:border-[var(--mint2)] disabled:opacity-50" />
+                               className="flex-1 px-3.5 py-2 rounded-lg border border-black/15 bg-white text-sm focus-visible:outline-2 focus-visible:outline-[var(--mint)] focus-visible:outline-offset-1 focus:border-[var(--mint2)] disabled:opacity-50" />
                         <button type="submit" disabled={!chatInput.trim() || chatBusy}
                                 className="px-4 py-2 rounded-lg bg-[var(--ink)] text-[var(--cream)] text-sm font-bold cursor-pointer border-none hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed">
                           ↑

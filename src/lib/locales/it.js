@@ -359,6 +359,9 @@ export default {
 
     // Common
     cancel: 'Annulla',
+    confirm_action: 'Conferma azione',
+    ai_key_show: 'Mostra chiave',
+    ai_key_hide: 'Nascondi chiave',
     confirm: 'Conferma',
     close: 'Chiudi',
     yes: 'Si',

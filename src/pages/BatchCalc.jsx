@@ -119,8 +119,9 @@ export default function BatchCalc() {
       <div className="card p-5 mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
           <div>
-            <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('recipe')}</label>
+            <label htmlFor="batch-recipe-select" className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('recipe')}</label>
             <SearchSelect
+              id="batch-recipe-select"
               options={recipes.map(r => ({ value: r.id, label: r.name }))}
               value={recipeId}
               onChange={setRecipeId}
@@ -128,8 +129,9 @@ export default function BatchCalc() {
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('liters_to_produce')}</label>
+            <label htmlFor="batch-liters" className="text-xs font-medium text-[var(--ink2)] block mb-1">{t('liters_to_produce')}</label>
             <NumberInput
+              id="batch-liters"
               min="0.1" max="500" step="0.1"
               className="input w-full rounded-lg text-right"
               value={liters}

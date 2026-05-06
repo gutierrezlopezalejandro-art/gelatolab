@@ -146,7 +146,10 @@ export default function Recipes() {
           <p className="text-sm text-[var(--ink2)] mt-1">{t('click_to_edit')}</p>
         </div>
         <div className="flex items-center gap-3">
+          <label htmlFor="recipes-search" className="sr-only">{t('search_recipes')}</label>
           <input
+            id="recipes-search"
+            type="search"
             className="input max-w-[200px]"
             placeholder={t('search_recipes')}
             value={q}

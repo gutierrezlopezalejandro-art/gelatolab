@@ -47,7 +47,9 @@ export default function Help() {
         <p className="text-sm text-[var(--ink2)] mt-1">{t('help_subtitle')}</p>
       </div>
 
+      <label htmlFor="help-search" className="sr-only">{t('help_search_placeholder')}</label>
       <input
+        id="help-search"
         type="search"
         className="input mb-5"
         placeholder={t('help_search_placeholder')}
