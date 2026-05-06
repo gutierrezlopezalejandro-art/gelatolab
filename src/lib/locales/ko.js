@@ -301,6 +301,7 @@ export default {
     cost_per_kg: '비용/kg',
     cancel: '취소',
     confirm_action: '작업 확인',
+    discard_changes_warning: '저장되지 않은 변경 사항이 있습니다. 지금 닫으면 손실됩니다. 삭제하시겠습니까?',
     ai_key_show: '키 표시',
     ai_key_hide: '키 숨기기',
     error_generic: '예상치 못한 오류가 발생했습니다. 몇 초 후에 다시 시도해 주세요.',

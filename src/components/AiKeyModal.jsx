@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { useAiStore } from '../store/aiStore';
 import { useT } from '../lib/i18n';
-import { useEscapeKey } from '../lib/hooks';
+import { useDirtyClose } from '../lib/hooks';
 
 export function AiKeyModal({ onClose }) {
   const t = useT();
-  useEscapeKey(onClose);
   const { apiKey, model, setApiKey, setModel, clear } = useAiStore();
   const [draft, setDraft] = useState(apiKey || '');
   const [draftModel, setDraftModel] = useState(model || 'gpt-4o-mini');
   const [show, setShow] = useState(false);
+
+  // Dirty cuando los valores del draft no coinciden con lo guardado.
+  const dirty = draft !== (apiKey || '') || draftModel !== (model || 'gpt-4o-mini');
+  const requestClose = useDirtyClose(onClose, dirty);
 
   function save() {
     setApiKey(draft);
@@ -18,7 +21,7 @@ export function AiKeyModal({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[300] flex items-center justify-center backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 z-[300] flex items-center justify-center backdrop-blur-sm" onClick={requestClose}>
       <div role="dialog" aria-modal="true" aria-labelledby="aikey-modal-title" className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
         <h2 id="aikey-modal-title" className="font-display text-lg text-[var(--ink)] mb-1">{t('ai_settings_title')}</h2>
         <p className="text-xs text-[var(--ink3)] mb-4">{t('ai_settings_subtitle')}</p>
@@ -58,7 +61,7 @@ export function AiKeyModal({ onClose }) {
             </button>
           )}
           <div className="flex gap-2 ml-auto">
-            <button className="btn-secondary text-xs" onClick={onClose}>{t('cancel')}</button>
+            <button className="btn-secondary text-xs" onClick={requestClose}>{t('cancel')}</button>
             <button className="btn-primary text-xs" onClick={save} disabled={!draft.trim()}>
               {t('save')}
             </button>

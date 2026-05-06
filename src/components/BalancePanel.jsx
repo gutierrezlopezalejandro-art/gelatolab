@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { analyzeRecipe, autoBalanceRecipe } from '../lib/icecreamCalc';
 import { useT, useIngredientName } from '../lib/i18n';
-import { useEscapeKey } from '../lib/hooks';
+import { useDirtyClose } from '../lib/hooks';
 
 /**
  * Modal that shows actionable adjustments to push a recipe back into the
@@ -14,9 +14,12 @@ import { useEscapeKey } from '../lib/hooks';
  */
 export function BalancePanel({ items, type, subtype = 'base', stats, servingTemp, onApply, onApplyAll, onClose }) {
   const t = useT();
-  useEscapeKey(onClose);
   const tIng = useIngredientName();
   const [autoResult, setAutoResult] = useState(null); // pending auto-balance preview
+
+  // Dirty cuando hay un preview de auto-balance pendiente. Cerrar sin aplicar
+  // ni descartar perdería el cómputo (30-60s de iteraciones).
+  const requestClose = useDirtyClose(onClose, autoResult !== null);
 
   const suggestions = analyzeRecipe(items, type, stats, { servingTemp, subtype });
 
@@ -33,7 +36,7 @@ export function BalancePanel({ items, type, subtype = 'base', stats, servingTemp
   return (
     <div
       className="fixed inset-0 bg-black/50 z-[300] flex items-center justify-center backdrop-blur-sm"
-      onClick={onClose}
+      onClick={requestClose}
     >
       <div
         role="dialog" aria-modal="true" aria-labelledby="balance-modal-title"
@@ -45,7 +48,7 @@ export function BalancePanel({ items, type, subtype = 'base', stats, servingTemp
             <h2 id="balance-modal-title" className="font-display text-lg text-[var(--ink)]">{t('balance_title')}</h2>
             <p className="text-xs text-[var(--ink3)]">{t('balance_subtitle')}</p>
           </div>
-          <button onClick={onClose} aria-label={t('close')} className="text-2xl text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none">×</button>
+          <button onClick={requestClose} aria-label={t('close')} className="text-2xl text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none">×</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4">

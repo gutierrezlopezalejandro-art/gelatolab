@@ -1389,6 +1389,7 @@ export default {
     // Common
     cancel: 'Cancelar',
     confirm_action: 'Confirmar ação',
+    discard_changes_warning: 'Você tem alterações não salvas. Se fechar agora, serão perdidas. Descartar?',
     ai_key_show: 'Mostrar chave',
     ai_key_hide: 'Ocultar chave',
     error_generic: 'Ocorreu um erro inesperado. Tente novamente em alguns segundos.',

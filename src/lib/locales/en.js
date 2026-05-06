@@ -1410,6 +1410,7 @@ export default {
     cost_per_kg: 'Cost/kg',
     cancel: 'Cancel',
     confirm_action: 'Confirm action',
+    discard_changes_warning: 'You have unsaved changes. They will be lost if you close now. Discard?',
     ai_key_show: 'Show key',
     ai_key_hide: 'Hide key',
     error_generic: 'An unexpected error occurred. Try again in a few seconds.',

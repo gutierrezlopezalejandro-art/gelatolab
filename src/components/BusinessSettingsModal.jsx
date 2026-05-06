@@ -18,7 +18,7 @@ import {
   getLastSyncDate, startFolderAutoSync,
 } from '../lib/folderBackup';
 import { track } from '../lib/analytics';
-import { useEscapeKey } from '../lib/hooks';
+import { useDirtyClose } from '../lib/hooks';
 
 /**
  * Edit-after-onboarding modal. Reuses the same fields the wizard captured but
@@ -27,7 +27,6 @@ import { useEscapeKey } from '../lib/hooks';
  */
 export function BusinessSettingsModal({ onClose }) {
   const t = useT();
-  useEscapeKey(onClose);
   const business = useBusinessStore();
   const country = useCountryStore(s => s.country);
   const setCountry = useCountryStore(s => s.setCountry);
@@ -213,6 +212,22 @@ export function BusinessSettingsModal({ onClose }) {
   const ent = useEntitlement();
   const [showUpgrade, setShowUpgrade] = useState(false);
 
+  // Dirty cuando cualquier campo del form difiere del valor persistido en
+  // el store. Comparamos los 7 campos string + length de los arrays de
+  // equipos. PIN draft y delete confirm se ignoran (no son edits del perfil).
+  const dirty = (
+    form.fantasy_name !== business.fantasy_name ||
+    form.legal_name !== business.legal_name ||
+    form.tax_id !== business.tax_id ||
+    form.sanitary_reg !== business.sanitary_reg ||
+    form.address !== business.address ||
+    form.contact_phone !== business.contact_phone ||
+    form.contact_email !== business.contact_email ||
+    JSON.stringify(form.machine_ids) !== JSON.stringify(business.machine_ids || []) ||
+    JSON.stringify(form.pasteurizer_ids) !== JSON.stringify(business.pasteurizer_ids || [])
+  );
+  const requestClose = useDirtyClose(onClose, dirty);
+
   function addMachine(id) {
     if (!id || form.machine_ids.includes(id)) return;
     // Free plan: limit to 1 batch freezer.
@@ -254,7 +269,7 @@ export function BusinessSettingsModal({ onClose }) {
   return (
     <div
       className="fixed inset-0 bg-black/50 z-[300] flex items-center justify-center backdrop-blur-sm p-4"
-      onClick={onClose}
+      onClick={requestClose}
     >
       <div
         role="dialog" aria-modal="true" aria-labelledby="business-modal-title"
@@ -266,7 +281,7 @@ export function BusinessSettingsModal({ onClose }) {
             <h2 id="business-modal-title" className="font-display text-lg text-[var(--ink)]">{t('business_settings_title')}</h2>
             <p className="text-xs text-[var(--ink3)]">{t('business_settings_sub')}</p>
           </div>
-          <button onClick={onClose}
+          <button onClick={requestClose} aria-label={t('close')}
                   className="text-2xl text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none">×</button>
         </div>
 
@@ -561,7 +576,7 @@ export function BusinessSettingsModal({ onClose }) {
         </div>
 
         <div className="px-6 py-3 border-t border-black/10 flex justify-end gap-2">
-          <button className="btn-secondary" onClick={onClose}>{t('cancel')}</button>
+          <button className="btn-secondary" onClick={requestClose}>{t('cancel')}</button>
           <button className="btn-primary" onClick={save} disabled={!form.fantasy_name.trim()}>
             {t('save')}
           </button>

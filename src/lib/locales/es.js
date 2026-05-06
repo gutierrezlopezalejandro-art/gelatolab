@@ -1506,6 +1506,7 @@ export default {
     cancel: 'Cancelar',
     confirm: 'Confirmar',
     confirm_action: 'Confirmar acción',
+    discard_changes_warning: 'Tienes cambios sin guardar. Si cierras ahora, se pierden. ¿Descartar?',
     ai_key_show: 'Mostrar clave',
     ai_key_hide: 'Ocultar clave',
     error_generic: 'Ocurrió un error inesperado. Inténtalo de nuevo en unos segundos.',

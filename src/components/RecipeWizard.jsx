@@ -5,7 +5,7 @@ import { useIngredientStore } from '../store/ingredientStore';
 import { useRecipeStore } from '../store/recipeStore';
 import { useAppStore } from '../store/appStore';
 import { track } from '../lib/analytics';
-import { useEscapeKey } from '../lib/hooks';
+import { useDirtyClose } from '../lib/hooks';
 
 /**
  * Asistente paso a paso para crear una receta nueva. El usuario elige UN
@@ -108,7 +108,6 @@ function getStepsForType(type) {
 
 export function RecipeWizard({ onClose }) {
   const t = useT();
-  useEscapeKey(onClose);
   const tIng = useIngredientName();
   const allIngredients = useIngredientStore(s => s.ingredients);
   const recipeStore = useRecipeStore();
@@ -122,6 +121,12 @@ export function RecipeWizard({ onClose }) {
   // selections: { roleKey: number[] }  — array de ids para permitir varios
   // ingredientes por categoria (ej. sacarosa + dextrosa).
   const [selections, setSelections] = useState({});
+
+  // Dirty cuando hay cualquier dato ingresado: nombre, avanzó pasos, o
+  // seleccionó ingredientes. Esto evita que un click backdrop accidental
+  // tire 8 pasos de configuración.
+  const dirty = name.trim() !== '' || stepIdx > 0 || Object.values(selections).some(arr => arr?.length > 0);
+  const requestClose = useDirtyClose(onClose, dirty);
 
   const steps = useMemo(() => getStepsForType(type), [type]);
   const currentStep = stepIdx === 0 ? null : steps[stepIdx - 1];
@@ -248,7 +253,7 @@ export function RecipeWizard({ onClose }) {
   const progressPct = ((stepIdx + 1) / totalSteps) * 100;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[300] flex items-center justify-center backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 z-[300] flex items-center justify-center backdrop-blur-sm" onClick={requestClose}>
       <div role="dialog" aria-modal="true" aria-labelledby="wizard-modal-title"
            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col"
            onClick={e => e.stopPropagation()}>
@@ -262,7 +267,7 @@ export function RecipeWizard({ onClose }) {
               {t('wiz_step_label', { current: stepIdx + 1, total: totalSteps })}
             </p>
           </div>
-          <button onClick={onClose} aria-label={t('close')} className="text-2xl text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none">×</button>
+          <button onClick={requestClose} aria-label={t('close')} className="text-2xl text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none">×</button>
         </div>
         <div className="h-1 bg-[var(--cream2)]">
           <div className="h-full bg-[var(--mint)] transition-all" style={{ width: `${progressPct}%` }} />

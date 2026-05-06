@@ -360,6 +360,7 @@ export default {
     // Common
     cancel: 'Annulla',
     confirm_action: 'Conferma azione',
+    discard_changes_warning: 'Hai modifiche non salvate. Andranno perse se chiudi ora. Scartare?',
     ai_key_show: 'Mostra chiave',
     ai_key_hide: 'Nascondi chiave',
     error_generic: 'Si è verificato un errore imprevisto. Riprova tra qualche secondo.',

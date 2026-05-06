@@ -360,6 +360,7 @@ export default {
     // Common
     cancel: 'Annuler',
     confirm_action: 'Confirmer l\'action',
+    discard_changes_warning: 'Tu as des modifications non sauvegardées. Elles seront perdues si tu fermes maintenant. Annuler?',
     ai_key_show: 'Afficher la clé',
     ai_key_hide: 'Masquer la clé',
     error_generic: 'Une erreur inattendue s\'est produite. Réessaie dans quelques secondes.',

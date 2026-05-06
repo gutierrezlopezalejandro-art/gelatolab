@@ -301,6 +301,7 @@ export default {
     cost_per_kg: '単価/kg',
     cancel: 'キャンセル',
     confirm_action: 'アクションを確認',
+    discard_changes_warning: '保存されていない変更があります。今閉じると失われます。破棄しますか？',
     ai_key_show: 'キーを表示',
     ai_key_hide: 'キーを隠す',
     error_generic: '予期しないエラーが発生しました。数秒後にもう一度お試しください。',

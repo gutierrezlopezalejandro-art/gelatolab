@@ -4,7 +4,7 @@ import { useIngredientStore } from '../store/ingredientStore';
 import { useInventoryStore } from '../store/inventoryStore';
 import { useAppStore } from '../store/appStore';
 import { track } from '../lib/analytics';
-import { useEscapeKey } from '../lib/hooks';
+import { useDirtyClose } from '../lib/hooks';
 
 /**
  * Modal de conteo fisico de inventario. Lista todos los ingredientes con su
@@ -14,7 +14,6 @@ import { useEscapeKey } from '../lib/hooks';
  */
 export function StocktakeModal({ onClose }) {
   const t = useT();
-  useEscapeKey(onClose);
   const tIng = useIngredientName();
   const tCat = useCategoryName();
   const ingredients = useIngredientStore(s => s.ingredients);
@@ -24,6 +23,10 @@ export function StocktakeModal({ onClose }) {
   const [counts, setCounts] = useState({});
   const [filter, setFilter] = useState('');
   const [notes, setNotes] = useState('');
+
+  // Dirty cuando ya hay al menos un conteo o nota — el filtro no cuenta.
+  const dirty = notes.trim() !== '' || Object.values(counts).some(v => v !== '' && v != null);
+  const requestClose = useDirtyClose(onClose, dirty);
 
   // Lista filtrada por nombre/categoria.
   const visible = useMemo(() => {
@@ -68,7 +71,7 @@ export function StocktakeModal({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[300] flex items-center justify-center backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 z-[300] flex items-center justify-center backdrop-blur-sm p-4" onClick={requestClose}>
       <div role="dialog" aria-modal="true" aria-labelledby="stocktake-modal-title"
            className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col"
            onClick={e => e.stopPropagation()}>
@@ -77,7 +80,7 @@ export function StocktakeModal({ onClose }) {
             <h2 id="stocktake-modal-title" className="font-display text-lg text-[var(--ink)]">🧮 {t('stk_title')}</h2>
             <p className="text-xs text-[var(--ink3)]">{t('stk_subtitle')}</p>
           </div>
-          <button onClick={onClose} aria-label={t('close')} className="text-2xl text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none">×</button>
+          <button onClick={requestClose} aria-label={t('close')} className="text-2xl text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none">×</button>
         </div>
 
         <div className="px-6 py-3 border-b border-black/10 flex items-center gap-3 flex-wrap">

@@ -360,6 +360,7 @@ export default {
     // Common
     cancel: 'Abbrechen',
     confirm_action: 'Aktion bestätigen',
+    discard_changes_warning: 'Du hast nicht gespeicherte Änderungen. Sie gehen verloren, wenn du jetzt schließt. Verwerfen?',
     ai_key_show: 'Schlüssel anzeigen',
     ai_key_hide: 'Schlüssel ausblenden',
     error_generic: 'Ein unerwarteter Fehler ist aufgetreten. Versuche es in einigen Sekunden erneut.',
