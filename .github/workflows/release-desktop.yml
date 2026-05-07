@@ -37,6 +37,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        # fetch-depth: 0 trae toda la historia incluyendo los tag objects
+        # con sus annotations. Necesario para leer el body del tag y usarlo
+        # como release notes (releaseBody) en lugar del texto generico.
+        with:
+          fetch-depth: 0
+
+      - name: Extract tag annotation body
+        id: tag_body
+        # Lee el body del tag annotation (creado con `git tag -a vX.Y.Z -m "..."`)
+        # y lo expone como output. Si por alguna razon el tag no tiene body
+        # (creacion lightweight), fallback a un mensaje generico.
+        shell: bash
+        run: |
+          BODY=$(git tag -l --format='%(contents:body)' "${GITHUB_REF_NAME}")
+          if [ -z "$BODY" ]; then
+            BODY="Release ${GITHUB_REF_NAME}. Ver commits desde el release anterior para el detalle de cambios."
+          fi
+          {
+            echo 'body<<EOF_TAG_BODY'
+            echo "$BODY"
+            echo 'EOF_TAG_BODY'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -88,16 +110,12 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'GelatoLab ${{ github.ref_name }}'
-          releaseBody: |
-            Instaladores de la app de escritorio. Todavia sin firma de codigo
-            (Windows/Mac mostraran un warning la primera vez — abrir igual).
-
-            **Windows**: descarga el `.msi` o `.exe` (NSIS).
-            **macOS**: descarga el `.dmg` (universal Intel + Apple Silicon).
-            **Linux**: descarga el `.AppImage` o `.deb`.
-
-            > Si ya tienes GelatoLab instalado, no necesitas descargar nada
-            > — la app detecta esta version y te ofrece actualizar al abrirla.
+          # releaseBody se llena con el body del tag annotation extraido
+          # arriba. Esto se propaga tambien al campo `notes` de latest.json,
+          # que es lo que el modal de auto-update muestra al usuario al
+          # ofrecer la actualizacion. Antes era un texto generico hardcoded
+          # que no le decia al usuario que cambio en cada version.
+          releaseBody: ${{ steps.tag_body.outputs.body }}
           # No-draft: el auto-updater de los clientes ya instalados consulta
           # /releases/latest/download/latest.json — un draft nunca aparece
           # ahi y nadie recibiria la actualizacion.

@@ -7,6 +7,7 @@ import { useT, useIngredientName, useCategoryName } from '../lib/i18n';
 import { EmptyState } from '../components/ui/index.jsx';
 import { InventoryModal } from '../components/InventoryModal';
 import { isBarcodeAvailable, isCapacitorNative, scanBarcode } from '../lib/barcode';
+import { useIsMobile } from '../lib/hooks';
 import { BarcodeScannerModal } from '../components/BarcodeScannerModal';
 import { getBarcodes, findIngredientByBarcode, buildAddBarcodePatch, buildRemoveBarcodePatch } from '../lib/barcodeMap';
 import { track } from '../lib/analytics';
@@ -83,6 +84,7 @@ export default function IngredientDB() {
   const tIng = useIngredientName();
   const tCat = useCategoryName();
   const { showToast, confirm } = useAppStore();
+  const isMobile = useIsMobile();
 
   const [view, setView] = useState('formulation'); // which column group is visible
 
@@ -235,7 +237,7 @@ export default function IngredientDB() {
   const navigate = useNavigate();
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    if (params.get('scan') === '1' && isBarcodeAvailable()) {
+    if (params.get('scan') === '1' && isMobile && isBarcodeAvailable()) {
       handleScan();
       // Limpia ?scan=1 sin recargar la pagina ni triggerear navigate del Router.
       params.delete('scan');
@@ -400,13 +402,12 @@ export default function IngredientDB() {
             {t('ing_subtitle')}
           </p>
         </div>
-        {/* Botones de accion. En mobile (≤640px) Escanear es el protagonista
-            (es la feature clave de mobile: usar la camara del telefono para
-            escanear códigos de barras de ingredientes). El resto de acciones
-            (Nuevo ingrediente sigue visible; Conteo, Proveedores, Excel
-            export/import) se ocultan porque no aportan en pantalla chica. */}
+        {/* Botones de accion. Escanear es solo mobile (Capacitor nativo o
+            web <=640px): es la feature clave de mobile — usar la camara del
+            telefono en bodega/cocina. En desktop ocupa espacio sin caso de
+            uso real. El resto de acciones se filtran como antes. */}
         <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-          {isBarcodeAvailable() && (
+          {isMobile && isBarcodeAvailable() && (
             <button
               onClick={handleScan}
               className="btn-primary w-full sm:w-auto text-base sm:text-sm py-3 sm:py-2 font-bold"

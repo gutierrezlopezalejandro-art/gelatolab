@@ -9,6 +9,7 @@ import { useI18nStore, useT, LANGUAGES } from './lib/i18n';
 import { trackPageview } from './lib/analytics';
 import { UserMenu } from './components/UserMenu';
 import { isBarcodeAvailable } from './lib/barcode';
+import { useIsMobile } from './lib/hooks';
 import { OnboardingWizard } from './components/OnboardingWizard';
 import { useBusinessStore } from './store/businessStore';
 import { CloudSyncProvider } from './components/CloudSyncProvider';
@@ -118,6 +119,7 @@ export default function App() {
   // Paginas publicas (marketing): traen su propio header/footer y no necesitan
   // el chrome de la app. Evita que un bot indexe el navbar como contenido.
   const isLanding = location.pathname === '/' || location.pathname === '/download';
+  const isMobile = useIsMobile();
   const t = useT();
   const lowStockCount = getLowStock(ingredients).length;
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -327,12 +329,14 @@ export default function App() {
 
           {/* Help + User menu + Country + Language selectors */}
           <div className="ml-auto md:ml-3 flex-shrink-0 flex items-center gap-2">
-            {/* Acceso rapido al escaner — visible si la plataforma soporta
-                camara (mobile nativo via Capacitor, o web con getUserMedia).
+            {/* Acceso rapido al escaner — solo en mobile (Capacitor nativo o
+                pantalla web <=640px). En desktop el feature esta disponible
+                desde la pagina IngredientDB pero el shortcut del navbar es
+                ruido visual: el caso de uso es escanear caminando con el
+                celular en bodega/cocina, no en escritorio.
                 Click navega a /ingredients con flag para auto-disparar el
-                scanner sin que el usuario tenga que cliquear "Escanear" ahi.
-                Es el shortcut clave para el workflow mobile. */}
-            {isBarcodeAvailable() && (
+                scanner sin que el usuario tenga que cliquear "Escanear" ahi. */}
+            {isMobile && isBarcodeAvailable() && (
               <button
                 type="button"
                 onClick={() => navigate('/ingredients?scan=1')}
