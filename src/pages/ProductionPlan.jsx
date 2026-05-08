@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRecipeStore } from '../store/recipeStore';
 import { useIngredientStore } from '../store/ingredientStore';
 import { usePlanStore } from '../store/planStore';
-import { useProductionStore } from '../store/productionStore';
+import { useProductionStore, dedupePlanOrders } from '../store/productionStore';
 import { useInventoryStore, processDueInventoryDeductions } from '../store/inventoryStore';
 import { track } from '../lib/analytics';
 import { useAppStore } from '../store/appStore';
@@ -342,8 +342,36 @@ export default function ProductionPlan() {
 
     setConfirming(true);
     try {
-      // Build production entries
-      const entries = enriched.map(o => ({
+      // Dedupe por COUNT entre orders del plan y lotes ya creados para esta
+      // fecha. Ver `dedupePlanOrders()` en productionStore.js para el detalle
+      // de la lógica + casos cubiertos + bug histórico (regresión 2026-05-08).
+      // Tests de regresión en productionStore.test.js.
+      const target = String(date).slice(0, 10);
+      const existingForDate = useProductionStore.getState().log
+        .filter(e => String(e.prod_date).slice(0, 10) === target);
+      const { newOrders, skipped } = dedupePlanOrders(enriched, existingForDate);
+
+      if (newOrders.length === 0) {
+        // Todas las recetas ya tienen lote para esta fecha. Aún así
+        // upsert el plan (puede haber cambiado liters de items existentes,
+        // y se persiste para próxima carga del calendario).
+        upsertPlan(date, {
+          plan_name: pname,
+          items: enriched.map(o => ({
+            recipe_id:        Number(o.recipe_id),
+            liters:           parseFloat(o.liters.toFixed(1)),
+            cost:             parseFloat(o.cost.toFixed(2)),
+            batch_freezer_id: o.batch_freezer_id || '',
+            pasteurizer_id:   o.pasteurizer_id   || '',
+          })),
+        });
+        showToast(t('plan_no_new_recipes_to_add'));
+        setConfirming(false);
+        return;
+      }
+
+      // Build production entries SOLO para las recetas nuevas
+      const entries = newOrders.map(o => ({
         recipe_id:            Number(o.recipe_id),
         recipe_name:          o.r?.name || '',
         prod_date:            date,
@@ -383,7 +411,12 @@ export default function ProductionPlan() {
         })),
       });
 
-      showToast(t('plan_confirmed'));
+      // Mensaje al usuario: si se omitieron pre-existentes, lo aclaramos.
+      if (skipped > 0) {
+        showToast(t('plan_confirmed_with_skipped', { added: entries.length, skipped }));
+      } else {
+        showToast(t('plan_confirmed'));
+      }
       navigate('/production');
       setOrders([]);
       setPname('');

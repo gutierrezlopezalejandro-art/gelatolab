@@ -12,6 +12,8 @@ import { calcLabelSeals, getCountry, getBusinessFields } from '../lib/countryReg
 import { useCountryStore } from '../store/countryStore';
 import { useBusinessStore } from '../store/businessStore';
 import { BatchRating } from '../components/BatchRating';
+import { ConfirmProductionModal } from '../components/ConfirmProductionModal';
+import { ProductionCalendar } from '../components/ProductionCalendar';
 
 const TYPE_COLOR = { helado: '#1a5c3a', gelato: '#6a1b9a', sorbete: '#0d5c6e' };
 const TYPE_BG    = { helado: '#c8e8d4', gelato: '#ede7f6', sorbete: '#d4eef5' };
@@ -418,9 +420,31 @@ export default function ProductionLog() {
     [allRecipes]
   );
 
-  const [openDates, setOpenDates] = useState(new Set());
+  // Al montar el componente, abrir automáticamente las fechas que tienen
+  // producciones pendientes de confirmar. Así, si el usuario llega aquí
+  // desde el banner global (v1.0.13), ve directo lo que tiene que
+  // confirmar sin tener que expandir la fecha a mano. Solo corre 1 vez —
+  // si el usuario cierra una fecha después, no se reabre sola.
+  const [openDates, setOpenDates] = useState(() => {
+    const pendingDates = new Set();
+    const initialLog = useProductionStore.getState().log;
+    for (const e of initialLog) {
+      if (e.pending_confirmation && !e.inventory_deducted_at) {
+        pendingDates.add(String(e.prod_date).slice(0, 10));
+      }
+    }
+    return pendingDates;
+  });
   const [openLotes, setOpenLotes] = useState(new Set());
   const [editingSnapshot, setEditingSnapshot] = useState(null); // { entryId, index, field, value }
+  // Wizard de confirmación de producción (v1.0.13). Si tiene entries cargados,
+  // el modal se renderiza al final con esa lista. Click en "Confirmar producción"
+  // de un lote arranca el wizard con ese único entry.
+  const [confirmingEntries, setConfirmingEntries] = useState(null);
+  // Toggle vista lista / calendario (v1.0.13 Fase 2). Default lista para
+  // mantener el comportamiento conocido. La preferencia podria persistirse
+  // en localStorage si el usuario la cambia mucho — por ahora vive en memoria.
+  const [view, setView] = useState('list');
 
   const typeLbl = (tp) => ({ helado: t('ice_cream'), gelato: t('gelato'), sorbete: t('sorbet') }[tp] || tp);
 
@@ -476,6 +500,19 @@ export default function ProductionLog() {
             {t('production_log_desc')}
           </p>
         </div>
+        {/* Toggle Lista / Calendario (v1.0.13 Fase 2). Siempre visible
+            (incluso con 0 lotes) para que el usuario pueda navegar el
+            calendario a futuro y ver fechas planificables. */}
+        <div className="inline-flex rounded-lg border border-black/10 overflow-hidden text-xs">
+          <button onClick={() => setView('list')}
+                  className={`px-3 py-1.5 cursor-pointer font-semibold ${view === 'list' ? 'bg-[var(--ink)] text-[var(--cream)]' : 'bg-white hover:bg-black/5'}`}>
+            {t('production_view_list')}
+          </button>
+          <button onClick={() => setView('calendar')}
+                  className={`px-3 py-1.5 cursor-pointer font-semibold border-l border-black/10 ${view === 'calendar' ? 'bg-[var(--ink)] text-[var(--cream)]' : 'bg-white hover:bg-black/5'}`}>
+            {t('production_view_calendar')}
+          </button>
+        </div>
       </div>
 
       {log.length > 0 && (
@@ -486,9 +523,32 @@ export default function ProductionLog() {
         </div>
       )}
 
-      {dates.length === 0 ? (
+      {/* Vista calendario (v1.0.13 Fase 2). Click en un dia con lotes vuelve
+          a la vista lista y abre esa fecha en el accordeon. Click en dia sin
+          lotes vuelve a lista sin abrir nada. */}
+      {view === 'calendar' && (
+        <ProductionCalendar
+          entries={log}
+          onDayClick={(date, dayEntries) => {
+            setView('list');
+            if (dayEntries.length > 0) {
+              setOpenDates(prev => {
+                const n = new Set(prev);
+                n.add(date);
+                return n;
+              });
+              setTimeout(() => {
+                const target = document.querySelector(`[data-date="${date}"]`);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }, 50);
+            }
+          }}
+        />
+      )}
+
+      {view === 'list' && dates.length === 0 ? (
         <EmptyState title={t('no_production_yet')} description={t('confirm_from_planning')} />
-      ) : (
+      ) : view === 'list' && (
         <div className="space-y-3">
           {dates.map(date => {
             const entries = byDate[date];
@@ -497,7 +557,7 @@ export default function ProductionLog() {
             const totalCost = entries.reduce((s, e) => s + (parseFloat(e.cost) || 0), 0);
 
             return (
-              <div key={date} className="rounded-xl overflow-hidden shadow-sm border border-black/10">
+              <div key={date} data-date={date} className="rounded-xl overflow-hidden shadow-sm border border-black/10">
                 {/* Date header */}
                 <div
                   className="bg-[var(--ink)] text-[var(--cream)] px-5 py-3 flex items-center gap-4 cursor-pointer select-none"
@@ -542,9 +602,17 @@ export default function ProductionLog() {
 
                       return (
                         <div key={entry.id} className="border border-black/10 rounded-xl overflow-hidden">
-                          {/* Lote header */}
+                          {/* Lote header. Si entry.pending_confirmation
+                              está activo (v1.0.13), agregamos un borde
+                              amarillo + badge "Pendiente" + botón prominente
+                              "Confirmar producción" que abre el modal. */}
                           <div className="px-4 py-2.5 flex items-center gap-3 flex-wrap"
-                               style={{ background: typeBg + '55' }}>
+                               style={{
+                                 background: typeBg + '55',
+                                 ...(entry.pending_confirmation && !entry.inventory_deducted_at
+                                   ? { boxShadow: 'inset 0 0 0 2px var(--gold)' }
+                                   : {}),
+                               }}>
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded text-white"
                                   style={{ background: typeColor }}>
                               {loteStr}
@@ -554,7 +622,22 @@ export default function ProductionLog() {
                                   style={{ background: typeColor }}>
                               {typeLabel}
                             </span>
+                            {entry.pending_confirmation && !entry.inventory_deducted_at && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--gold)] text-white uppercase tracking-wider">
+                                ⏳ {t('production_pending_badge')}
+                              </span>
+                            )}
                             <div className="flex gap-2 ml-auto items-center flex-wrap">
+                              {entry.pending_confirmation && !entry.inventory_deducted_at && (
+                                <button
+                                  className="text-xs font-bold px-3 py-1 rounded-lg bg-[var(--mint)] text-white
+                                             hover:opacity-90 transition-colors border-none cursor-pointer"
+                                  onClick={() => setConfirmingEntries([entry])}
+                                  title={t('production_confirm_btn_tooltip')}
+                                >
+                                  ✓ {t('production_confirm_btn')}
+                                </button>
+                              )}
                               {entry.rating?.overall > 0 && (
                                 <span className="text-[11px] font-semibold text-[#b8860b]" title={t('rating_overall')}>
                                   {'★'.repeat(entry.rating.overall)}{'☆'.repeat(5 - entry.rating.overall)}
@@ -704,6 +787,15 @@ export default function ProductionLog() {
             );
           })}
         </div>
+      )}
+
+      {/* Modal de confirmación de producción (v1.0.13). Se abre desde el
+          botón "Confirmar producción" en el header de cada lote pendiente. */}
+      {confirmingEntries && (
+        <ConfirmProductionModal
+          entries={confirmingEntries}
+          onClose={() => setConfirmingEntries(null)}
+        />
       )}
     </div>
   );

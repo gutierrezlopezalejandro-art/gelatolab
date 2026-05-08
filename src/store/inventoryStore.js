@@ -148,24 +148,43 @@ export const useInventoryStore = create(
 );
 
 /**
- * Apply inventory deductions for any production entry whose date has arrived
- * (prod_date <= today) and that hasn't been deducted yet.
+ * Apply inventory deductions for any production entry whose date has arrived.
  *
- * Idempotent: marking an entry as deducted prevents re-processing on later
- * runs, even if the helper is invoked many times per session.
+ * Lógica nueva v1.0.13 (confirmación explícita):
+ *   - prod_date < hoy (ayer o antes): auto-confirma — descuenta inventario
+ *     y marca inventory_deducted_at. Comportamiento legacy.
+ *   - prod_date == hoy: marca pending_confirmation y NO descuenta. El usuario
+ *     debe confirmar via modal en /production (botón "Confirmar producción").
  *
- * Returns the number of entries processed (useful for toasts).
+ * Razón: descontar silenciosamente el día programado quita feedback al
+ * usuario (¿realmente se hizo? ¿en qué cantidad? ¿cómo salió?). Confirmar
+ * convierte "auto-mágico" en "explícito + rating de cata".
+ *
+ * Idempotente: marking deducted o pending_confirmation prevents re-processing.
+ *
+ * Returns { autoConfirmed, markedPending } counts (useful for toasts/banners).
  */
 export function processDueInventoryDeductions() {
   const today = new Date().toISOString().slice(0, 10);
-  const entries = useProductionStore.getState().log
-    .filter(e => !e.inventory_deducted_at && String(e.prod_date).slice(0, 10) <= today);
-  if (entries.length === 0) return 0;
+  const log = useProductionStore.getState().log;
+
+  // Entries con fecha pasada (no hoy) y sin descontar → auto-confirmar
+  const toAutoConfirm = log.filter(e =>
+    !e.inventory_deducted_at &&
+    String(e.prod_date).slice(0, 10) < today
+  );
+  // Entries con fecha == hoy y sin marcar pending ni descontadas → marcar pending
+  const toMarkPending = log.filter(e =>
+    !e.inventory_deducted_at &&
+    !e.pending_confirmation &&
+    String(e.prod_date).slice(0, 10) === today
+  );
 
   const record = useInventoryStore.getState().record;
   const markDeducted = useProductionStore.getState().markDeducted;
+  const updateEntry = useProductionStore.getState().update;
 
-  for (const e of entries) {
+  for (const e of toAutoConfirm) {
     const outputs = (e.ingredients_snapshot || [])
       .filter(i => i.ingredient_id && i.batch_g > 0)
       .map(i => ({ ingredient_id: i.ingredient_id, qty_g: i.batch_g }));
@@ -174,7 +193,72 @@ export function processDueInventoryDeductions() {
     }
     markDeducted(e.id);
   }
-  return entries.length;
+
+  for (const e of toMarkPending) {
+    updateEntry(e.id, { pending_confirmation: true });
+  }
+
+  return { autoConfirmed: toAutoConfirm.length, markedPending: toMarkPending.length };
+}
+
+/**
+ * Confirma una producción que estaba pendiente (estado pending_confirmation).
+ * Atomicamente:
+ *   1. Si actualDate != prod_date original, actualiza prod_date a la fecha real
+ *   2. Descuenta inventario (registrando un movement 'out' por cada ingrediente)
+ *   3. Marca inventory_deducted_at, limpia pending_confirmation
+ *   4. Guarda rating + comment si se proveen
+ *
+ * Llamada típica desde ConfirmProductionModal cuando el usuario completa el wizard.
+ *
+ * Args:
+ *   entryId  — ID del log entry a confirmar
+ *   options  — { rating?, comment?, actualDate? }
+ *     - rating: { overall, texture, body, taste, color } — todos 0-5
+ *     - comment: texto libre opcional
+ *     - actualDate: 'YYYY-MM-DD' si la producción se hizo en otra fecha
+ *
+ * Returns el log entry actualizado, o null si no se encontró.
+ */
+export function confirmProduction(entryId, { rating, comment, actualDate } = {}) {
+  const log = useProductionStore.getState().log;
+  const entry = log.find(e => e.id === Number(entryId));
+  if (!entry) return null;
+  if (entry.inventory_deducted_at) return entry; // ya confirmada
+
+  const updateEntry = useProductionStore.getState().update;
+  const record = useInventoryStore.getState().record;
+  const markDeducted = useProductionStore.getState().markDeducted;
+
+  // Step 1: actualizar fecha si cambió
+  const finalDate = actualDate || entry.prod_date;
+  const patches = { pending_confirmation: false };
+  if (finalDate !== entry.prod_date) patches.prod_date = finalDate;
+  if (rating) patches.rating = rating;
+  if (comment) patches.rating_comment = comment;
+  updateEntry(entryId, patches);
+
+  // Step 2: descontar inventario
+  const outputs = (entry.ingredients_snapshot || [])
+    .filter(i => i.ingredient_id && i.batch_g > 0)
+    .map(i => ({ ingredient_id: i.ingredient_id, qty_g: i.batch_g }));
+  for (const o of outputs) {
+    record({ ingredient_id: o.ingredient_id, type: 'out', qty_g: o.qty_g, date: finalDate, notes: entry.lote_str });
+  }
+
+  // Step 3: marcar deducted
+  markDeducted(entryId);
+
+  return useProductionStore.getState().log.find(e => e.id === Number(entryId));
+}
+
+/**
+ * Helper: devuelve las entries pendientes de confirmación (prod_date == hoy
+ * marcadas con pending_confirmation=true). Útil para el banner global.
+ */
+export function getPendingConfirmations() {
+  const log = useProductionStore.getState().log;
+  return log.filter(e => e.pending_confirmation && !e.inventory_deducted_at);
 }
 
 /**

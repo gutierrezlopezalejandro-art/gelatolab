@@ -16,10 +16,14 @@ const DIMS = [
 ];
 
 function StarRow({ value = 0, onChange, label, icon }) {
+  // Layout: icon + label + stars JUNTOS (no separados con flex-1) para
+  // que el ojo conecte visualmente el rating con su dimension. Antes
+  // flex-1 empujaba stars al extremo derecho dejando un hueco grande
+  // (feedback usuario 2026-05-07).
   return (
     <div className="flex items-center gap-2 py-1">
-      <span className="text-sm" aria-hidden="true">{icon}</span>
-      <span className="flex-1 text-xs text-[var(--ink2)]">{label}</span>
+      <span className="text-sm shrink-0" aria-hidden="true">{icon}</span>
+      <span className="text-xs text-[var(--ink2)] min-w-[80px]">{label}</span>
       <div className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map(n => (
           <button

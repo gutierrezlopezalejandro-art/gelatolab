@@ -3,7 +3,8 @@ import { Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-d
 import { useAppStore } from './store/appStore';
 import { useAuthStore } from './store/authStore';
 import { useIngredientStore } from './store/ingredientStore';
-import { getLowStock, processDueInventoryDeductions } from './store/inventoryStore';
+import { getLowStock, processDueInventoryDeductions, getPendingConfirmations } from './store/inventoryStore';
+import { useProductionStore } from './store/productionStore';
 import { supabase } from './lib/supabase';
 import { useI18nStore, useT, LANGUAGES } from './lib/i18n';
 import { trackPageview } from './lib/analytics';
@@ -123,6 +124,15 @@ export default function App() {
   const isMobile = useIsMobile();
   const t = useT();
   const lowStockCount = getLowStock(ingredients).length;
+  // Producciones pendientes de confirmar (v1.0.13). Se suscribe al store de
+  // producción para que el banner reaccione cuando cambia el log (ej. tras
+  // confirmar una entry el count baja). useMemo no sirve acá — necesitamos
+  // re-render cuando el log muta.
+  const productionLog = useProductionStore(s => s.log);
+  const pendingConfirmations = productionLog.filter(
+    e => e.pending_confirmation && !e.inventory_deducted_at
+  );
+  const pendingCount = pendingConfirmations.length;
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [pendingUpdate, setPendingUpdate] = useState(null);
   const businessCompleted = useBusinessStore(s => s.completed);
@@ -401,6 +411,27 @@ export default function App() {
             cuándo mostrarse (no logueado / dismissed / carpeta conectada =
             null). */}
         <BackupReminder />
+
+        {/* Banner de producciones pendientes de confirmar (v1.0.13). Aparece
+            cuando hay entries con prod_date == hoy esperando confirmación
+            del usuario. Click → /production con scroll al primer pendiente.
+            Se oculta en /production (ya está la UI ahí). */}
+        {user && pendingCount > 0 && location.pathname !== '/production' && (
+          <div className="max-w-[1280px] mx-auto px-4 mt-3">
+            <button
+              onClick={() => navigate('/production')}
+              className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg bg-[var(--gold2)] border-2 border-[var(--gold)] hover:opacity-90 cursor-pointer transition-opacity"
+              aria-label={t('production_pending_banner_aria')}
+            >
+              <span className="text-2xl shrink-0" aria-hidden="true">⏳</span>
+              <span className="flex-1 text-sm text-[#5c3d00]">
+                <strong>{t('production_pending_banner_title', { count: pendingCount })}</strong>
+                <span className="ml-2 text-xs">{t('production_pending_banner_cta')}</span>
+              </span>
+              <span className="text-[#5c3d00] text-base shrink-0" aria-hidden="true">→</span>
+            </button>
+          </div>
+        )}
         <ErrorBoundary>
           <Suspense fallback={<Spinner />}>
             <Routes>
