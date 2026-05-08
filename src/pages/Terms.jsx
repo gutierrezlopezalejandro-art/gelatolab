@@ -55,6 +55,24 @@ export default function Terms() {
             <p>{t('legal_terms_s8_body')}</p>
           </div>
 
+          {/* Cláusulas nuevas (2026-05-08) — Merchant of Record + Reembolsos
+              + Cancelación. Necesarias antes de activar Lemonsqueezy en
+              producción. Decisión completa en docs/decisiones.md. */}
+          <div>
+            <h2 className="font-display text-lg text-[var(--ink)] mb-2">9. {t('legal_terms_s9_title')}</h2>
+            <p>{t('legal_terms_s9_body')}</p>
+          </div>
+
+          <div>
+            <h2 className="font-display text-lg text-[var(--ink)] mb-2">10. {t('legal_terms_s10_title')}</h2>
+            <p>{t('legal_terms_s10_body')}</p>
+          </div>
+
+          <div>
+            <h2 className="font-display text-lg text-[var(--ink)] mb-2">11. {t('legal_terms_s11_title')}</h2>
+            <p>{t('legal_terms_s11_body')}</p>
+          </div>
+
           <div className="mt-8 p-4 rounded-lg bg-[var(--gold2)] text-[#5c3d00] text-xs">
             {t('legal_template_warning')}
           </div>

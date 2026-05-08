@@ -705,7 +705,46 @@ export default {
     legal_privacy_s8_title: 'Seguridad',
     legal_privacy_s8_body: 'Aplicamos medidas técnicas y organizativas razonables: cifrado en transito (HTTPS), cifrado en reposo por parte del proveedor, Row Level Security en base de datos y controles de acceso.',
     legal_privacy_s9_title: 'Contacto y reclamaciones',
-    legal_privacy_s9_body: 'Para ejercer tus derechos o resolver dudas, escribenos a daniela.llano@tecnoandina.cl. Si no estas conforme con nuestra respuesta puedes reclamar ante la autoridad de protección de datos competente en tu país.',
+    legal_privacy_s9_body: 'Para ejercer tus derechos o resolver dudas, escribenos a soporte@gelatolab.app. Si no estas conforme con nuestra respuesta puedes reclamar ante la autoridad de protección de datos competente en tu país.',
+    // Subprocesador Lemonsqueezy (procesador de pagos) — sumado a la sección 4
+    legal_privacy_s4_lemonsqueezy: 'procesador de pagos. Como Merchant of Record, Lemonsqueezy Inc. (Estados Unidos) procesa los cobros de tu suscripción y maneja los impuestos correspondientes en tu país. Datos compartidos: correo, dirección de facturación, país y dirección IP (necesarios para determinación tributaria). Tu información de tarjeta NUNCA pasa por nuestros servidores. Política de privacidad: https://www.lemonsqueezy.com/privacy',
+
+    // Terms — secciones nuevas (procesador de pagos, reembolsos, cancelación)
+    legal_terms_s9_title: 'Procesador de pagos',
+    legal_terms_s9_body: 'Las suscripciones a GelatoLab son procesadas por Lemonsqueezy Inc. (Estados Unidos), que actua como Merchant of Record. Esto significa que tu contrato de pago es legalmente con Lemonsqueezy en representación de Llanquihue Tech SpA. Lemonsqueezy se encarga del cobro, la emisión de comprobantes válidos en tu jurisdicción, los impuestos aplicables y eventuales reembolsos. En tu estado de cuenta el cargo aparecera como "LEMONSQUEEZY" o "LSQ*GELATOLAB" segun tu banco.',
+    legal_terms_s10_title: 'Política de reembolsos',
+    legal_terms_s10_body: 'Ofrecemos garantía de satisfacción de 30 días desde tu primera suscripción: si no estás conforme te devolvemos el 100% sin preguntas. Después de los 30 días evaluamos cada caso individualmente. Detalle completo en /refund-policy.',
+    legal_terms_s11_title: 'Cancelación de la suscripción',
+    legal_terms_s11_body: 'Podes cancelar tu suscripción en cualquier momento desde tu panel de cuenta. La suscripción seguira activa hasta el final del período ya pagado (mes o año según tu plan) y no se renovara automaticamente despues. No realizamos reembolsos por períodos parciales no usados despues del día 30, salvo que la ley aplicable lo requiera.',
+
+    // Refund Policy — página nueva /refund-policy
+    legal_refund_title: 'Política de Reembolsos',
+    legal_refund_intro: 'En GelatoLab queremos que estes 100% conforme con la herramienta. Por eso ofrecemos una garantía de satisfacción clara y un procedimiento simple para solicitar reembolsos.',
+    legal_refund_s1_title: 'Garantía de satisfacción de 30 días',
+    legal_refund_s1_body: 'Si en los primeros 30 días desde tu primera suscripción no estás conforme con GelatoLab, te devolvemos el 100% sin preguntas. Solo escribinos a soporte@gelatolab.app desde el correo de tu cuenta y procesamos tu reembolso en menos de 48 horas.',
+    legal_refund_s2_title: 'Después de los 30 días',
+    legal_refund_s2_body: 'Evaluamos cada caso individualmente. Casos típicos donde reembolsamos: cobrado por error, doble cobro, bug crítico que impidio usar la app por mas de 7 días, o cancelación que no fue procesada a tiempo. Otros casos los resolvemos buscando una solución (mes gratis, downgrade, crédito).',
+    legal_refund_s3_title: 'Cancelación de suscripción',
+    legal_refund_s3_body: 'Podes cancelar en cualquier momento desde tu panel de cuenta sin tener que pedir un reembolso. La suscripción seguira activa hasta el final del período ya pagado y no se renovara despues. Esto NO involucra devolución de dinero — la cancelación solo evita el próximo cobro.',
+    legal_refund_s4_title: 'Cómo se procesa un reembolso',
+    legal_refund_s4_body: 'El reembolso se acredita a la misma tarjeta usada en el cobro original. El tiempo de acreditación depende de tu banco: típicamente entre 5 y 10 días hábiles. Procesado a través de nuestro proveedor de pagos Lemonsqueezy.',
+    legal_refund_s5_title: 'Identificación del cargo en tu estado de cuenta',
+    legal_refund_s5_body: 'El cargo aparece como "LEMONSQUEEZY" o "LSQ*GELATOLAB" segun tu banco. Esto es normal — Lemonsqueezy Inc. es nuestro procesador de pagos legal (Merchant of Record). Si ves un cargo que no reconoces, antes de disputar con tu banco escribinos: en la mayoría de los casos lo resolvemos en horas.',
+    legal_refund_s6_title: 'Contacto para reembolsos y soporte',
+    legal_refund_s6_body: 'Para cualquier solicitud de reembolso o consulta sobre tu suscripción: soporte@gelatolab.app. Tiempo de respuesta: 48 horas hábiles maximo.',
+
+    // Pricing — actualizado con $11/$99 y mención garantía
+    plan_pro_per_year: 'USD/año',
+    plan_pro_yearly_amount: '$99',
+    plan_pro_yearly_label: 'o $99/año (ahorras 25%)',
+    plan_pro_monthly_amount: '$11',
+    pricing_guarantee_badge: 'Garantía de 30 días',
+    pricing_guarantee_body: 'Si no estás conforme en los primeros 30 días, te devolvemos el 100% sin preguntas.',
+    pricing_refund_link: 'Ver política de reembolsos',
+
+    // Landing — sección de garantía cerca del CTA Pro
+    landing_guarantee_title: 'Garantía de 30 días',
+    landing_guarantee_body: 'Probá GelatoLab Pro un mes gratis. Si no estás conforme en los primeros 30 días, te devolvemos el 100% sin preguntas.',
 
     param_water: 'Agua',
     param_solids: 'Solidos totales',
@@ -1891,7 +1930,7 @@ export default {
     download_info_offline_body: "Toda la formulación y el cálculo corren localmente. La nube solo guarda tus respaldos cuando hay internet.",
     pricing_title: "Planes que te acompañan",
     pricing_sub: "Free es perfecto para experimentar y formular en casa. Pro es para quien produce y vende: sincronización, etiquetas legales, hojas de producción y todo lo profesional.",
-    pricing_coming_soon: "Estamos en beta cerrada. Escríbenos a contacto@gelatolab.app y te damos acceso anticipado.",
+    pricing_coming_soon: "Estamos terminando la integración de pagos. Mientras tanto podés usar GelatoLab gratis con tu cuenta Free.",
     pricing_footnote: "Cancela cuando quieras desde tu cuenta. Sin permanencia. Garantía de devolución de 14 días.",
     plan_free: "Free",
     plan_free_sub: "Para empezar y aprender la base.",
@@ -1906,7 +1945,8 @@ export default {
     plan_pro_per_month: "USD / mes",
     plan_pro_recommended: "Recomendado",
     plan_pro_current: "Tu plan actual — gracias por apoyar GelatoLab",
-    plan_pro_cta: "Solicitar acceso anticipado",
+    plan_pro_cta: "Próximamente",
+    landing_view_pricing: "Ver planes y precios",
     plan_pro_f1: "Recetas ilimitadas",
     plan_pro_f2: "Sincronización en la nube entre dispositivos",
     plan_pro_f3: "Multi-equipo (mantecadores + pasteurizadores)",

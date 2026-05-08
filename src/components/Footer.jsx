@@ -11,12 +11,15 @@ export function Footer() {
         <p className="text-[11px] text-[var(--ink3)]">
           © {year} GelatoLab. {t('footer_rights')}
         </p>
-        <nav className="flex gap-4 text-[11px]" aria-label={t('footer_legal')}>
+        <nav className="flex gap-4 text-[11px] flex-wrap justify-center" aria-label={t('footer_legal')}>
           <Link to="/terms" className="text-[var(--ink3)] hover:text-[var(--ink)] transition-colors">
             {t('legal_terms_title')}
           </Link>
           <Link to="/privacy" className="text-[var(--ink3)] hover:text-[var(--ink)] transition-colors">
             {t('legal_privacy_title')}
+          </Link>
+          <Link to="/refund-policy" className="text-[var(--ink3)] hover:text-[var(--ink)] transition-colors">
+            {t('legal_refund_title')}
           </Link>
         </nav>
       </div>

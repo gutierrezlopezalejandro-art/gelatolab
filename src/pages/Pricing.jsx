@@ -1,6 +1,6 @@
 import { useT } from '../lib/i18n';
 import { useEntitlement } from '../lib/entitlement';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
 import { track } from '../lib/analytics';
 import { shouldHidePricingUI } from '../lib/platform';
@@ -85,8 +85,9 @@ export default function Pricing() {
                 fuera del IAP de Apple. */}
             {!hidePricing && (
               <div className="text-right">
-                <span className="font-display text-3xl text-[var(--ink)]">$9</span>
+                <span className="font-display text-3xl text-[var(--ink)]">{t('plan_pro_monthly_amount')}</span>
                 <span className="text-xs text-[var(--ink3)] block">{t('plan_pro_per_month')}</span>
+                <span className="text-[10px] text-[var(--ink3)] block mt-0.5">{t('plan_pro_yearly_label')}</span>
               </div>
             )}
           </div>
@@ -114,9 +115,31 @@ export default function Pricing() {
               {t('pricing_ios_manage_on_web')}
             </div>
           ) : (
-            <button onClick={handleSubscribe} className="btn-primary-filled w-full">
-              {t('plan_pro_cta')}
-            </button>
+            <>
+              {/* CTA "Próximamente" — disabled-look porque el pago real aun
+                  no esta integrado (espera a Lemonsqueezy SDK). Click muestra
+                  un toast informativo. Cuando se integre, se reemplaza el
+                  estilo + handler para iniciar checkout real. */}
+              <button onClick={handleSubscribe}
+                      className="w-full px-4 py-3 rounded-lg bg-black/5 text-[var(--ink2)] font-semibold text-sm cursor-not-allowed border-2 border-dashed border-black/20"
+                      title={t('pricing_coming_soon')}>
+                ⏳ {t('plan_pro_cta')}
+              </button>
+              {/* Garantía 30 días — visible debajo del CTA Pro. Refuerza
+                  confianza al momento de decidir suscribirse. Linkea a
+                  /refund-policy con la política completa. */}
+              <div className="mt-3 text-center">
+                <span className="inline-block px-2 py-0.5 rounded-full bg-[var(--mint3)] text-[var(--mint)] text-[10px] font-bold uppercase tracking-wider">
+                  ✓ {t('pricing_guarantee_badge')}
+                </span>
+                <p className="mt-2 text-[11px] text-[var(--ink3)] leading-relaxed">
+                  {t('pricing_guarantee_body')}{' '}
+                  <Link to="/refund-policy" className="underline hover:text-[var(--ink)]">
+                    {t('pricing_refund_link')}
+                  </Link>
+                </p>
+              </div>
+            </>
           )}
         </div>
       </div>

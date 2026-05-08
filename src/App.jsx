@@ -45,6 +45,7 @@ const Haccp          = lazy(() => import('./pages/Haccp'));
 const Landing        = lazy(() => import('./pages/Landing'));
 import { resetVisited } from './pages/Landing';
 const Pricing        = lazy(() => import('./pages/Pricing'));
+const Refund         = lazy(() => import('./pages/Refund'));
 const Download       = lazy(() => import('./pages/Download'));
 
 const NAV_KEYS = [
@@ -417,6 +418,7 @@ export default function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/terms"       element={<Terms />} />
               <Route path="/privacy"     element={<Privacy />} />
+              <Route path="/refund-policy" element={<Refund />} />
               <Route path="/help"        element={<Help />} />
               <Route path="/pricing"     element={<Pricing />} />
               <Route path="*"            element={<NotFound />} />

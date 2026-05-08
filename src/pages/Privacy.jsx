@@ -42,6 +42,7 @@ export default function Privacy() {
             <ul className="list-disc pl-6 mt-2 space-y-1">
               <li><strong>Supabase</strong> — {t('legal_privacy_s4_supabase')}</li>
               <li><strong>Google OAuth</strong> — {t('legal_privacy_s4_google')}</li>
+              <li><strong>Lemonsqueezy</strong> — {t('legal_privacy_s4_lemonsqueezy')}</li>
             </ul>
           </div>
 

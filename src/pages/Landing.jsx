@@ -216,6 +216,18 @@ export default function Landing() {
                 {t('landing_cta_secondary')}
               </button>
             </div>
+            {/* Link a /pricing — para visitantes que quieren ver planes y
+                precios sin pasar por la landing completa. Decisión 2026-05-08.
+                Color gold (asociado a Pro en el resto de la app) + tamaño
+                base + emoji 💎 + subrayado solido para que destaque sin
+                competir con los 2 CTA principales del hero. */}
+            <div className="mt-5">
+              <Link to="/pricing"
+                    onClick={() => track('landing_view_pricing')}
+                    className="inline-flex items-center gap-1.5 text-base font-semibold text-[#a87a00] hover:text-[#5c3d00] underline underline-offset-4 decoration-2 decoration-[#a87a00]/40 hover:decoration-[#a87a00] transition-colors">
+                💎 {t('landing_view_pricing')} →
+              </Link>
+            </div>
 
             {/* Strip de stats */}
             <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm bg-white/70 backdrop-blur rounded-2xl px-5 py-2.5 shadow-sm border border-black/5">
@@ -580,6 +592,20 @@ export default function Landing() {
                       className="text-base font-bold px-8 py-3.5 rounded-xl bg-[var(--mint)] text-white hover:opacity-90 cursor-pointer border-none transition-all hover:scale-[1.02] shadow-md">
                 {t('landing_cta_primary')} →
               </button>
+              {/* Garantía de 30 días — refuerza confianza junto al CTA
+                  final. Decisión 2026-05-08 (ver docs/decisiones.md). */}
+              <div className="mt-4 flex items-start gap-2.5 max-w-md">
+                <span className="text-base shrink-0" aria-hidden="true">✓</span>
+                <div>
+                  <p className="text-xs font-semibold text-[var(--ink)]">{t('landing_guarantee_title')}</p>
+                  <p className="text-xs text-[var(--ink3)] leading-relaxed mt-0.5">
+                    {t('landing_guarantee_body')}{' '}
+                    <Link to="/refund-policy" className="underline hover:text-[var(--ink)]">
+                      {t('pricing_refund_link')}
+                    </Link>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -598,6 +624,7 @@ export default function Landing() {
               <Link to="/help" className="hover:text-[var(--ink)] transition-colors">{t('help_title')}</Link>
               <Link to="/terms" className="hover:text-[var(--ink)] transition-colors">{t('legal_terms_title')}</Link>
               <Link to="/privacy" className="hover:text-[var(--ink)] transition-colors">{t('legal_privacy_title')}</Link>
+              <Link to="/refund-policy" className="hover:text-[var(--ink)] transition-colors">{t('legal_refund_title')}</Link>
             </nav>
           </div>
           <div className="mt-6 pt-6 border-t border-black/5 text-center text-xs text-[var(--ink3)]">
