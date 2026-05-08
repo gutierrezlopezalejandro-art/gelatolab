@@ -37,20 +37,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        # fetch-depth: 0 trae toda la historia incluyendo los tag objects
-        # con sus annotations. Necesario para leer el body del tag y usarlo
-        # como release notes (releaseBody) en lugar del texto generico.
+        # fetch-depth: 0 + fetch-tags: true asegura que se descargan los
+        # objects completos de los tags anotados (no solo el ref). Sin esto
+        # `git tag -l --format='%(contents:body)'` cae en el cuerpo del
+        # commit en vez de la annotation del tag — bug visto en v1.0.10.
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - name: Extract tag annotation body
         id: tag_body
         # Lee el body del tag annotation (creado con `git tag -a vX.Y.Z -m "..."`)
         # y lo expone como output. Si por alguna razon el tag no tiene body
         # (creacion lightweight), fallback a un mensaje generico.
+        #
+        # Defense in depth: hacemos un git fetch explicito del tag como
+        # objeto anotado antes de leer, por si fetch-tags no llego a traer
+        # la annotation completa.
         shell: bash
         run: |
-          BODY=$(git tag -l --format='%(contents:body)' "${GITHUB_REF_NAME}")
+          git fetch --no-tags --no-recurse-submodules origin "+refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}" || true
+          BODY=$(git for-each-ref --format='%(contents:body)' "refs/tags/${GITHUB_REF_NAME}")
           if [ -z "$BODY" ]; then
             BODY="Release ${GITHUB_REF_NAME}. Ver commits desde el release anterior para el detalle de cambios."
           fi

@@ -588,6 +588,8 @@ export default {
     onb_skip: 'Saltar',
     onb_start: 'Comenzar',
     account: 'Cuenta',
+    auth_back: '← Volver',
+    your_account: 'Tu cuenta',
     auth_login_title: 'Iniciar sesión',
     auth_login_sub: 'Accede a tu cuenta para sincronizar datos',
     auth_login_btn: 'Iniciar sesión',

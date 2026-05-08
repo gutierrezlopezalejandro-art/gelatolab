@@ -170,6 +170,8 @@ export default {
     onb_skip: 'Passer',
     onb_start: 'Commencer',
     account: 'Compte',
+    auth_back: '← Retour',
+    your_account: 'Mon compte',
     auth_login_title: 'Se connecter',
     auth_login_sub: 'Accedez a votre compte pour synchroniser',
     auth_login_btn: 'Se connecter',

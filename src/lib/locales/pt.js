@@ -532,6 +532,8 @@ export default {
     onb_skip: 'Pular',
     onb_start: 'Começar',
     account: 'Conta',
+    auth_back: '← Voltar',
+    your_account: 'Sua conta',
     auth_login_title: 'Entrar',
     auth_login_sub: 'Acesse sua conta para sincronizar dados',
     auth_login_btn: 'Entrar',

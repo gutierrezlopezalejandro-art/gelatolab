@@ -5,6 +5,7 @@ import { useAppStore } from '../store/appStore';
 import { useT } from '../lib/i18n';
 import { Logo } from '../components/Logo';
 import { authStorage } from '../lib/authStorage';
+import { isTauriDesktop } from '../lib/platform';
 
 // "Recordarme" — solo guardamos el email para pre-rellenarlo. La contraseña
 // NUNCA se persiste: hacerlo en localStorage equivalía a texto plano expuesto
@@ -140,7 +141,24 @@ export default function Auth() {
 
   return (
     <div className="max-w-md mx-auto mt-8">
-      <div className="card p-8">
+      <div className="card p-8 relative">
+        {/* Boton "Volver" — visible solo en desktop Tauri. En web no tiene
+            sentido porque la Landing es la entrada y desde el navbar siempre
+            se puede volver. En desktop, /auth puede ser punto inicial (desde
+            DesktopWelcome) y el usuario puede querer arrepentirse y volver
+            a la pantalla de elegir login/signup. */}
+        {isTauriDesktop() && (
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="absolute top-3 left-3 text-xs font-semibold px-3 py-1.5 rounded-lg
+                       bg-black/5 hover:bg-black/10 text-[var(--ink2)] transition-colors
+                       cursor-pointer border-none"
+            aria-label={t('auth_back')}
+          >
+            {t('auth_back')}
+          </button>
+        )}
         <div className="flex justify-center mb-4">
           <Logo size={56} variant="light" />
         </div>

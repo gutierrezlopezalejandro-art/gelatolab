@@ -170,6 +170,8 @@ export default {
     onb_skip: 'Salta',
     onb_start: 'Inizia',
     account: 'Account',
+    auth_back: '← Indietro',
+    your_account: 'Il tuo account',
     auth_login_title: 'Accedi',
     auth_login_sub: 'Accedi al tuo account per sincronizzare',
     auth_login_btn: 'Accedi',

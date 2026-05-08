@@ -574,6 +574,8 @@ export default {
     onb_skip: 'Skip',
     onb_start: 'Get started',
     account: 'Account',
+    auth_back: '← Back',
+    your_account: 'Your account',
     auth_login_title: 'Sign in',
     auth_login_sub: 'Access your account to sync data',
     auth_login_btn: 'Sign in',

@@ -83,9 +83,17 @@ export function UserMenu() {
         aria-expanded={open}
         aria-label={`${t('account')}: ${user.email}`}
         title={`${t('account')}: ${user.email}`}
-        className="flex items-center gap-1.5 px-2 py-1 rounded-lg
+        className="flex items-center gap-2 px-2 py-1 rounded-lg
                    bg-white/10 hover:bg-white/20 transition-colors cursor-pointer border-none"
       >
+        {/* "Tu cuenta" — discoverability del menu de usuario.
+            Antes era solo el avatar circular con iniciales y la flecha,
+            que muchos usuarios no reconocian como menu/logout (feedback
+            usuario 2026-05-07). En mobile (<sm) ocultamos el texto para
+            ahorrar espacio en el navbar. */}
+        <span className="hidden sm:inline text-xs font-semibold text-white/80">
+          {t('your_account')}
+        </span>
         <span className="w-9 h-9 rounded-full bg-[var(--gold)] text-white font-bold text-xs
                          flex items-center justify-center tracking-wider">
           {initials}

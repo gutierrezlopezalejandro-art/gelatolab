@@ -49,12 +49,35 @@ fn clear_stale_service_worker_cache() {
         if sw_dir.exists() {
             let _ = fs::remove_dir_all(&sw_dir);
         }
+        // Refresca el icon cache de Windows. Sin esto, el escritorio /
+        // menu inicio / explorer muestran el icono viejo de la version
+        // anterior aun cuando gelatolab.exe tiene el icono nuevo embebido.
+        // Apps grandes (Discord, Slack) usan el mismo truco.
+        refresh_windows_icon_cache();
     }
 
     if let Some(parent) = version_file.parent() {
         let _ = fs::create_dir_all(parent);
     }
     let _ = fs::write(&version_file, CURRENT_VERSION);
+}
+
+// Notifica al shell de Windows que las associations de archivos cambiaron,
+// lo cual fuerza refresh del icon cache global. Equivalente Rust del
+// comando manual `taskkill /f /im explorer.exe + del IconCache + start
+// explorer` pero sin matar explorer.
+//
+// Uso: solo en startup despues de detectar cambio de version. SHCNF_IDLIST
+// con dwItem1/dwItem2 en NULL pide refresh global, que es lo que queremos.
+#[cfg(target_os = "windows")]
+fn refresh_windows_icon_cache() {
+    use windows::Win32::UI::Shell::{SHChangeNotify, SHCNE_ASSOCCHANGED, SHCNF_IDLIST};
+    // SAFETY: SHChangeNotify con punteros nulos y SHCNE_ASSOCCHANGED esta
+    // documentado por Microsoft como seguro y es el patron canonico para
+    // forzar refresh del icon cache global.
+    unsafe {
+        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, None, None);
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
