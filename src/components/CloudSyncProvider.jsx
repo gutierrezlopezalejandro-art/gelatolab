@@ -5,7 +5,7 @@ import { useIngredientStore } from '../store/ingredientStore';
 import { useProductionStore } from '../store/productionStore';
 import { usePlanStore } from '../store/planStore';
 import { useInventoryStore } from '../store/inventoryStore';
-import { pullFromCloud, debouncedPush, subscribeToCloud, flushPendingPushes, hasPendingPushes, pushToCloud } from '../lib/cloudSync';
+import { pullFromCloud, debouncedPush, subscribeToCloud, flushPendingPushes, hasPendingPushes, hasPendingPushFor, pushToCloud } from '../lib/cloudSync';
 import defaultRecipes from '../data/recipes.json';
 
 // Bug v1.0.8: usuarios Pro solo veían 2 recetas (seed) tras login en vez de
@@ -113,10 +113,37 @@ export function CloudSyncProvider() {
         if (!appliedPlans)       pushToCloud(user.id, 'plans',       usePlanStore.getState());
         if (!appliedInventory)   pushToCloud(user.id, 'inventory',   useInventoryStore.getState());
 
-        // After merging, setup realtime
-        unsubRef.current = subscribeToCloud(user.id, (table, data) => {
+        // After merging, setup realtime.
+        //
+        // CRITICO (bug 2026-05-10): el realtime puede recibir un push de
+        // OTRO device que tiene state mas viejo que el local. Si lo aplicamos
+        // sin checks, sobrescribimos los cambios locales del usuario antes
+        // de que el debouncedPush local fire (2s delay). El sintoma reportado
+        // por usuario fue: "creo un ingrediente y desaparece" — porque el
+        // realtime echo del web/desktop con sus 91 items llegaba al iPhone
+        // antes de que el iPhone pudiera pushear sus 92.
+        //
+        // Solucion: skip si hay un push local pendiente para esa tabla
+        // (los cambios locales son por definicion mas nuevos que cualquier
+        // cosa que ya este en cloud), o si nuestro localTs es mayor que el
+        // cloudTs del realtime payload (defense in depth).
+        unsubRef.current = subscribeToCloud(user.id, (table, data, cloudTs) => {
           if (!data) return;
-          // Realtime updates are always from cloud — apply them and refresh baseline.
+
+          // Skip 1: tenemos cambios locales pendientes de pushear.
+          if (hasPendingPushFor(user.id, table)) {
+            return;
+          }
+
+          // Skip 2: nuestro localTs es estrictamente mas nuevo que cloudTs
+          // (caso raro: cambio local sin debouncedPush en flight, ej. se
+          // perdio el subscribe en alguna race). No es exhaustivo pero
+          // protege contra rollback con clocks decentes.
+          const localTs = getLocalChangeTs(table);
+          if (localTs && cloudTs && localTs > cloudTs) {
+            return;
+          }
+
           switch (table) {
             // Mismo merge que en syncOnLogin para cualquier update via realtime.
             case 'recipes':     useRecipeStore.setState(mergeRecipesWithSeeds(data)); break;
@@ -125,7 +152,9 @@ export function CloudSyncProvider() {
             case 'plans':       usePlanStore.setState(data); break;
             case 'inventory':   useInventoryStore.setState(data); break;
           }
-          try { localStorage.setItem(LOCAL_TS_KEY(table), new Date().toISOString()); } catch { /* ignore */ }
+          // Refresh local baseline al timestamp cloud (no a now) — eso evita
+          // que el subscribe local de Zustand gatille un re-push circular.
+          try { localStorage.setItem(LOCAL_TS_KEY(table), cloudTs || new Date().toISOString()); } catch { /* ignore */ }
         });
 
         // Flag: we are ready to push changes

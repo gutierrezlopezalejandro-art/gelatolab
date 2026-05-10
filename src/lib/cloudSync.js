@@ -126,6 +126,17 @@ export function hasPendingPushes() {
 }
 
 /**
+ * Returns true if there is a pending debounced push for (userId, table).
+ * Usado por CloudSyncProvider para skipear realtime overwrites cuando hay
+ * cambios locales que todavia no se pushearon — sino, el realtime de OTRO
+ * device borraria los cambios locales antes de que la queue debounce envie.
+ */
+export function hasPendingPushFor(userId, table) {
+  if (!userId) return false;
+  return pushTimers.has(`${userId}:${table}`);
+}
+
+/**
  * Subscribe to realtime changes for a user's tables.
  * Returns an unsubscribe function.
  */
@@ -137,7 +148,9 @@ export function subscribeToCloud(userId, onUpdate) {
       .channel(`sync_${table}`)
       .on('postgres_changes',
         { event: '*', schema: 'public', table: `user_${table}`, filter: `user_id=eq.${userId}` },
-        (payload) => onUpdate(table, payload.new?.data)
+        // Pasamos data + updated_at para que el handler pueda comparar
+        // timestamps cloud vs local antes de aplicar.
+        (payload) => onUpdate(table, payload.new?.data, payload.new?.updated_at)
       )
       .subscribe()
   );
