@@ -1,0 +1,120 @@
+PROPRIETARY SOFTWARE LICENSE
+============================
+
+Copyright (c) 2026 Llanquihue Tech SpA (RUT 78.414.411-9)
+Frutillar, Region de Los Lagos, Chile.
+All rights reserved.
+
+This source code and all associated materials in this repository
+("the Software") are the exclusive property of Llanquihue Tech SpA.
+
+NO PERMISSION IS GRANTED, expressly or implicitly, to any person or
+entity to:
+
+  (a) copy, reproduce, or duplicate the Software, in whole or in part,
+      in any form or by any means;
+
+  (b) modify, translate, adapt, or create derivative works based on
+      the Software;
+
+  (c) distribute, publish, sublicense, sell, lease, rent, or otherwise
+      transfer the Software or any rights therein to third parties;
+
+  (d) reverse engineer, decompile, or disassemble the Software, except
+      to the extent expressly permitted by applicable mandatory law;
+
+  (e) remove, alter, or obscure any copyright, trademark, or other
+      proprietary notice contained in the Software;
+
+  (f) use the Software, in whole or in part, to develop competing
+      products or services.
+
+The Software is made publicly visible on this repository solely for
+transparency, security review, and demonstration purposes. Public
+visibility does NOT constitute a grant of any license or right of use
+under copyright, trademark, patent, or any other intellectual property
+law.
+
+End-user use of compiled binaries distributed by Llanquihue Tech SpA
+(via gelatolab.app or official release channels) is governed by the
+separate End User License Agreement (EULA) and Terms of Service
+published at https://gelatolab.app/legal.
+
+THIRD-PARTY COMPONENTS
+----------------------
+The Software incorporates open source components which remain subject
+to their respective licenses. Those licenses apply only to the
+respective components and do not extend any rights over the Software
+as a whole.
+
+DISCLAIMER
+----------
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE USE OF OR
+INABILITY TO USE THE SOFTWARE.
+
+ENFORCEMENT
+-----------
+Unauthorized use of the Software constitutes copyright infringement
+under Ley N. 17.336 de Propiedad Intelectual (Chile) and applicable
+international treaties. Llanquihue Tech SpA reserves all rights to
+pursue civil and criminal remedies against infringers.
+
+For licensing inquiries: contacto@gelatolab.app
+
+
+================================================================
+LICENCIA DE SOFTWARE PROPIETARIO (Espanol)
+================================================================
+
+Copyright (c) 2026 Llanquihue Tech SpA (RUT 78.414.411-9)
+Frutillar, Region de Los Lagos, Chile.
+Todos los derechos reservados.
+
+Este codigo fuente y todos los materiales asociados en este repositorio
+("el Software") son propiedad exclusiva de Llanquihue Tech SpA.
+
+NO SE OTORGA AUTORIZACION, expresa ni implicita, a ninguna persona o
+entidad para:
+
+  (a) copiar, reproducir o duplicar el Software, total o parcialmente,
+      por cualquier medio o forma;
+
+  (b) modificar, traducir, adaptar o crear obras derivadas basadas
+      en el Software;
+
+  (c) distribuir, publicar, sublicenciar, vender, arrendar o transferir
+      el Software o cualquier derecho sobre el mismo a terceros;
+
+  (d) realizar ingenieria inversa, descompilar o desensamblar el
+      Software, salvo en la medida expresamente permitida por ley
+      imperativa aplicable;
+
+  (e) eliminar, alterar u ocultar avisos de copyright, marca u otros
+      avisos de propiedad contenidos en el Software;
+
+  (f) utilizar el Software, total o parcialmente, para desarrollar
+      productos o servicios competidores.
+
+El Software se mantiene publicamente visible en este repositorio
+unicamente con fines de transparencia, revision de seguridad y
+demostracion. La visibilidad publica NO constituye otorgamiento de
+licencia ni derecho de uso bajo copyright, marca registrada, patente
+o cualquier otra ley de propiedad intelectual.
+
+El uso por parte de usuarios finales de los binarios compilados
+distribuidos por Llanquihue Tech SpA (via gelatolab.app o canales
+oficiales de release) se rige por el Acuerdo de Licencia de Usuario
+Final (EULA) y Terminos de Servicio publicados en
+https://gelatolab.app/legal.
+
+El uso no autorizado del Software constituye infraccion de copyright
+bajo la Ley N. 17.336 de Propiedad Intelectual de Chile y los tratados
+internacionales aplicables. Llanquihue Tech SpA se reserva todos los
+derechos para perseguir las acciones civiles y penales que correspondan
+contra los infractores.
+
+Consultas de licenciamiento: contacto@gelatolab.app

@@ -18,6 +18,24 @@ ios/App/build/
 ios/DerivedData/
 ios/App/App/capacitor.config.json
 
+# Android Capacitor — todo el proyecto generado se regenera con `npx cap add
+# android` + `npx cap sync`. NO commitear: ocupa MB y queda obsoleto rapido.
+# Si se quisiera commitear, hay que excluir keystore.properties (con password!)
+# y los build artifacts.
+android/
+
+# Code signing — claves y certificados nunca van al repo (estan en GH Secrets
+# para CI o en password manager local). Listado defensivo por si alguien crea
+# uno fuera de las carpetas tipicas.
+*.jks                  # Android keystore
+*.keystore             # Android keystore (alt extension)
+*.pfx                  # Windows Authenticode cert (SSL.com cuando llegue)
+*.p12                  # Apple Developer ID cert (cuando enrollemos Apple Dev)
+*.cer                  # Certificate signing request / output
+*.mobileprovision      # iOS provisioning profile
+*.key                  # Generic private key (Tauri minisign, ssh, etc.)
+keystore.properties    # Password file referenced by Gradle
+
 # Environment
 .env
 .env.local
