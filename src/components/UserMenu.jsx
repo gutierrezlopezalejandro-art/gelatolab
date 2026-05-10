@@ -10,7 +10,7 @@ export function UserMenu() {
   const t = useT();
   const navigate = useNavigate();
   const { showToast } = useAppStore();
-  const { user, signOut, hasCloud } = useAuthStore();
+  const { user, signOut, hasCloud, isAdmin } = useAuthStore();
   const [open, setOpen] = useState(false);
   const [showBiz, setShowBiz] = useState(false);
 
@@ -122,6 +122,17 @@ export function UserMenu() {
             >
               ⚙ {t('business_settings_title')}
             </button>
+            {isAdmin && isAdmin() && (
+              <button
+                role="menuitem"
+                onClick={() => { setOpen(false); navigate('/admin'); }}
+                className="w-full text-left px-3 py-2 text-xs font-medium
+                           hover:bg-[var(--cream)] transition-colors cursor-pointer border-none
+                           bg-white text-[var(--ink)] border-t border-black/5"
+              >
+                🛡 {t('admin_menu_link')}
+              </button>
+            )}
             <button
               role="menuitem"
               onClick={handleSignOut}

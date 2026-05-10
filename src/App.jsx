@@ -48,6 +48,10 @@ import { resetVisited } from './pages/Landing';
 const Pricing        = lazy(() => import('./pages/Pricing'));
 const Refund         = lazy(() => import('./pages/Refund'));
 const Download       = lazy(() => import('./pages/Download'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminUsers     = lazy(() => import('./pages/AdminUsers'));
+const AdminAuditLog  = lazy(() => import('./pages/AdminAuditLog'));
+import { AdminLayout } from './components/AdminLayout';
 
 const NAV_KEYS = [
   { to: '/dashboard',   key: 'dashboard' },
@@ -452,6 +456,14 @@ export default function App() {
               <Route path="/refund-policy" element={<Refund />} />
               <Route path="/help"        element={<Help />} />
               <Route path="/pricing"     element={<Pricing />} />
+              {/* Admin panel — gateado por role='admin' (requireAdmin chequea
+                  profile.role !== 'admin' y muestra el card "⛔" si no aplica).
+                  3 sub-rutas anidadas bajo AdminLayout (sidebar tabs). */}
+              <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
+                <Route index            element={<AdminDashboard />} />
+                <Route path="users"     element={<AdminUsers />} />
+                <Route path="audit"     element={<AdminAuditLog />} />
+              </Route>
               <Route path="*"            element={<NotFound />} />
             </Routes>
           </Suspense>
