@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GelatoLab" />
+    <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- SEO -->
     <title>GelatoLab — Formulación profesional de helados y gelatos</title>
@@ -29,8 +31,18 @@
     <meta name="twitter:description" content="Herramienta profesional para formular helados, gelatos y sorbetes." />
     <meta name="twitter:image" content="./icons/icon-512.png" />
 
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <!-- Manifest: vite-plugin-pwa lo inyecta automaticamente en build como
+         <link rel="manifest" href="./manifest.webmanifest"> al final del head.
+         No lo declaramos aca para evitar el duplicado. (public/manifest.json
+         viejo se mantiene como fallback si algun crawler lo pide por nombre
+         directo, pero NO esta linkeado desde el HTML.) -->
+    <!-- Apple Touch Icons multi-size: iOS elige el mejor segun densidad de pantalla.
+         Todos tienen fondo opaco (verde brand) — iOS aplica su propia mascara
+         redondeada y queda mal con fondo transparente. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-152.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="./icons/apple-touch-icon-120.png" />
     <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
     <meta name="theme-color" content="#1a1a1a" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -68,14 +80,15 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      // Service worker registration:
-      //   - Web prod (gelatolab.app): register, sirve offline + faster reloads.
+      // Service Worker registration condicional al entorno:
+      //   - Web prod (gelatolab.app): register sw.js → pre-cache + offline.
       //   - Localhost dev: unregister, evita stale-chunk con Vite HMR.
       //   - Tauri desktop: unregister + limpiar caches. La app ya tiene el
-      //     bundle local en el binario, no hay beneficio offline. Y los SW
-      //     viejos de versiones previas v1.0.6 cacheaban chunks que despues
-      //     no existian al actualizar => pantalla blanca. Eliminandolo aqui,
-      //     cualquier user que actualice de >=v1.0.7 queda limpio.
+      //     bundle local en el binario, un SW solo causa stale chunks y
+      //     pantalla blanca al actualizar (incidente v1.0.6 → v1.0.9).
+      // El SW lo genera vite-plugin-pwa al build (Workbox, pre-cachea ~70
+      // assets/8.4MB del bundle Vite). injectRegister:false en vite.config.js
+      // para que el plugin NO meta su propio script — registramos aca con guard.
       (function () {
         if (!('serviceWorker' in navigator)) return;
         var isLocal = ['localhost', '127.0.0.1'].indexOf(location.hostname) !== -1;
