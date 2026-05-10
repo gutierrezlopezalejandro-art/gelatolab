@@ -23,11 +23,23 @@ const pwaConfig = {
   injectRegister: false,
   devOptions: { enabled: false },
   workbox: {
+    // skipWaiting + clientsClaim: forzar al SW nuevo a tomar control sin
+    // esperar que "todas las tabs cierren". Critico para PWA standalone iOS:
+    // ahi el "tab" nunca se cierra (la app siempre esta abierta como icono),
+    // sin estos flags el SW nuevo se queda en estado "waiting" indefinido y
+    // el usuario sigue viendo el bundle viejo. Bug 2026-05-10: usuario
+    // quedo trabado en v1.0.13 aunque deployamos v1.0.14.
+    skipWaiting: true,
+    clientsClaim: true,
     // Pre-cache: todos los chunks Vite + iconos + manifest. globPatterns mira
     // en /dist (output de build), no en /public.
     globPatterns: ['**/*.{js,css,html,svg,png,ico,webp,woff2}'],
     // Cap por archivo: aumentar a 5MB para chunks gordos (xlsx, recharts).
     maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+    // Forzar cleanup de caches viejas al activar SW nuevo. Sin esto los
+    // caches del SW anterior pueden quedar dando vueltas (waste storage,
+    // posibles hits accidentales).
+    cleanupOutdatedCaches: true,
     // Runtime caching para recursos que no estan en el bundle pre-cacheado:
     runtimeCaching: [
       {
