@@ -98,6 +98,7 @@ export default function Landing() {
   // la sesión cambia (login/logout) y hace re-render.
   const detectedOS = useMemo(() => detectOS(), []);
   const isTauri = useMemo(() => isTauriDesktop(), []);
+  const [showIosModal, setShowIosModal] = useState(false);
 
   // Si el usuario ya esta logueado, manda directo al dashboard sin ver
   // landing. Idem si vuelve y ya marco "visited" (web only — en Tauri
@@ -130,6 +131,17 @@ export default function Landing() {
       navigate('/download');
     }
     // Si no hay release todavia, el boton queda en "proximamente" via disabled.
+  }
+  function handleAndroidDownload() {
+    track('landing_download_clicked', { platform: 'android' });
+    // /releases/latest/ → siempre apunta al ultimo release sin tocar el link
+    // cuando publiquemos v1.0.14, etc. El asset 'app-release.apk' debe estar
+    // adjunto al Release manualmente (o por release-desktop.yml a futuro).
+    window.location.href = 'https://github.com/gutierrezlopezalejandro-art/gelatolab/releases/latest/download/app-release.apk';
+  }
+  function handleIosInstall() {
+    track('landing_download_clicked', { platform: 'ios' });
+    setShowIosModal(true);
   }
 
   return (
@@ -500,7 +512,11 @@ export default function Landing() {
           <h2 className="font-display text-4xl mb-4">{t('landing_download_title')}</h2>
           <p className="text-base text-[var(--ink2)] mb-10 max-w-xl mx-auto">{t('landing_download_sub')}</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+          {/* Desktop subgroup */}
+          <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--ink3)] mb-3 text-left max-w-[700px] mx-auto">
+            {t('landing_download_desktop_title')}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8 max-w-[700px] mx-auto">
             <DownloadCard
               os="win"
               icon="🪟"
@@ -529,6 +545,34 @@ export default function Landing() {
               highlighted={detectedOS === 'linux'}
               onClick={() => handleDownload('linux')}
               disabled={!RELEASES_AVAILABLE}
+              t={t}
+            />
+          </div>
+
+          {/* Mobile subgroup */}
+          <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--ink3)] mb-3 text-left max-w-[500px] mx-auto">
+            {t('landing_download_mobile_title')}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 max-w-[500px] mx-auto">
+            <DownloadCard
+              os="ios"
+              icon="📱"
+              title="iPhone / iPad"
+              sub={t('landing_download_ios_sub')}
+              highlighted={false}
+              onClick={handleIosInstall}
+              disabled={false}
+              t={t}
+              actionLabel={t('landing_download_ios_action')}
+            />
+            <DownloadCard
+              os="android"
+              icon="🤖"
+              title="Android"
+              sub={t('landing_download_android_sub')}
+              highlighted={false}
+              onClick={handleAndroidDownload}
+              disabled={false}
               t={t}
             />
           </div>
@@ -632,7 +676,73 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {showIosModal && (
+        <IosInstallModal onClose={() => setShowIosModal(false)} t={t} />
+      )}
     </div>
+  );
+}
+
+// Modal con instrucciones para instalar la PWA en iPhone/iPad. Se abre cuando
+// el usuario clickea la card "iPhone / iPad" en la seccion de descargas. iOS
+// no expone API JS para gatillar el "Add to Home Screen" — el usuario tiene
+// que hacerlo manual desde Safari (no funciona desde Chrome iOS por restriccion
+// del propio sistema, ya que todos los browsers iOS estan obligados a usar
+// WebKit pero solo Safari tiene el menu Compartir > Inicio).
+function IosInstallModal({ onClose, t }) {
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ios-install-title"
+    >
+      <div
+        className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <h3 id="ios-install-title" className="font-display text-2xl text-[var(--ink)]">
+            {t('landing_ios_install_title')}
+          </h3>
+          <button
+            onClick={onClose}
+            aria-label={t('landing_ios_install_close')}
+            className="text-[var(--ink3)] hover:text-[var(--ink)] cursor-pointer bg-transparent border-none text-2xl leading-none p-1"
+          >
+            ×
+          </button>
+        </div>
+        <ol className="space-y-3 text-sm text-[var(--ink2)]">
+          <IosStep n="1" body={t('landing_ios_install_step1')} />
+          <IosStep n="2" body={t('landing_ios_install_step2')} />
+          <IosStep n="3" body={t('landing_ios_install_step3')} />
+          <IosStep n="4" body={t('landing_ios_install_step4')} />
+        </ol>
+        <p className="text-xs text-[var(--ink3)] mt-4 p-3 bg-[var(--cream2)]/60 rounded-lg leading-relaxed">
+          ⚠️ {t('landing_ios_install_note')}
+        </p>
+        <button
+          onClick={onClose}
+          className="mt-5 w-full py-3 rounded-lg bg-[var(--ink)] text-[var(--cream)] font-semibold text-sm cursor-pointer border-none hover:opacity-90 transition-opacity"
+        >
+          {t('landing_ios_install_close')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function IosStep({ n, body }) {
+  return (
+    <li className="flex items-start gap-3">
+      <span className="flex-shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full bg-[var(--mint3)] text-[var(--mint)] font-bold text-sm">
+        {n}
+      </span>
+      <span className="leading-relaxed pt-0.5">{body}</span>
+    </li>
   );
 }
 
@@ -824,12 +934,15 @@ function Sello({ children }) {
   );
 }
 
-function DownloadCard({ icon, title, sub, highlighted, onClick, disabled, t }) {
+function DownloadCard({ icon, title, sub, highlighted, onClick, disabled, t, actionLabel }) {
+  // actionLabel opcional: cuando viene, sobreescribe el "↓ Descargar" default.
+  // Util para iOS donde no hay descarga sino instructivo PWA install.
+  const action = actionLabel ? `→ ${actionLabel}` : `↓ ${t('landing_download_btn')}`;
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      aria-label={`${t('landing_download_btn')} ${title}`}
+      aria-label={`${actionLabel || t('landing_download_btn')} ${title}`}
       className={`p-5 rounded-xl border-2 transition-all cursor-pointer text-left
         ${highlighted ? 'border-[var(--mint)] bg-white shadow-md' : 'border-black/10 bg-white hover:border-[var(--mint2)]'}
         ${disabled ? 'opacity-50 cursor-not-allowed hover:border-black/10' : ''}`}
@@ -847,7 +960,7 @@ function DownloadCard({ icon, title, sub, highlighted, onClick, disabled, t }) {
         )}
       </div>
       <div className="text-xs text-[var(--ink2)] mt-2 font-semibold">
-        {disabled ? `⏳ ${t('landing_download_coming_soon')}` : `↓ ${t('landing_download_btn')}`}
+        {disabled ? `⏳ ${t('landing_download_coming_soon')}` : action}
       </div>
     </button>
   );
