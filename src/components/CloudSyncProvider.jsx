@@ -99,12 +99,19 @@ export function CloudSyncProvider() {
         const appliedPlans       = applyIfCloudNewer('plans',       (d) => usePlanStore.setState(d));
         const appliedInventory   = applyIfCloudNewer('inventory',   (d) => useInventoryStore.setState(d));
 
-        // If local was newer for a table, push it now so cloud catches up.
+        // If local was newer (o si la tabla cloud aun no existe para este user),
+        // push el estado local ahora. Asi se garantiza que la fila se crea en
+        // el primer login Pro (antes habia un catch-22: el push solo ocurria
+        // si cloud.X existia, pero cloud.X solo se creaba con un push).
+        // Bug detectado 2026-05-10: usuario veia inventarios distintos en
+        // desktop/web/iPhone porque user_ingredients y user_inventory nunca
+        // se creaban en cloud (otras tablas si se creaban porque el subscribe
+        // disparaba el primer push cuando el usuario tocaba el store).
         if (!appliedRecipes)     pushToCloud(user.id, 'recipes',     useRecipeStore.getState());
-        if (!appliedIngredients && cloud.ingredients) pushToCloud(user.id, 'ingredients', useIngredientStore.getState());
-        if (!appliedProductions && cloud.productions) pushToCloud(user.id, 'productions', useProductionStore.getState());
-        if (!appliedPlans       && cloud.plans)       pushToCloud(user.id, 'plans',       usePlanStore.getState());
-        if (!appliedInventory   && cloud.inventory)   pushToCloud(user.id, 'inventory',   useInventoryStore.getState());
+        if (!appliedIngredients) pushToCloud(user.id, 'ingredients', useIngredientStore.getState());
+        if (!appliedProductions) pushToCloud(user.id, 'productions', useProductionStore.getState());
+        if (!appliedPlans)       pushToCloud(user.id, 'plans',       usePlanStore.getState());
+        if (!appliedInventory)   pushToCloud(user.id, 'inventory',   useInventoryStore.getState());
 
         // After merging, setup realtime
         unsubRef.current = subscribeToCloud(user.id, (table, data) => {
