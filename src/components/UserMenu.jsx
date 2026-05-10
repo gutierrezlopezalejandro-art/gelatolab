@@ -35,14 +35,18 @@ export function UserMenu() {
   }
 
   async function handleSignOut() {
-    await signOut();
+    // 1. Feedback visual INMEDIATO: cerrar menu + navegar a landing.
+    //    Antes (await signOut() primero) el menu quedaba abierto mientras
+    //    Supabase respondia; en /admin el ProtectedRoute requireAdmin re-
+    //    renderizaba mid-flow al user=null y la continuacion async se rompia.
     setOpen(false);
-    showToast(t('auth_signed_out'));
-    // Volvemos a la landing para que el usuario pueda re-loguearse o llegar
-    // a /download. Reseteamos el flag "visited" para que la landing no se
-    // auto-skipee.
     resetVisited();
     navigate('/');
+    showToast(t('auth_signed_out'));
+    // 2. Cerrar sesion en Supabase en background. Si falla (red caida,
+    //    sesion ya expirada), el set({user:null}) interno igual deja al
+    //    usuario deslogueado en memoria. No bloquea la UX.
+    try { await signOut(); } catch (e) { /* tolerable: state ya limpio */ }
   }
 
   if (!user) {
