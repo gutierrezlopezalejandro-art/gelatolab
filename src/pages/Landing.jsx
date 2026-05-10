@@ -23,6 +23,24 @@ function isTauriDesktop() {
   return false;
 }
 
+// Detecta si la pagina corre como PWA standalone (instalada en el home
+// screen de iOS / Android, no como tab de Safari/Chrome). En ese caso el
+// landing publico tampoco aplica — el usuario ya tomo la decision de
+// instalar, mostrarle marketing es ruido. Renderizamos DesktopWelcome igual
+// que en Tauri.
+//
+// matchMedia('(display-mode: standalone)') funciona en Chrome/Edge/Firefox
+// y iOS Safari moderno. navigator.standalone es el legacy de iOS Safari
+// (todavia presente, redundante pero defensivo).
+function isStandalonePWA() {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+    if (window.navigator && window.navigator.standalone === true) return true;
+  } catch { /* tolerable */ }
+  return false;
+}
+
 const VISITED_KEY = 'gelatolab-visited';
 
 // La pagina /download lista los instaladores con detección de OS, fetch a
@@ -98,12 +116,17 @@ export default function Landing() {
   // la sesión cambia (login/logout) y hace re-render.
   const detectedOS = useMemo(() => detectOS(), []);
   const isTauri = useMemo(() => isTauriDesktop(), []);
+  const isPwa = useMemo(() => isStandalonePWA(), []);
+  // Tratamos Tauri y PWA standalone como el mismo contexto "app instalada":
+  // ambos se saltean la landing publica de marketing.
+  const isAppContext = isTauri || isPwa;
   const [showIosModal, setShowIosModal] = useState(false);
 
   // Si el usuario ya esta logueado, manda directo al dashboard sin ver
-  // landing. Idem si vuelve y ya marco "visited" (web only — en Tauri
-  // siempre mostramos algo: dashboard si logueado, welcome A2 si no).
-  const shouldRedirect = user || (!isTauri && hasVisited());
+  // landing. Idem si vuelve a la web (no app) y ya marco "visited".
+  // En contexto app (Tauri o PWA standalone) siempre mostramos algo:
+  // dashboard si logueado, welcome A2 si no.
+  const shouldRedirect = user || (!isAppContext && hasVisited());
   useEffect(() => {
     if (shouldRedirect) navigate('/dashboard', { replace: true });
   }, [shouldRedirect, navigate]);
@@ -111,9 +134,10 @@ export default function Landing() {
   // flash de contenido.
   if (shouldRedirect) return null;
 
-  // En Tauri sin sesion: mostramos pantalla de bienvenida simple en vez
-  // de la landing publica de marketing.
-  if (isTauri) return <DesktopWelcome />;
+  // App instalada (Tauri desktop o PWA standalone iOS/Android) sin sesion:
+  // pantalla de bienvenida simple (login/signup) en vez de la landing
+  // publica de marketing.
+  if (isAppContext) return <DesktopWelcome />;
 
   function handleTryFree() {
     track('landing_cta_try_free');
