@@ -242,6 +242,7 @@ export default {
     report_selected: '{n} seleccionadas',
     report_generate: 'Generar reporte',
     report_clear: 'Limpiar selección',
+    report_actions_desktop_only: 'Disponible solo en escritorio',
     recipes_locked_title: '{n} recetas más esperando en la biblioteca',
     recipes_locked_sub: 'El plan Free incluye una receta de helado y una de gelato como muestra. Activa Pro para acceder a la biblioteca completa y crear las tuyas sin límite.',
     recipes_locked_cta: 'Ver planes Pro',

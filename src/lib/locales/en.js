@@ -230,6 +230,7 @@ export default {
     report_selected: '{n} selected',
     report_generate: 'Generate report',
     report_clear: 'Clear selection',
+    report_actions_desktop_only: 'Only available on desktop',
     recipes_locked_title: '{n} more recipes waiting in the library',
     recipes_locked_sub: 'The Free plan includes one ice-cream recipe and one gelato recipe as samples. Unlock Pro to access the full library and create unlimited recipes of your own.',
     recipes_locked_cta: 'See Pro plans',

@@ -289,7 +289,12 @@ export default function Recipes() {
         </>
       )}
 
-      {/* Action bar flotante para generar reporte / comparar varias recetas */}
+      {/* Action bar flotante para generar reporte / comparar varias recetas.
+          Las acciones "Generar reporte" y "Comparar" usan window.open o
+          modales con layout horizontal — en PWA iOS standalone abren vistas
+          sin nav de vuelta y el usuario queda atrapado. Por eso las ocultamos
+          en mobile (<sm) y dejamos solo el contador + boton X.
+          Reportado por usuario 2026-05-10. */}
       {selectedIds.length > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[var(--ink)] text-white rounded-full shadow-2xl px-5 py-3 flex items-center gap-3 max-w-[90vw]">
           <span className="text-sm font-semibold">{t('report_selected', { n: selectedIds.length })}</span>
@@ -297,7 +302,7 @@ export default function Recipes() {
             <button
               type="button"
               onClick={handleGenerateReport}
-              className="text-xs font-bold px-4 py-1.5 rounded-full bg-white text-[var(--ink)] hover:bg-[var(--cream)] cursor-pointer border-none transition-colors"
+              className="hidden sm:inline-block text-xs font-bold px-4 py-1.5 rounded-full bg-white text-[var(--ink)] hover:bg-[var(--cream)] cursor-pointer border-none transition-colors"
             >
               📄 {t('report_generate')}
             </button>
@@ -308,12 +313,15 @@ export default function Recipes() {
               type="button"
               onClick={() => { setShowCompare(true); track('recipes_compared', { count: selectedIds.length }); }}
               disabled={selectedIds.length < 2}
-              className="text-xs font-bold px-4 py-1.5 rounded-full bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+              className="hidden sm:inline-block text-xs font-bold px-4 py-1.5 rounded-full bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               title={selectedIds.length < 2 ? t('compare_need_two') : t('compare_btn_tooltip')}
             >
               ⚖️ {t('compare_btn')}
             </button>
           </ProGate>
+          <span className="sm:hidden text-[10px] text-white/60 italic">
+            {t('report_actions_desktop_only')}
+          </span>
           <button
             type="button"
             onClick={clearSelection}

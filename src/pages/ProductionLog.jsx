@@ -516,7 +516,7 @@ export default function ProductionLog() {
       </div>
 
       {log.length > 0 && (
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
           <StatCard label={t('batches_this_month')} value={monthStats.count} />
           <StatCard label={t('liters_this_month')} value={`${monthStats.liters.toFixed(1)} L`} />
           <StatCard label={t('cost_this_month')} value={fmtCurrency(Math.round(monthStats.cost))} />
@@ -558,31 +558,39 @@ export default function ProductionLog() {
 
             return (
               <div key={date} data-date={date} className="rounded-xl overflow-hidden shadow-sm border border-black/10">
-                {/* Date header */}
+                {/* Date header. En mobile stackeamos: linea 1 = fecha + chevron;
+                    linea 2 = los 3 stats horizontales mas compactos (sin
+                    min-w fijo). En desktop sm+ el layout original con todo
+                    en linea unica funciona bien. */}
                 <div
-                  className="bg-[var(--ink)] text-[var(--cream)] px-5 py-3 flex items-center gap-4 cursor-pointer select-none"
+                  className="bg-[var(--ink)] text-[var(--cream)] px-4 sm:px-5 py-3 cursor-pointer select-none
+                             flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4"
                   onClick={() => toggleDate(date)}
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="font-display text-base capitalize">{formatDate(date, lang)}</div>
+                  <div className="flex items-center gap-2 sm:flex-1 sm:min-w-0">
+                    <div className="font-display text-base capitalize flex-1">{formatDate(date, lang)}</div>
+                    <span className="text-base transition-transform duration-200 sm:hidden"
+                          style={{ transform: isOpen ? 'rotate(90deg)' : 'none' }}>
+                      ›
+                    </span>
                   </div>
-                  <div className="flex items-center gap-6">
-                    <div className="text-center min-w-[48px]">
-                      <div className="font-display text-lg text-[var(--gold)]">{entries.length}</div>
+                  <div className="flex items-center justify-around sm:justify-end gap-3 sm:gap-6">
+                    <div className="text-center sm:min-w-[48px]">
+                      <div className="font-display text-base sm:text-lg text-[var(--gold)]">{entries.length}</div>
                       <div className="text-[9px] text-[var(--cream)]/50 uppercase tracking-wide">{t('batches')}</div>
                     </div>
-                    <div className="text-center min-w-[64px]">
-                      <div className="font-display text-lg text-[var(--gold)]">{totalL.toFixed(1)} L</div>
+                    <div className="text-center sm:min-w-[64px]">
+                      <div className="font-display text-base sm:text-lg text-[var(--gold)]">{totalL.toFixed(1)} L</div>
                       <div className="text-[9px] text-[var(--cream)]/50 uppercase tracking-wide">{t('liters')}</div>
                     </div>
-                    <div className="text-center min-w-[80px]">
-                      <div className="font-display text-lg text-[var(--gold)]">
+                    <div className="text-center sm:min-w-[80px]">
+                      <div className="font-display text-base sm:text-lg text-[var(--gold)]">
                         {fmtCurrency(Math.round(totalCost))}
                       </div>
                       <div className="text-[9px] text-[var(--cream)]/50 uppercase tracking-wide">{t('cost')}</div>
                     </div>
                   </div>
-                  <span className="text-base ml-1 transition-transform duration-200"
+                  <span className="hidden sm:inline text-base ml-1 transition-transform duration-200"
                         style={{ transform: isOpen ? 'rotate(90deg)' : 'none' }}>
                     ›
                   </span>
@@ -649,8 +657,13 @@ export default function ProductionLog() {
                               <span className="text-xs font-semibold text-[var(--mint)]">
                                 {fmtCurrency(Math.round(entry.cost || 0))}
                               </span>
-                              <button className="text-xs px-3 py-1 rounded-lg bg-[var(--teal)] text-white
+                              {/* En mobile (<sm) los 2 botones de impresion van como icono solo
+                                  para reducir densidad. En sm+ vuelven a tener el texto completo.
+                                  El boton "Ver detalle" siempre lleva texto porque es la accion
+                                  primaria. */}
+                              <button className="text-xs px-2 sm:px-3 py-1 rounded-lg bg-[var(--teal)] text-white
                                                  hover:opacity-90 transition-colors"
+                                      title={t('label_btn')}
                                       onClick={async () => {
                                         // Guard: para etiquetas legales (Chile Ley 20.606, Brasil RDC 429,
                                         // etc.) faltan RUT y razón social puede ser un problema con
@@ -663,13 +676,15 @@ export default function ProductionLog() {
                                         printLabel(entry, t, country, business, 60, recipeMap);
                                         track('label_printed', { country: country.code });
                                       }}>
-                                {t('label_btn')}
+                                <span aria-hidden="true">🏷</span>
+                                <span className="hidden sm:inline ml-1">{t('label_btn')}</span>
                               </button>
-                              <button className="text-xs px-3 py-1 rounded-lg bg-[var(--mint)] text-white
+                              <button className="text-xs px-2 sm:px-3 py-1 rounded-lg bg-[var(--mint)] text-white
                                                  hover:opacity-90 transition-colors"
                                       onClick={() => { printProductionSheet(entry, t); track('production_sheet_printed'); }}
                                       title={t('print_sheet_tooltip')}>
-                                {t('print_sheet_btn')}
+                                <span aria-hidden="true">🖨</span>
+                                <span className="hidden sm:inline ml-1">{t('print_sheet_btn')}</span>
                               </button>
                               <button className="text-xs px-3 py-1 rounded-lg border border-black/10
                                                  hover:bg-[var(--cream2)] transition-colors"
