@@ -1600,6 +1600,8 @@ export default {
     ai_key_hide: 'Hide key',
     error_generic: 'An unexpected error occurred. Try again in a few seconds.',
     error_boundary_title: 'Something went wrong',
+    error_chunk_recovering_title: 'Updating GelatoLab…',
+    error_chunk_recovering_body: "We detected a new version. We're reloading the app to apply the update. Just takes a second.",
     error_boundary_body: 'An unexpected error occurred. You can try again or reload the app.',
     error_technical_details: 'Technical details',
     retry: 'Retry',

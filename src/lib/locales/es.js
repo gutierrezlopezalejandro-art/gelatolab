@@ -1703,6 +1703,8 @@ export default {
     ai_key_hide: 'Ocultar clave',
     error_generic: 'Ocurrió un error inesperado. Inténtalo de nuevo en unos segundos.',
     error_boundary_title: 'Algo salió mal',
+    error_chunk_recovering_title: 'Actualizando GelatoLab…',
+    error_chunk_recovering_body: 'Detectamos una versión nueva. Estamos recargando la app para aplicar la actualización. Solo toma un segundo.',
     error_boundary_body: 'Ocurrió un error inesperado. Puedes intentar nuevamente o recargar la aplicación.',
     error_technical_details: 'Detalles técnicos',
     retry: 'Reintentar',
