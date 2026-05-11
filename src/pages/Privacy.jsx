@@ -2,7 +2,10 @@ import { useT } from '../lib/i18n';
 
 export default function Privacy() {
   const t = useT();
-  const effective = '2026-04-19';
+  // Fecha de última revisión sustantiva. Se actualiza al cambiar contenido
+  // material (no por typos). Próximo cambio recomendado: cuando se integre
+  // Lemonsqueezy SDK con cobros reales o cuando se agregue cifrado E2E.
+  const effective = '2026-05-11';
 
   return (
     <article className="max-w-3xl mx-auto">
@@ -66,6 +69,11 @@ export default function Privacy() {
           <div>
             <h2 className="font-display text-lg text-[var(--ink)] mb-2">7. {t('legal_privacy_s7_title')}</h2>
             <p>{t('legal_privacy_s7_body')}</p>
+            <ul className="list-disc pl-6 mt-2 space-y-1">
+              <li>{t('legal_privacy_s7_li1')}</li>
+              <li>{t('legal_privacy_s7_li2')}</li>
+              <li>{t('legal_privacy_s7_li3')}</li>
+            </ul>
           </div>
 
           <div>
@@ -73,9 +81,33 @@ export default function Privacy() {
             <p>{t('legal_privacy_s8_body')}</p>
           </div>
 
+          {/* Sección 9 — Compromiso de no uso de datos. Agregada 2026-05-11
+              tras auditoría legal Sandra Fernández (Ley 21.719). Era una
+              "trampa legal" no documentada explícitamente. */}
           <div>
             <h2 className="font-display text-lg text-[var(--ink)] mb-2">9. {t('legal_privacy_s9_title')}</h2>
             <p>{t('legal_privacy_s9_body')}</p>
+          </div>
+
+          {/* Sección 10 — Datos de proveedores ingresados por el usuario.
+              Agregada 2026-05-11 tras auditoría legal. Aplica al módulo
+              Inventario donde el usuario registra proveedores. */}
+          <div>
+            <h2 className="font-display text-lg text-[var(--ink)] mb-2">10. {t('legal_privacy_s10_title')}</h2>
+            <p>{t('legal_privacy_s10_body')}</p>
+          </div>
+
+          {/* Sección 11 — Sincronización: aclaración explícita de que NO es
+              peer-to-peer y los datos pasan por Supabase como intermediario.
+              Agregada 2026-05-11 tras auditoría legal. */}
+          <div>
+            <h2 className="font-display text-lg text-[var(--ink)] mb-2">11. {t('legal_privacy_s11_title')}</h2>
+            <p>{t('legal_privacy_s11_body')}</p>
+          </div>
+
+          <div>
+            <h2 className="font-display text-lg text-[var(--ink)] mb-2">12. {t('legal_privacy_s12_title')}</h2>
+            <p>{t('legal_privacy_s12_body')}</p>
           </div>
 
           <div className="mt-8 p-4 rounded-lg bg-[var(--gold2)] text-[#5c3d00] text-xs">

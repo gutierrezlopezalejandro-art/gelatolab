@@ -11,6 +11,7 @@ import { useEntitlement, FEATURES, FREE_LIMITS } from '../lib/entitlement';
 import { ProBadge, ProGate } from './ProGate';
 import { UpgradeModal } from './UpgradeModal';
 import { exportBackup, importBackup, getBackupStatus } from '../lib/backup';
+import { exportUserDataAsZip } from '../lib/userDataExport';
 import { setPin as savePin, isPinSet, lock as pinLock } from '../lib/pinLock';
 import {
   isFolderBackupSupported, isTauri, pickBackupFolder, getStoredFolderHandle,
@@ -47,6 +48,23 @@ export function BusinessSettingsModal({ onClose }) {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const DELETE_KEYWORD = 'ELIMINAR';
+  const [exporting, setExporting] = useState(false);
+
+  // Exportacion de datos personales (derecho de acceso + portabilidad,
+  // Ley 21.719 chilena). Genera un ZIP con 1 JSON por store + README.
+  // Agregado 2026-05-11 tras auditoria legal Sandra Fernandez (gap G11).
+  async function handleExportMyData() {
+    setExporting(true);
+    try {
+      const { filename, sizeBytes } = await exportUserDataAsZip();
+      showToast(t('account_export_ok', { filename, size: (sizeBytes / 1024).toFixed(1) }));
+      track('user_data_exported');
+    } catch (err) {
+      showToast(err.message || t('account_export_failed'), 'error');
+    } finally {
+      setExporting(false);
+    }
+  }
 
   function handleSetPin() {
     if (!pinDraft || pinDraft.length < 3) {
@@ -538,6 +556,39 @@ export function BusinessSettingsModal({ onClose }) {
               </button>
             </div>
           </details>
+
+          {/* === EXPORTAR MIS DATOS ===
+              Cumple derecho de acceso + portabilidad de Ley 21.719 chilena
+              (auditoria legal Sandra Fernandez 2026-05-11, gap G11). El
+              usuario puede descargar un ZIP con TODOS sus datos en formato
+              JSON estandar para llevarse a otro sistema o tener un respaldo
+              independiente. Disponible para todos (Free y Pro). */}
+          {user && (
+            <details className="border-t border-black/10 pt-3 mt-2">
+              <summary className="text-xs font-semibold text-[var(--ink2)] cursor-pointer hover:opacity-80 select-none">
+                {t('account_export_section')}
+              </summary>
+              <div className="mt-3 p-4 rounded-lg bg-[var(--cream2)]/40 border border-black/10">
+                <h3 className="font-semibold text-sm text-[var(--ink)] mb-1">
+                  {t('account_export_title')}
+                </h3>
+                <p className="text-xs text-[var(--ink2)] leading-relaxed mb-3">
+                  {t('account_export_body')}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleExportMyData}
+                  disabled={exporting}
+                  className="w-full text-sm font-semibold px-4 py-2 rounded-lg
+                             bg-[var(--ink)] text-[var(--cream)] border-none cursor-pointer
+                             disabled:opacity-40 disabled:cursor-not-allowed
+                             hover:opacity-90 transition-opacity"
+                >
+                  {exporting ? t('saving') : `↓ ${t('account_export_btn')}`}
+                </button>
+              </div>
+            </details>
+          )}
 
           {/* === ZONA DE PELIGRO: eliminar cuenta ===
               Solo se muestra si el usuario tiene sesión iniciada (sentido).

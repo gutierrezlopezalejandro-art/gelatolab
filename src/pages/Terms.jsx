@@ -2,7 +2,9 @@ import { useT } from '../lib/i18n';
 
 export default function Terms() {
   const t = useT();
-  const effective = '2026-04-19';
+  // Última revisión sustantiva 2026-05-11: agregada sección 12 con
+  // diferencias Free vs Pro tras auditoría legal Sandra Fernández.
+  const effective = '2026-05-11';
 
   return (
     <article className="max-w-3xl mx-auto">
@@ -71,6 +73,19 @@ export default function Terms() {
           <div>
             <h2 className="font-display text-lg text-[var(--ink)] mb-2">11. {t('legal_terms_s11_title')}</h2>
             <p>{t('legal_terms_s11_body')}</p>
+          </div>
+
+          {/* Sección 12 — Diferencias por tier (Free vs Pro). Agregada
+              2026-05-11 tras auditoría legal Sandra Fernández (Ley 21.719).
+              Importante: aclarar que Pro mantiene custodia local de datos. */}
+          <div>
+            <h2 className="font-display text-lg text-[var(--ink)] mb-2">12. {t('legal_terms_s12_title')}</h2>
+            <p>{t('legal_terms_s12_body')}</p>
+            <ul className="list-disc pl-6 mt-3 space-y-2">
+              <li><strong>{t('legal_terms_s12_free_title')}</strong> — {t('legal_terms_s12_free_body')}</li>
+              <li><strong>{t('legal_terms_s12_pro_title')}</strong> — {t('legal_terms_s12_pro_body')}</li>
+            </ul>
+            <p className="mt-3 italic">{t('legal_terms_s12_note')}</p>
           </div>
 
           <div className="mt-8 p-4 rounded-lg bg-[var(--gold2)] text-[#5c3d00] text-xs">
