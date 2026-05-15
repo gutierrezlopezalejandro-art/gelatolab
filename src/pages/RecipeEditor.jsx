@@ -407,7 +407,13 @@ export default function RecipeEditor() {
   const servingTempCalc = stats ? calcServingTemp(stats) : null;
 
   return (
-    <div>
+    // Wrapper con max-w propio mas estrecho que el del <main> global (1280px).
+    // En pantallas anchas (Tauri desktop fullscreen, monitores grandes) el
+    // contenido queda con margenes visibles a los lados, sensacion mas de
+    // documento centrado. El panel HELADO derecho queda cerca de la tabla
+    // de ingredientes en vez de pegado al borde derecho del viewport.
+    // Reportado por usuario 2026-05-15.
+    <div className="max-w-[1100px] mx-auto">
       <MobileDesktopHint pageId="recipe-editor" />
       {/* h1 oculto: el nombre de la receta es un input editable, no un heading
           tradicional. Para landmarks/SEO/screen-readers necesitamos un h1
