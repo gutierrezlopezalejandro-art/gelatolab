@@ -685,6 +685,10 @@ export default {
 
     landing_guarantee_title: 'Garantia de 30 dias',
     landing_guarantee_body: 'Experimente o GelatoLab Pro um mês grátis. Se não estiver satisfeito nos primeiros 30 dias, devolvemos 100% sem perguntas.',
+    landing_trust_price_title: 'Menos que um sanduíche por mês',
+    landing_trust_price_body: 'GelatoLab Pro custa menos que um sanduíche. O primeiro lote que você evita jogar fora graças ao melhor controle de custos já paga o ano inteiro.',
+    landing_trust_export_title: 'Seus dados são sempre seus',
+    landing_trust_export_body: 'Botão "Exportar meus dados" nas configurações: baixe todas as suas receitas, ingredientes, lotes e registro HACCP em um ZIP quando quiser. Cumpre a Lei chilena 21.719 e o RGPD.',
 
     param_water: 'Água',
     param_solids: 'Sólidos totais',
@@ -873,7 +877,7 @@ export default {
     landing_hero_badge: 'Pensado e construído na América Latina',
     landing_hero_title_1: 'Software de sorveteria',
     landing_hero_title_2: 'que entende o seu mercado',
-    landing_hero_sub: 'Cumpre Lei 20.606 (Chile), RDC 429 (Brasil) e Reg. UE 1169 — tudo num só lugar. Funciona sem internet, seus dados ficam no seu computador, e a interface está em 8 idiomas. Feito por sorveteiros, para sorveteiros.',
+    landing_hero_sub: 'O assistente digital para sua sorveteria artesanal: padroniza receitas, controla o estoque, avisa antes que um ingrediente acabe e mostra suas margens em tempo real. Cumpre normas de rotulagem em 11 países, funciona sem internet, em 6 idiomas. Feito por sorveteiros, para sorveteiros.',
     landing_cta_primary: 'Começar grátis',
     landing_cta_secondary: 'Entrar',
     landing_no_card: 'Sem cartão de crédito · Funciona offline · Seus dados no seu computador',

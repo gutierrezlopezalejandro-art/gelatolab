@@ -844,6 +844,10 @@ export default {
     // Landing — sección de garantía cerca del CTA Pro
     landing_guarantee_title: 'Garantía de 30 días',
     landing_guarantee_body: 'Prueba GelatoLab Pro un mes gratis. Si no estás conforme en los primeros 30 días, te devolvemos el 100% sin preguntas.',
+    landing_trust_price_title: 'Menos que un sándwich al mes',
+    landing_trust_price_body: 'GelatoLab Pro cuesta menos que un sándwich. El primer lote que evites tirar por costos mal calculados ya paga el año completo.',
+    landing_trust_export_title: 'Tus datos siempre tuyos',
+    landing_trust_export_body: 'Botón "Exportar mis datos" en la configuración: descargás todas tus recetas, ingredientes, lotes y bitácora HACCP en un ZIP cuando quieras. Cumple Ley 21.719 (Chile) y RGPD.',
 
     param_water: 'Agua',
     param_solids: 'Solidos totales',
@@ -1032,7 +1036,7 @@ export default {
     landing_hero_badge: 'Pensado y construido en Latinoamérica',
     landing_hero_title_1: 'Software de heladería',
     landing_hero_title_2: 'que sí entiende tu mercado',
-    landing_hero_sub: 'Cumple las normativas de etiquetado de Chile, Perú, México, Argentina, Uruguay, Colombia, Brasil, Canadá, Ecuador, EE.UU. y la Unión Europea — todo en un solo lugar. Funciona sin internet, tus datos viven en tu computadora, y la interfaz está en 6 idiomas. Hecho por heladeros, para heladeros.',
+    landing_hero_sub: 'El asistente digital para tu heladería artesanal: estandariza recetas, controla el inventario, te avisa antes de que falte un ingrediente y te muestra tus márgenes en tiempo real. Cumple normativas de etiquetado en 11 países, funciona sin internet, en 6 idiomas. Hecho por heladeros, para heladeros.',
     landing_cta_primary: 'Empezar gratis',
     landing_cta_secondary: 'Iniciar sesión',
     landing_no_card: 'Sin tarjeta de crédito · Funciona sin internet · Tus datos en tu computadora',

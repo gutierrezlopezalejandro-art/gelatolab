@@ -826,6 +826,10 @@ export default {
 
     landing_guarantee_title: '30-day guarantee',
     landing_guarantee_body: 'Try GelatoLab Pro one month free. If you are not satisfied within the first 30 days, we refund 100% no questions asked.',
+    landing_trust_price_title: 'Less than a sandwich a month',
+    landing_trust_price_body: 'GelatoLab Pro costs less than a sandwich. The first batch you avoid throwing away thanks to better cost tracking already pays for the whole year.',
+    landing_trust_export_title: 'Your data is always yours',
+    landing_trust_export_body: "Click 'Export my data' in settings: download all your recipes, ingredients, batches and HACCP log in a ZIP whenever you want. Complies with Chilean Law 21.719 and GDPR.",
 
     param_water: 'Water',
     param_solids: 'Total solids',
@@ -1014,7 +1018,7 @@ export default {
     landing_hero_badge: 'Built in Latin America, for the world',
     landing_hero_title_1: 'Ice cream software',
     landing_hero_title_2: 'that gets your market',
-    landing_hero_sub: 'Complies with Chile (Law 20.606), Brazil (RDC 429) and EU (Reg. 1169) — all in one place. Works offline, your data lives on your computer, and the interface is in 8 languages. Built by ice cream makers, for ice cream makers.',
+    landing_hero_sub: 'The digital assistant for your artisanal gelato shop: standardize recipes, control inventory, get alerts before you run out of an ingredient, and see your margins in real time. Complies with labeling laws in 11 countries, works offline, in 6 languages. Built by ice cream makers, for ice cream makers.',
     landing_cta_primary: 'Start free',
     landing_cta_secondary: 'Sign in',
     landing_no_card: 'No credit card · Works offline · Your data on your computer',

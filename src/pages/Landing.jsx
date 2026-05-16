@@ -660,18 +660,40 @@ export default function Landing() {
                       className="text-base font-bold px-8 py-3.5 rounded-xl bg-[var(--mint)] text-white hover:opacity-90 cursor-pointer border-none transition-all hover:scale-[1.02] shadow-md">
                 {t('landing_cta_primary')} →
               </button>
-              {/* Garantía de 30 días — refuerza confianza junto al CTA
-                  final. Decisión 2026-05-08 (ver docs/decisiones.md). */}
-              <div className="mt-4 flex items-start gap-2.5 max-w-md">
-                <span className="text-base shrink-0" aria-hidden="true">✓</span>
-                <div>
-                  <p className="text-xs font-semibold text-[var(--ink)]">{t('landing_guarantee_title')}</p>
-                  <p className="text-xs text-[var(--ink3)] leading-relaxed mt-0.5">
-                    {t('landing_guarantee_body')}{' '}
-                    <Link to="/refund-policy" className="underline hover:text-[var(--ink)]">
-                      {t('pricing_refund_link')}
-                    </Link>
-                  </p>
+              {/* Trust strip — 3 puntos de confianza junto al CTA final:
+                  garantia 30d + sandwich pricing + portabilidad de datos.
+                  Decision 2026-05-08 (garantia) + 2026-05-15 (los otros 2,
+                  agregados tras feedback de copy de marketing). */}
+              <div className="mt-4 space-y-3 max-w-md">
+                <div className="flex items-start gap-2.5">
+                  <span className="text-base shrink-0" aria-hidden="true">✓</span>
+                  <div>
+                    <p className="text-xs font-semibold text-[var(--ink)]">{t('landing_guarantee_title')}</p>
+                    <p className="text-xs text-[var(--ink3)] leading-relaxed mt-0.5">
+                      {t('landing_guarantee_body')}{' '}
+                      <Link to="/refund-policy" className="underline hover:text-[var(--ink)]">
+                        {t('pricing_refund_link')}
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="text-base shrink-0" aria-hidden="true">🥪</span>
+                  <div>
+                    <p className="text-xs font-semibold text-[var(--ink)]">{t('landing_trust_price_title')}</p>
+                    <p className="text-xs text-[var(--ink3)] leading-relaxed mt-0.5">
+                      {t('landing_trust_price_body')}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="text-base shrink-0" aria-hidden="true">📦</span>
+                  <div>
+                    <p className="text-xs font-semibold text-[var(--ink)]">{t('landing_trust_export_title')}</p>
+                    <p className="text-xs text-[var(--ink3)] leading-relaxed mt-0.5">
+                      {t('landing_trust_export_body')}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
