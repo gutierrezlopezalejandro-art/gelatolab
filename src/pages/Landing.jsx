@@ -269,6 +269,8 @@ export default function Landing() {
             <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm bg-white/70 backdrop-blur rounded-2xl px-5 py-2.5 shadow-sm border border-black/5">
               <Stat n="50+" label={t('landing_stat_recipes')} />
               <span className="text-black/15 hidden md:inline">·</span>
+              <Stat n="90+" label={t('landing_stat_ingredients')} />
+              <span className="text-black/15 hidden md:inline">·</span>
               <Stat n="6" label={t('landing_stat_languages')} />
               <span className="text-black/15 hidden md:inline">·</span>
               <Stat n="11" label={t('landing_stat_countries')} />
@@ -306,6 +308,16 @@ export default function Landing() {
             <Pain
               dolor={t('landing_pain_4_pain')}
               solucion={t('landing_pain_4_sol')}
+            />
+            {/* Pain 5 agregado 2026-05-18 tras revision externa de copy.
+                Dolor super especifico del heladero tecnico (PAC/POD en Excel).
+                Span 2 cols en md+ para que ocupe ancho completo cuando es el
+                unico item de la 3era fila — destacado visual del "dolor mas
+                comun y reconocible". */}
+            <Pain
+              dolor={t('landing_pain_5_pain')}
+              solucion={t('landing_pain_5_sol')}
+              className="md:col-span-2"
             />
           </div>
         </div>
@@ -880,9 +892,9 @@ function GlossaryItem({ term, def }) {
   );
 }
 
-function Pain({ dolor, solucion }) {
+function Pain({ dolor, solucion, className = '' }) {
   return (
-    <div className="bg-[var(--cream2)]/40 rounded-2xl p-6 border border-black/5">
+    <div className={`bg-[var(--cream2)]/40 rounded-2xl p-6 border border-black/5 ${className}`}>
       <div className="flex items-start gap-3 mb-3">
         <span className="text-2xl shrink-0" aria-hidden="true">😩</span>
         <p className="text-base text-[var(--ink2)] leading-relaxed italic">"{dolor}"</p>
