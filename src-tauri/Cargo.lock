@@ -1024,7 +1024,7 @@ dependencies = [
 
 [[package]]
 name = "gelatolab"
-version = "1.0.8"
+version = "1.0.24"
 dependencies = [
  "serde",
  "serde_json",

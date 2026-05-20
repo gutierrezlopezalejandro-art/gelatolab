@@ -114,6 +114,19 @@ jobs:
           # pubkey configurada rechazarian el update por firma invalida.
           TAURI_SIGNING_PRIVATE_KEY:          ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # Apple Developer ID code signing + notarization. tauri-action en
+          # el runner macos-latest detecta estas vars y automaticamente:
+          # (1) importa el .p12 a un keychain temporal, (2) firma .app/.dmg
+          # con el cert, (3) sube el .dmg a Apple para notarizacion, (4)
+          # staplea el ticket de notarizacion al .dmg. Sin estas vars el
+          # macOS sale sin firmar y Gatekeeper bloquea con warning fuerte.
+          # Tauri ignora estas vars en Windows/Linux — solo aplican en mac.
+          APPLE_CERTIFICATE:          ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY:     ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID:                   ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD:             ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID:              ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'GelatoLab ${{ github.ref_name }}'

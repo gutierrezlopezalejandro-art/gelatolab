@@ -1,6 +1,6 @@
 [package]
 name = "gelatolab"
-version = "1.0.23"
+version = "1.0.24"
 description = "GelatoLab — formulacion profesional de helado y gelato"
 authors = ["GelatoLab"]
 edition = "2021"
