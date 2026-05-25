@@ -114,19 +114,15 @@ jobs:
           # pubkey configurada rechazarian el update por firma invalida.
           TAURI_SIGNING_PRIVATE_KEY:          ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          # Apple Developer ID code signing + notarization. tauri-action en
-          # el runner macos-latest detecta estas vars y automaticamente:
-          # (1) importa el .p12 a un keychain temporal, (2) firma .app/.dmg
-          # con el cert, (3) sube el .dmg a Apple para notarizacion, (4)
-          # staplea el ticket de notarizacion al .dmg. Sin estas vars el
-          # macOS sale sin firmar y Gatekeeper bloquea con warning fuerte.
-          # Tauri ignora estas vars en Windows/Linux — solo aplican en mac.
+          # Apple Developer ID code signing. APPLE_ID/APPLE_PASSWORD/APPLE_TEAM_ID
+          # se omiten aqui a proposito: tauri-action los usaria para notarizacion
+          # con xcrun notarytool --wait, que mantiene una conexion abierta y falla
+          # con NSURLError -1009 cuando el runner de GitHub pierde la red tras
+          # 30+ min de polling. La notarizacion se hace en el step siguiente con
+          # retry por polling corto (requests independientes, resistente a caidas).
           APPLE_CERTIFICATE:          ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_SIGNING_IDENTITY:     ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID:                   ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD:             ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID:              ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'GelatoLab ${{ github.ref_name }}'
@@ -142,3 +138,69 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
+
+      # Notarizacion separada de tauri-action para evitar NSURLError -1009.
+      # tauri-action usa xcrun notarytool --wait (una sola conexion larga).
+      # Este step hace: submit sin --wait → submission ID inmediato →
+      # polling corto cada 2 min (requests independientes) → staple → re-upload.
+      # Con esto, una caida puntual de red solo falla un poll, no el job entero.
+      - name: Notarize macOS .dmg
+        if: matrix.os == 'macos-latest'
+        env:
+          APPLE_ID:       ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID:  ${{ secrets.APPLE_TEAM_ID }}
+          GITHUB_TOKEN:   ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME:       ${{ github.ref_name }}
+        run: |
+          set -e
+          DMG=$(find src-tauri/target -name "*.dmg" | head -1)
+          echo "Notarizing: $DMG"
+
+          # Submit sin --wait → retorna submission ID de inmediato
+          SUBMIT_JSON=$(xcrun notarytool submit "$DMG" \
+            --apple-id  "$APPLE_ID" \
+            --password  "$APPLE_PASSWORD" \
+            --team-id   "$APPLE_TEAM_ID" \
+            --output-format json)
+          echo "$SUBMIT_JSON"
+          SUBMISSION_ID=$(echo "$SUBMIT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+          echo "Submission ID: $SUBMISSION_ID"
+
+          # Poll cada 2 min, hasta 90 min (45 intentos).
+          # Cada iteracion es un request HTTPS independiente: si la red cae
+          # un momento, el siguiente intento sigue funcionando.
+          STATUS="In Progress"
+          for i in $(seq 1 45); do
+            sleep 120
+            # Limpiar cache DNS antes de cada poll (workaround -1009 stale cache)
+            sudo dscacheutil -flushcache  2>/dev/null || true
+            sudo killall -HUP mDNSResponder 2>/dev/null || true
+
+            INFO_JSON=$(xcrun notarytool info "$SUBMISSION_ID" \
+              --apple-id  "$APPLE_ID" \
+              --password  "$APPLE_PASSWORD" \
+              --team-id   "$APPLE_TEAM_ID" \
+              --output-format json 2>/dev/null || echo '{"status":"Unknown"}')
+            STATUS=$(echo "$INFO_JSON" | python3 -c \
+              "import sys,json; print(json.load(sys.stdin).get('status','Unknown'))")
+            echo "Intento $i/45 — status: $STATUS"
+
+            if [ "$STATUS" = "Accepted" ]; then break; fi
+            if [ "$STATUS" = "Invalid" ] || [ "$STATUS" = "Rejected" ]; then
+              xcrun notarytool log "$SUBMISSION_ID" \
+                --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" \
+                --team-id  "$APPLE_TEAM_ID"
+              exit 1
+            fi
+          done
+
+          if [ "$STATUS" != "Accepted" ]; then
+            echo "Notarizacion timeout tras 90 minutos"
+            exit 1
+          fi
+
+          # Staplear ticket y reemplazar el .dmg sin notarizar en el release
+          xcrun stapler staple "$DMG"
+          gh release upload "$TAG_NAME" "$DMG" --clobber
+          echo "DMG notarizado subido al release $TAG_NAME"
