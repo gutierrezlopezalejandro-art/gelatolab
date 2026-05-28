@@ -1,0 +1,53 @@
+name: Supabase Keepalive
+
+# Mantiene el proyecto Supabase activo evitando el auto-pause de Supabase
+# después de 7 días sin actividad (free tier). Ejecuta un GET ligero al
+# endpoint REST diariamente. El costo en GitHub Actions free es despreciable
+# (< 1 min/día).
+#
+# Si en el futuro GelatoLab migra a Supabase Pro, este workflow se puede
+# eliminar — Pro no tiene auto-pause.
+
+on:
+  schedule:
+    # Diariamente a las 09:00 UTC (06:00 Chile invierno / 05:00 Chile verano)
+    - cron: '0 9 * * *'
+  # También permite trigger manual desde la UI de Actions
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping Supabase REST endpoint
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Faltan secrets VITE_SUPABASE_URL o VITE_SUPABASE_ANON_KEY"
+            exit 1
+          fi
+
+          # GET al root del REST endpoint. PostgREST responde con OpenAPI spec.
+          # 200 = proyecto vivo. 503/timeout = proyecto pausado o caído.
+          STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            --max-time 30 \
+            "$SUPABASE_URL/rest/v1/")
+
+          echo "HTTP status: $STATUS"
+          BYTES=$(wc -c < /tmp/response.txt)
+          echo "Response size: $BYTES bytes"
+
+          if [ "$STATUS" = "200" ]; then
+            echo "Supabase activo - keepalive OK"
+            exit 0
+          else
+            echo "::warning::Supabase respondió $STATUS (esperado 200). Posible pausa o degradación."
+            # No fallar el workflow para no llenar la inbox de notificaciones.
+            # El warning queda visible en la UI de Actions.
+            exit 0
+          fi
