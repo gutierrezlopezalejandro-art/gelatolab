@@ -573,7 +573,7 @@ export default function RecipeEditor() {
 
       {/* ═══════════════════ TAB: FORMULACION ═══════════════════ */}
       {activeTab === 'formulacion' && (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
           {/* ── Left: ingredients table + diagnostics ── */}
           <div data-tour="recipe-formulation" className="card p-5 min-w-0">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
