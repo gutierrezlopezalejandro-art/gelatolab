@@ -847,7 +847,7 @@ export default function RecipeEditor() {
           </div>
 
           {/* ── Right: sticky AnalysisPanel sidebar ── */}
-          <div className="sticky top-20">
+          <div className="sticky top-20 min-w-0">
             <AnalysisPanel
               items={flattenedBase}
               type={type}

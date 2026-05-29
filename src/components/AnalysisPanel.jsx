@@ -122,15 +122,15 @@ export default function AnalysisPanel({
   const npac          = calcNPAC(s);
 
   return (
-    <div className="card p-4 space-y-3">
+    <div className="card p-4 space-y-3 overflow-hidden">
 
       {/* -- Cabecera -- */}
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--ink3)]">
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--ink3)] shrink-0">
           {t(type === 'helado' ? 'ice_cream' : type === 'gelato' ? 'gelato' : 'sorbet')}
         </span>
-        <div className="flex items-center gap-2">
-          <div className="text-xs font-semibold px-2 py-0.5 rounded-full"
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="text-xs font-semibold px-2 py-0.5 rounded-full truncate"
                style={{ background: vc.bg, color: vc.fg }}>
             {vc.lbl}
           </div>
