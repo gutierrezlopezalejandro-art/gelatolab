@@ -1,9 +1,15 @@
+import { useState } from 'react';
 import { useT } from '../lib/i18n';
 import { useEntitlement } from '../lib/entitlement';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
 import { track } from '../lib/analytics';
 import { shouldHidePricingUI } from '../lib/platform';
+
+const CHECKOUT_URLS = {
+  monthly: 'https://gelatolab-mensual.lemonsqueezy.com/checkout/buy/2692dd77-d226-41c4-a457-b1e88c7d3fe3',
+  annual:  'https://gelatolab-mensual.lemonsqueezy.com/checkout/buy/a8aacb9b-c091-41f0-8fd1-32f32f572614',
+};
 
 /**
  * Pricing page. Lists Free vs Pro features and a CTA. The CTA is currently
@@ -21,10 +27,16 @@ export default function Pricing() {
   const { showToast } = useAppStore();
   const ent = useEntitlement();
   const hidePricing = shouldHidePricingUI();
+  const [billingPeriod, setBillingPeriod] = useState('monthly');
 
   function handleSubscribe() {
-    track('pricing_subscribe_clicked');
-    showToast(t('pricing_coming_soon'));
+    track('pricing_subscribe_clicked', { period: billingPeriod });
+    const url = CHECKOUT_URLS[billingPeriod];
+    if (window.LemonSqueezy?.Url?.Open) {
+      window.LemonSqueezy.Url.Open(url);
+    } else {
+      window.open(url, '_blank');
+    }
   }
 
   function goBack() {
@@ -42,6 +54,32 @@ export default function Pricing() {
         <h1 className="font-display text-4xl text-[var(--ink)] mb-3">{t('pricing_title')}</h1>
         <p className="text-base text-[var(--ink2)] max-w-xl mx-auto">{t('pricing_sub')}</p>
       </div>
+
+      {/* Toggle mensual / anual — solo en web (no iOS) */}
+      {!hidePricing && (
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <button
+            onClick={() => setBillingPeriod('monthly')}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+              billingPeriod === 'monthly'
+                ? 'bg-[#e8b920] text-white'
+                : 'bg-black/5 text-[var(--ink2)] hover:bg-black/10'
+            }`}
+          >
+            Mensual
+          </button>
+          <button
+            onClick={() => setBillingPeriod('annual')}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+              billingPeriod === 'annual'
+                ? 'bg-[#e8b920] text-white'
+                : 'bg-black/5 text-[var(--ink2)] hover:bg-black/10'
+            }`}
+          >
+            Anual · 2 meses gratis
+          </button>
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-6 mb-10">
         {/* Free plan */}
@@ -116,14 +154,11 @@ export default function Pricing() {
             </div>
           ) : (
             <>
-              {/* CTA "Próximamente" — disabled-look porque el pago real aun
-                  no esta integrado (espera a Lemonsqueezy SDK). Click muestra
-                  un toast informativo. Cuando se integre, se reemplaza el
-                  estilo + handler para iniciar checkout real. */}
               <button onClick={handleSubscribe}
-                      className="w-full px-4 py-3 rounded-lg bg-black/5 text-[var(--ink2)] font-semibold text-sm cursor-not-allowed border-2 border-dashed border-black/20"
-                      title={t('pricing_coming_soon')}>
-                ⏳ {t('plan_pro_cta')}
+                      className="w-full px-4 py-3 rounded-lg bg-[#e8b920] hover:bg-[#c9a018] text-white font-semibold text-sm transition-colors">
+                {billingPeriod === 'annual'
+                  ? `Suscribirse anual · $99/año`
+                  : `Suscribirse · $11/mes`}
               </button>
               {/* Garantía 30 días — visible debajo del CTA Pro. Refuerza
                   confianza al momento de decidir suscribirse. Linkea a
