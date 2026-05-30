@@ -34,15 +34,14 @@ export function UserMenu() {
     );
   }
 
-  async function handleSignOut() {
-    // Cerrar menu inmediatamente para feedback visual.
-    // Luego esperar signOut() antes de navegar — si navegamos primero,
-    // la Landing detecta sesion activa y redirige al dashboard, haciendo
-    // que el usuario crea que el logout no funcionó (bug: múltiples clicks).
+  function handleSignOut() {
+    // signOut() limpia user/session/profile de forma sincrona (set() inmediato)
+    // y dispara supabase.auth.signOut() en background. No necesitamos await.
+    // Navegar inmediatamente despues garantiza que Landing vea user=null.
     setOpen(false);
     resetVisited();
     showToast(t('auth_signed_out'));
-    try { await signOut(); } catch (e) { /* tolerable: state ya limpio */ }
+    signOut();
     navigate('/');
   }
 
