@@ -79,8 +79,12 @@ export const useAuthStore = create((set, get) => ({
 
   async signOut() {
     if (!supabase) return;
-    await supabase.auth.signOut();
+    // Limpiar estado local inmediatamente — no esperar la respuesta de Supabase.
+    // Si el request falla (red caida, token ya expirado), el usuario igual
+    // queda deslogueado en la app. onAuthStateChange puede disparar SIGNED_OUT
+    // despues, pero el store ya esta limpio — no causa doble-clear.
     set({ user: null, session: null, profile: null });
+    supabase.auth.signOut().catch(() => {});
   },
 
   // Borrado completo de cuenta (auth.users + tablas relacionadas via FK
