@@ -71,3 +71,23 @@ export function adminGetAuditLog({ limit = 50, offset = 0, targetUserId = null }
     'admin_get_audit_log',
   );
 }
+
+export async function adminSendEmail({ to, subject, html, targetUserId = null }) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('adminSendEmail: no session');
+
+  const res = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-send-email`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ to, subject, html, target_user_id: targetUserId }),
+    },
+  );
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'adminSendEmail: error');
+  return json;
+}

@@ -5,6 +5,7 @@ import {
   adminUpdateUserRole,
   adminSuspendUser,
   adminGetUserActivity,
+  adminSendEmail,
 } from '../lib/admin';
 import { Spinner } from '../components/ui/index.jsx';
 import { useT } from '../lib/i18n';
@@ -29,6 +30,8 @@ export default function AdminUsers() {
   const [openUserId, setOpenUserId] = useState(null);
   const [activityCache, setActivityCache] = useState({});
   const [pendingAction, setPendingAction] = useState(null);
+  const [emailTarget, setEmailTarget] = useState(null); // { user_id, email }
+  const [emailForm, setEmailForm] = useState({ subject: '', body: '', sending: false, error: null, sent: false });
 
   async function reload() {
     setLoading(true);
@@ -87,6 +90,28 @@ export default function AdminUsers() {
     } catch (e) {
       // Mantener el modal abierto y mostrar el error ahi.
       setPendingAction(p => p ? { ...p, error: e.message } : null);
+    }
+  }
+
+  function requestEmail(user) {
+    setEmailTarget(user);
+    setEmailForm({ subject: '', body: '', sending: false, error: null, sent: false });
+  }
+
+  async function sendEmail() {
+    if (!emailTarget || !emailForm.subject || !emailForm.body) return;
+    setEmailForm(f => ({ ...f, sending: true, error: null }));
+    try {
+      await adminSendEmail({
+        to: emailTarget.email,
+        subject: emailForm.subject,
+        html: emailForm.body.replace(/\n/g, '<br>'),
+        targetUserId: emailTarget.user_id,
+      });
+      setEmailForm(f => ({ ...f, sending: false, sent: true }));
+      setTimeout(() => setEmailTarget(null), 1500);
+    } catch (e) {
+      setEmailForm(f => ({ ...f, sending: false, error: e.message }));
     }
   }
 
@@ -175,6 +200,7 @@ export default function AdminUsers() {
                 onRequestPlan={p => requestPlanChange(u, p)}
                 onRequestRole={r => requestRoleChange(u, r)}
                 onRequestSuspend={() => requestSuspendToggle(u)}
+                onRequestEmail={() => requestEmail(u)}
                 onToggle={() => toggleDetails(u.user_id)}
                 t={t}
               />
@@ -199,11 +225,49 @@ export default function AdminUsers() {
           t={t}
         />
       )}
+
+      {emailTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg">✉ Enviar email</h2>
+              <button onClick={() => setEmailTarget(null)} className="text-[var(--ink3)] hover:text-[var(--ink)] bg-transparent border-none cursor-pointer text-xl">×</button>
+            </div>
+            <div className="text-xs text-[var(--ink3)] bg-[var(--cream2)] px-3 py-2 rounded-lg font-mono">{emailTarget.email}</div>
+            <input
+              type="text"
+              placeholder="Asunto"
+              value={emailForm.subject}
+              onChange={e => setEmailForm(f => ({ ...f, subject: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm"
+            />
+            <textarea
+              placeholder="Cuerpo del email (texto plano)"
+              value={emailForm.body}
+              onChange={e => setEmailForm(f => ({ ...f, body: e.target.value }))}
+              rows={6}
+              className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm resize-none"
+            />
+            {emailForm.error && <div className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded">⚠ {emailForm.error}</div>}
+            {emailForm.sent && <div className="text-xs text-green-700 bg-green-50 px-3 py-2 rounded">✓ Email enviado</div>}
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setEmailTarget(null)} className="px-4 py-2 rounded-lg border border-black/10 text-sm cursor-pointer">Cancelar</button>
+              <button
+                onClick={sendEmail}
+                disabled={emailForm.sending || emailForm.sent || !emailForm.subject || !emailForm.body}
+                className="px-4 py-2 rounded-lg bg-[var(--mint)] text-white text-sm font-semibold cursor-pointer disabled:opacity-50"
+              >
+                {emailForm.sending ? 'Enviando...' : 'Enviar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function UserRow({ u, isMe, expanded, activity, onRequestPlan, onRequestRole, onRequestSuspend, onToggle, t }) {
+function UserRow({ u, isMe, expanded, activity, onRequestPlan, onRequestRole, onRequestSuspend, onRequestEmail, onToggle, t }) {
   const isSuspended = !!u.suspended_at;
   return (
     <>
@@ -249,18 +313,27 @@ function UserRow({ u, isMe, expanded, activity, onRequestPlan, onRequestRole, on
         <td className="px-3 py-2 text-xs text-[var(--ink3)]">{formatDate(u.created_at)}</td>
         <td className="px-3 py-2 text-xs text-[var(--ink3)]">{formatDate(u.last_sign_in_at) || '—'}</td>
         <td className="px-3 py-2 text-right">
-          <button
-            onClick={onRequestSuspend}
-            disabled={isMe}
-            className={`text-xs px-2 py-1 rounded border cursor-pointer ${
-              isSuspended
-                ? 'border-[var(--mint)] text-[var(--mint)] hover:bg-[var(--mint3)]'
-                : 'border-[var(--coral)] text-[var(--coral)] hover:bg-[var(--coral2)]/40'
-            } ${isMe ? 'opacity-30 cursor-not-allowed' : ''}`}
-            title={isMe ? t('admin_cannot_suspend_self') : ''}
-          >
-            {isSuspended ? t('admin_action_unsuspend') : t('admin_action_suspend')}
-          </button>
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={onRequestEmail}
+              className="text-xs px-2 py-1 rounded border border-[var(--ink3)]/30 text-[var(--ink3)] hover:bg-[var(--cream2)] cursor-pointer"
+              title="Enviar email"
+            >
+              ✉
+            </button>
+            <button
+              onClick={onRequestSuspend}
+              disabled={isMe}
+              className={`text-xs px-2 py-1 rounded border cursor-pointer ${
+                isSuspended
+                  ? 'border-[var(--mint)] text-[var(--mint)] hover:bg-[var(--mint3)]'
+                  : 'border-[var(--coral)] text-[var(--coral)] hover:bg-[var(--coral2)]/40'
+              } ${isMe ? 'opacity-30 cursor-not-allowed' : ''}`}
+              title={isMe ? t('admin_cannot_suspend_self') : ''}
+            >
+              {isSuspended ? t('admin_action_unsuspend') : t('admin_action_suspend')}
+            </button>
+          </div>
         </td>
       </tr>
       {expanded && (
