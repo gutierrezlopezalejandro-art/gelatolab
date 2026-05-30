@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   adminListUsers,
+  adminListUserCounts,
   adminUpdateUserPlan,
   adminUpdateUserRole,
   adminSuspendUser,
@@ -30,7 +31,10 @@ export default function AdminUsers() {
   const [openUserId, setOpenUserId] = useState(null);
   const [activityCache, setActivityCache] = useState({});
   const [pendingAction, setPendingAction] = useState(null);
-  const [emailTarget, setEmailTarget] = useState(null); // { user_id, email }
+  const [emailTarget, setEmailTarget] = useState(null);
+  const [activityFilter, setActivityFilter] = useState('all');
+  const [minRecipes, setMinRecipes] = useState('');
+  const [userCounts, setUserCounts] = useState(null); // map user_id → {recipe_count, ingredient_count} // { user_id, email }
   const [emailForm, setEmailForm] = useState({ subject: '', body: '', sending: false, error: null, sent: false });
 
   async function reload() {
@@ -48,8 +52,26 @@ export default function AdminUsers() {
 
   useEffect(() => { reload(); }, []);
 
+  // Cargar counts cuando se activa filtro de uso
+  useEffect(() => {
+    if (minRecipes !== '' && userCounts === null) {
+      adminListUserCounts()
+        .then(rows => {
+          const map = {};
+          (rows || []).forEach(r => { map[r.user_id] = r; });
+          setUserCounts(map);
+        })
+        .catch(() => setUserCounts({}));
+    }
+  }, [minRecipes, userCounts]);
+
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
+    const now = Date.now();
+    const day7  = now - 7  * 86400000;
+    const day30 = now - 30 * 86400000;
+    const minR  = minRecipes !== '' ? parseInt(minRecipes, 10) : null;
+
     return users.filter(u => {
       if (planFilter !== 'all' && u.plan !== planFilter) return false;
       if (roleFilter !== 'all' && u.role !== roleFilter) return false;
@@ -57,9 +79,22 @@ export default function AdminUsers() {
         const hay = [u.email, u.display_name].filter(Boolean).join(' ').toLowerCase();
         if (!hay.includes(s)) return false;
       }
+      // Filtro actividad
+      if (activityFilter !== 'all') {
+        const last = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : null;
+        if (activityFilter === 'active7d'  && (!last || last < day7))  return false;
+        if (activityFilter === 'active30d' && (!last || last < day30)) return false;
+        if (activityFilter === 'inactive'  && last && last >= day30)   return false;
+        if (activityFilter === 'never'     && last !== null)            return false;
+      }
+      // Filtro uso mínimo recetas
+      if (minR !== null && !isNaN(minR) && userCounts) {
+        const count = userCounts[u.user_id]?.recipe_count ?? 0;
+        if (count < minR) return false;
+      }
       return true;
     });
-  }, [users, search, planFilter, roleFilter]);
+  }, [users, search, planFilter, roleFilter, activityFilter, minRecipes, userCounts]);
 
   function requestPlanChange(user, newPlan) {
     if (newPlan === user.plan) return;
@@ -164,6 +199,28 @@ export default function AdminUsers() {
           <option value="user">user</option>
           <option value="admin">admin</option>
         </select>
+        <select
+          value={activityFilter}
+          onChange={e => setActivityFilter(e.target.value)}
+          className="px-3 py-2 rounded-lg border border-black/10 text-sm bg-white"
+        >
+          <option value="all">Toda actividad</option>
+          <option value="active7d">Activos 7d</option>
+          <option value="active30d">Activos 30d</option>
+          <option value="inactive">Inactivos &gt;30d</option>
+          <option value="never">Nunca conectados</option>
+        </select>
+        <div className="flex items-center gap-1">
+          <label className="text-xs text-[var(--ink3)] whitespace-nowrap">Min. recetas</label>
+          <input
+            type="number"
+            min="0"
+            value={minRecipes}
+            onChange={e => setMinRecipes(e.target.value)}
+            placeholder="0"
+            className="w-16 px-2 py-2 rounded-lg border border-black/10 text-sm text-center"
+          />
+        </div>
         <button
           onClick={reload}
           className="px-3 py-2 rounded-lg border border-black/10 text-sm bg-white hover:bg-[var(--cream2)] cursor-pointer"

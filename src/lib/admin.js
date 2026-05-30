@@ -72,6 +72,10 @@ export function adminGetAuditLog({ limit = 50, offset = 0, targetUserId = null }
   );
 }
 
+export function adminListUserCounts() {
+  return unwrap(supabase.rpc('admin_list_user_counts'), 'admin_list_user_counts');
+}
+
 export function adminGetChurn30d() {
   return unwrap(supabase.rpc('admin_get_churn_30d'), 'admin_get_churn_30d');
 }
