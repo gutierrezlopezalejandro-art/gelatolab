@@ -224,6 +224,18 @@ jobs:
           Write-Host "MSI EN: $msiEn"
           Write-Host "MSI ES: $msiEs"
 
+      # Diagnostico: listar credential IDs reales de la API CSC de SSL.com.
+      # El ID que muestra eSigner Express puede diferir del que usa CodeSignTool.
+      - name: Debug - List SSL.com credential IDs
+        if: matrix.os == 'windows-latest'
+        uses: sslcom/esigner-codesign@develop
+        with:
+          command:          get_credential_ids
+          username:         ${{ secrets.SSL_COM_USERNAME }}
+          password:         ${{ secrets.SSL_COM_PASSWORD }}
+          totp_secret:      ${{ secrets.SSL_COM_TOTP_SECRET }}
+          environment_name: PROD
+
       - name: Sign .exe with SSL.com eSigner
         if: matrix.os == 'windows-latest'
         uses: sslcom/esigner-codesign@develop
