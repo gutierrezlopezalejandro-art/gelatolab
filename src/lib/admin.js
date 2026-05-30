@@ -72,6 +72,14 @@ export function adminGetAuditLog({ limit = 50, offset = 0, targetUserId = null }
   );
 }
 
+export function adminGetChurn30d() {
+  return unwrap(supabase.rpc('admin_get_churn_30d'), 'admin_get_churn_30d');
+}
+
+export function adminGetUpgrades30d() {
+  return unwrap(supabase.rpc('admin_get_upgrades_30d'), 'admin_get_upgrades_30d');
+}
+
 export async function adminSendEmail({ to, subject, html, targetUserId = null }) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error('adminSendEmail: no session');
