@@ -238,7 +238,7 @@ jobs:
           TAG_NAME:          ${{ github.ref_name }}
         run: |
           # Descargar CodeSignTool v1.3.0 directamente
-          $cstUrl = "https://github.com/SSLcom/CodeSignTool/releases/download/v1.3.0/CodeSignTool-v1.3.0_win.zip"
+          $cstUrl = "https://github.com/SSLcom/CodeSignTool/releases/download/v1.3.0/CodeSignTool-v1.3.0-windows.zip"
           $cstZip = "codesign.zip"
           $cstDir = "codesign"
           Write-Host "Descargando CodeSignTool..."
