@@ -167,11 +167,11 @@ jobs:
           SUBMISSION_ID=$(echo "$SUBMIT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
           echo "Submission ID: $SUBMISSION_ID"
 
-          # Poll cada 2 min, hasta 90 min (45 intentos).
+          # Poll cada 2 min, hasta 120 min (60 intentos).
           # Cada iteracion es un request HTTPS independiente: si la red cae
           # un momento, el siguiente intento sigue funcionando.
           STATUS="In Progress"
-          for i in $(seq 1 45); do
+          for i in $(seq 1 60); do
             sleep 120
             # Limpiar cache DNS antes de cada poll (workaround -1009 stale cache)
             sudo dscacheutil -flushcache  2>/dev/null || true
@@ -184,7 +184,7 @@ jobs:
               --output-format json 2>/dev/null || echo '{"status":"Unknown"}')
             STATUS=$(echo "$INFO_JSON" | python3 -c \
               "import sys,json; print(json.load(sys.stdin).get('status','Unknown'))")
-            echo "Intento $i/45 — status: $STATUS"
+            echo "Intento $i/60 — status: $STATUS"
 
             if [ "$STATUS" = "Accepted" ]; then break; fi
             if [ "$STATUS" = "Invalid" ] || [ "$STATUS" = "Rejected" ]; then
@@ -196,7 +196,7 @@ jobs:
           done
 
           if [ "$STATUS" != "Accepted" ]; then
-            echo "Notarizacion timeout tras 90 minutos"
+            echo "Notarizacion timeout tras 120 minutos"
             exit 1
           fi
 
