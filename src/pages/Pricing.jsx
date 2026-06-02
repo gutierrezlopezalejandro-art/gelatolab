@@ -35,7 +35,7 @@ export default function Pricing() {
     // Si no está logueado, redirigir a registro antes del checkout.
     // Así el email de Lemonsqueezy siempre coincide con la cuenta GelatoLab.
     if (!user) {
-      navigate('/auth', { state: { from: '/pricing', returnAfterAuth: true } });
+      navigate('/auth?mode=signup', { state: { from: '/pricing' } });
       return;
     }
     track('pricing_subscribe_clicked', { period: billingPeriod });

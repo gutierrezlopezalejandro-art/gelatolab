@@ -104,7 +104,7 @@ export default function Auth() {
           await authStorage.removeItem(REMEMBER_EMAIL_KEY);
         }
         showToast(t('auth_signed_in'));
-        navigate('/dashboard');
+        navigate(location.state?.from || '/dashboard');
       } else if (mode === 'signup') {
         if (password.length < 6) {
           showToast(t('auth_password_short'), 'error');
