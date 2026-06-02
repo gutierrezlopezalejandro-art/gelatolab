@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
 import { track } from '../lib/analytics';
 import { shouldHidePricingUI } from '../lib/platform';
+import { useAuthStore } from '../store/authStore';
 
 const CHECKOUT_URLS = {
   monthly: 'https://gelatolab-mensual.lemonsqueezy.com/checkout/buy/2692dd77-d226-41c4-a457-b1e88c7d3fe3',
@@ -28,10 +29,18 @@ export default function Pricing() {
   const ent = useEntitlement();
   const hidePricing = shouldHidePricingUI();
   const [billingPeriod, setBillingPeriod] = useState('monthly');
+  const { user } = useAuthStore();
 
   function handleSubscribe() {
+    // Si no está logueado, redirigir a registro antes del checkout.
+    // Así el email de Lemonsqueezy siempre coincide con la cuenta GelatoLab.
+    if (!user) {
+      navigate('/auth', { state: { from: '/pricing', returnAfterAuth: true } });
+      return;
+    }
     track('pricing_subscribe_clicked', { period: billingPeriod });
-    const url = CHECKOUT_URLS[billingPeriod];
+    let url = CHECKOUT_URLS[billingPeriod];
+    url += `?checkout[email]=${encodeURIComponent(user.email)}`;
     if (window.LemonSqueezy?.Url?.Open) {
       window.LemonSqueezy.Url.Open(url);
     } else {
