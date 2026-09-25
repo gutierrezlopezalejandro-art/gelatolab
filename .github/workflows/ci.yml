@@ -31,10 +31,14 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # Ya no hace falta --legacy-peer-deps: @vitejs/plugin-basic-ssl se
-        # bajo a 1.2.0, que si soporta vite 5. El conflicto de peers que
-        # obligaba al parche quedo resuelto.
-        run: npm ci
+        # --legacy-peer-deps SIGUE siendo necesario. Se intento quitarlo el
+        # 2026-09-25 tras resolver el conflicto de @vitejs/plugin-basic-ssl
+        # con vite 5 (se bajo a 1.2.0), pero `npm ci` a secas falla en CI
+        # aunque pase en local con npm 11. Hay otro conflicto de peers que
+        # la version de npm de Node 20 si rechaza y no esta identificado:
+        # los logs de Actions requieren token para leerse.
+        # PENDIENTE: diagnosticar con token o con un paso de depuracion.
+        run: npm ci --legacy-peer-deps
 
       - name: Run tests
         run: npm test
@@ -66,7 +70,8 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        # Mismo motivo que en el job de arriba.
+        run: npm ci --legacy-peer-deps
 
       - name: Install browsers
         # Solo WebKit: es el motor de iOS, donde va a correr la app dentro
