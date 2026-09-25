@@ -142,43 +142,11 @@ export default function App() {
     trackPageview();
   }, [location.pathname]);
 
-  // Auto-init de respaldo a carpeta:
-  //   - En Tauri (app de escritorio): crea Documents/GelatoLab/ si no existe
-  //     y activa auto-sync sin pedir permiso (silencioso, profesional).
-  //   - En navegador con File System Access API: si habia una carpeta
-  //     conectada en sesion previa con permiso vivo, reactiva el sync.
-  useEffect(() => {
-    (async () => {
-      try {
-        const fb = await import('./lib/folderBackup');
-        if (!fb.isFolderBackupSupported()) return;
-        if (fb.isTauri()) {
-          // App nativa: garantizamos la carpeta default y arrancamos sync.
-          let handle = await fb.getStoredFolderHandle();
-          if (!handle || !handle.__tauri) {
-            handle = await fb.pickBackupFolder(); // crea Documents/GelatoLab/
-          }
-          await fb.writeAllStoresToFolder(handle); // primera escritura inmediata
-          fb.startFolderAutoSync();
-          // Snapshot diario (idempotente: si ya se escribio hoy, no hace nada).
-          fb.writeDailySnapshot(handle).catch(e =>
-            console.warn('daily snapshot failed', e)
-          );
-          return;
-        }
-        // Web: respeta permiso previo, no abre prompts.
-        const handle = await fb.getStoredFolderHandle();
-        if (!handle) return;
-        const ok = await fb.ensureFolderPermission(handle, { interactive: false });
-        if (ok) {
-          fb.startFolderAutoSync();
-          fb.writeDailySnapshot(handle).catch(e =>
-            console.warn('daily snapshot failed', e)
-          );
-        }
-      } catch (e) { console.warn('folder backup boot failed', e); }
-    })();
-  }, []);
+  // El auto-init de respaldo a carpeta se elimino junto con folderBackup:
+  // escribia los stores a una carpeta del disco via File System Access API o
+  // Tauri, y ninguna de las dos existe en una app nativa de telefono. Lo
+  // reemplaza la copia de seguridad a la nube del propio usuario, que vive
+  // en lib/backup.js y se dispara desde la configuracion o el recordatorio.
 
   // Apply any pending inventory deductions whose production date has arrived.
   // Runs once on app mount and again whenever the tab becomes visible (catches

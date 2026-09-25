@@ -103,6 +103,10 @@ async function deleteQuiet(path) {
 // ── Cola de escritura por clave ────────────────────────────────────────────
 // Evita que dos setItem simultaneos de la misma clave se pisen entre si
 // durante la secuencia tmp → bak → rename.
+//
+// Se aplica en los DOS backends, no solo en el nativo, porque tambien es lo
+// que permite saber cuando terminaron de escribirse los datos. Ver
+// `flushPendingWrites()`.
 const queues = new Map();
 function enqueue(name, task) {
   const prev = queues.get(name) || Promise.resolve();
@@ -110,6 +114,33 @@ function enqueue(name, task) {
   // La cola no debe romperse si una tarea falla.
   queues.set(name, next.catch(() => {}));
   return next;
+}
+
+/**
+ * Espera a que terminen TODAS las escrituras pendientes.
+ *
+ * POR QUE EXISTE: `zustand/persist` escribe a disco de forma asincronica
+ * despues de cada `setState`. Al restaurar un respaldo se reponen los ocho
+ * stores y acto seguido se recarga la app para que todas las pantallas lean
+ * el estado nuevo. Si la recarga llega antes de que terminen las escrituras,
+ * **la restauracion se pierde en silencio** y el usuario cree que recupero
+ * sus datos cuando no.
+ *
+ * NOTA DE PRECISION: la intermitencia que se vio en las pruebas de extremo a
+ * extremo NO venia de aqui, venia de la propia prueba, que borraba la base de
+ * datos con la app abierta. Esta espera es un blindaje legitimo igual: el
+ * plazo de medio segundo que usa la restauracion antes de recargar alcanza
+ * hoy, pero no hay nada que lo garantice con un recetario grande o un disco
+ * lento. Con esto deja de depender del azar.
+ */
+export async function flushPendingWrites() {
+  // Se toma una foto de las colas vivas y se esperan. Si mientras tanto
+  // entran escrituras nuevas, entran a la misma cola y quedan encadenadas
+  // detras, asi que esperar la ultima alcanza.
+  const pendientes = [...queues.values()];
+  await Promise.allSettled(pendientes);
+  // Segunda pasada: una escritura puede haber encolado otra.
+  await Promise.allSettled([...queues.values()]);
 }
 
 async function writeNative(name, value) {
@@ -173,7 +204,10 @@ export const appStorage = {
   },
 
   setItem: async (name, value) => {
-    if (!isNative) return idbStorage.setItem(name, value);
+    // La cola envuelve los dos backends: ademas de evitar que dos escrituras
+    // de la misma clave se pisen, es lo que hace que `flushPendingWrites()`
+    // pueda esperarlas.
+    if (!isNative) return enqueue(name, () => idbStorage.setItem(name, value));
     try {
       await enqueue(name, () => writeNative(name, value));
     } catch (e) {
@@ -183,7 +217,7 @@ export const appStorage = {
   },
 
   removeItem: async (name) => {
-    if (!isNative) return idbStorage.removeItem(name);
+    if (!isNative) return enqueue(name, () => idbStorage.removeItem(name));
     try {
       await enqueue(name, async () => {
         await deleteQuiet(pathMain(name));

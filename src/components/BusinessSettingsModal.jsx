@@ -12,11 +12,6 @@ import { UpgradeModal } from './UpgradeModal';
 import { exportBackup, importBackup, getBackupStatus } from '../lib/backup';
 import { exportUserDataAsZip } from '../lib/userDataExport';
 import { setPin as savePin, isPinSet, lock as pinLock } from '../lib/pinLock';
-import {
-  isFolderBackupSupported, isTauri, pickBackupFolder, getStoredFolderHandle,
-  ensureFolderPermission, disconnectFolder, writeAllStoresToFolder,
-  getLastSyncDate, startFolderAutoSync,
-} from '../lib/folderBackup';
 import { track } from '../lib/analytics';
 import { useDirtyClose } from '../lib/hooks';
 
@@ -33,11 +28,6 @@ export function BusinessSettingsModal({ onClose }) {
   const { showToast, confirm } = useAppStore();
   const fileInputRef = useRef(null);
   const [backupStatus, setBackupStatus] = useState(getBackupStatus());
-  const folderSupported = isFolderBackupSupported();
-  const [folderHandle, setFolderHandle] = useState(null);
-  const [folderName, setFolderName] = useState('');
-  const [lastFolderSync, setLastFolderSync] = useState(getLastSyncDate());
-  const [folderBusy, setFolderBusy] = useState(false);
   const [pinDraft, setPinDraft] = useState('');
   const [pinHasSaved, setPinHasSaved] = useState(isPinSet());
   // Account deletion (requisito Apple App Store)
@@ -79,65 +69,6 @@ export function BusinessSettingsModal({ onClose }) {
     showToast(t('pin_cleared'));
   }
 
-  // Carga el handle guardado al montar. Para Tauri, mostramos el path completo
-  // ("Documents/GelatoLab"); para web mostramos solo el nombre de la carpeta.
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const h = await getStoredFolderHandle();
-      if (!cancelled && h) {
-        setFolderHandle(h);
-        setFolderName(h.__tauri ? h.path : (h.name || ''));
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  async function handlePickFolder() {
-    setFolderBusy(true);
-    try {
-      const h = await pickBackupFolder();
-      setFolderHandle(h);
-      setFolderName(h.__tauri ? h.path : (h.name || ''));
-      // Escritura inicial inmediata para confirmar que funciona.
-      await writeAllStoresToFolder(h);
-      setLastFolderSync(getLastSyncDate());
-      startFolderAutoSync();
-      showToast(t('folder_backup_connected'));
-      track('folder_backup_connected', { runtime: h.__tauri ? 'tauri' : 'web' });
-    } catch (e) {
-      if (e.name !== 'AbortError') showToast(e.message || t('error_generic'), 'error');
-    } finally {
-      setFolderBusy(false);
-    }
-  }
-
-  async function handleSyncNow() {
-    if (!folderHandle) return;
-    setFolderBusy(true);
-    try {
-      const ok = await ensureFolderPermission(folderHandle, { interactive: true });
-      if (!ok) { showToast(t('folder_backup_no_permission'), 'error'); return; }
-      const r = await writeAllStoresToFolder(folderHandle);
-      if (r.ok) {
-        setLastFolderSync(getLastSyncDate());
-        showToast(t('folder_backup_synced'));
-      } else {
-        showToast(t('folder_backup_failed') + ': ' + r.error, 'error');
-      }
-    } finally {
-      setFolderBusy(false);
-    }
-  }
-
-  async function handleDisconnectFolder() {
-    const ok = await confirm(t('folder_backup_disconnect_confirm'));
-    if (!ok) return;
-    await disconnectFolder();
-    setFolderHandle(null);
-    setFolderName('');
-    showToast(t('folder_backup_disconnected'));
-  }
 
   async function handleExport() {
     try {
@@ -413,108 +344,65 @@ export function BusinessSettingsModal({ onClose }) {
             )}
           </div>
 
-          {/* === Backup automatico via carpeta del PC (PRO) === */}
+          {/* === COPIA DE SEGURIDAD ===
+              Reemplaza a las dos secciones anteriores: el respaldo a una
+              carpeta del PC (que dependia de la File System Access API o de
+              Tauri y en un telefono no existe) y el ZIP "avanzado" que
+              estaba colapsado.
+
+              Al no haber nube propia, el dispositivo es la UNICA copia del
+              recetario, asi que esto deja de ser una opcion secundaria y
+              pasa a ser una seccion principal.
+
+              El archivo se entrega por la hoja nativa de compartir y el
+              usuario elige su iCloud Drive, su Google Drive o lo que quiera.
+              Nosotros no guardamos nada.
+
+              NO se gatea por plan: no se le cobra a nadie por no perder sus
+              datos. */}
           <div className="border-t border-black/10 pt-4 mt-2">
             <h3 className="text-sm font-semibold text-[var(--ink)] mb-1 flex items-center gap-1.5">
-              📁 {t('folder_backup_title_short')} {!ent.can(FEATURES.FOLDER_BACKUP) && <ProBadge />}
+              ☁️ {t('backup_section_title')}
             </h3>
-            <p className="text-[11px] text-[var(--ink3)] mb-3">{t('folder_backup_sub')}</p>
+            <p className="text-[11px] text-[var(--ink3)] mb-3">{t('backup_section_sub')}</p>
 
-            {!ent.can(FEATURES.FOLDER_BACKUP) ? (
-              <ProGate feature={FEATURES.FOLDER_BACKUP} mode="intercept">
-                <button type="button" className="btn-primary text-xs">
-                  📁 {t('folder_backup_connect')}
-                </button>
-              </ProGate>
-            ) : !folderSupported ? (
-              <div className="text-[11px] rounded-lg p-3 bg-[#fff8e1] text-[#8a6d00] border border-[#ffe082]">
-                ⚠ {t('folder_backup_unsupported')}
-              </div>
-            ) : folderHandle ? (
-              <div className="space-y-2">
-                <div className="text-xs rounded-lg p-3 bg-[#e8f5ed] text-[#0d3d22] border border-[#b3d8c0] font-medium">
-                  ✓ {t('folder_backup_connected_to', { name: folderName })}
-                  {lastFolderSync && (
-                    <span className="block text-[10px] opacity-80 mt-1 font-normal">
-                      {t('folder_backup_last_sync', { time: lastFolderSync.toLocaleString() })}
-                    </span>
-                  )}
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  <button type="button"
-                          className="btn-primary text-xs"
-                          onClick={handleSyncNow} disabled={folderBusy}>
-                    {folderBusy ? '…' : '🔄 ' + t('folder_backup_sync_now')}
-                  </button>
-                  <button type="button"
-                          className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--coral)] text-[var(--coral)] hover:bg-[var(--coral)] hover:text-white transition-colors cursor-pointer bg-transparent"
-                          onClick={handleDisconnectFolder}>
-                    ✕ {t('folder_backup_disconnect')}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="text-xs rounded-lg p-3 bg-[#fff8e1] text-[#8a6d00] border border-[#ffe082]">
-                  ⚠ {t('folder_backup_not_connected')}
-                </div>
-                <button type="button"
-                        className="btn-primary text-xs"
-                        onClick={handlePickFolder} disabled={folderBusy}>
-                  {folderBusy ? '…' : '📁 ' + t('folder_backup_connect')}
-                </button>
-              </div>
-            )}
-          </div>
+            <p className="text-[11px] text-[var(--ink2)] mb-3">
+              {backupStatus === null
+                ? t('backup_never')
+                : backupStatus.daysSinceBackup === 0
+                  ? t('backup_status_today')
+                  : t('backup_last', { days: backupStatus.daysSinceBackup })}
+            </p>
 
-          {/* === ZIP manual (SECUNDARIO/colapsado) === */}
-          <details className="border-t border-black/10 pt-3">
-            <summary className="text-xs text-[var(--ink3)] cursor-pointer hover:text-[var(--ink)] select-none">
-              {t('backup_zip_advanced')}
-            </summary>
-            <div className="mt-2 space-y-2">
-              <p className="text-[11px] text-[var(--ink3)]">{t('backup_zip_advanced_sub')}</p>
-              {backupStatus && (
-                <p className="text-[11px] text-[var(--ink2)]">
-                  {backupStatus.daysSinceBackup === 0
-                    ? t('backup_status_today')
-                    : t('backup_status_days', { days: backupStatus.daysSinceBackup })}
-                </p>
-              )}
-              <div className="flex gap-2 flex-wrap">
-                <button type="button"
-                        className="btn-soft text-xs"
-                        onClick={handleExport}>
-                  ⬇ {t('backup_export_btn')}
-                </button>
-                <button type="button"
-                        className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--coral)] text-[var(--coral)] hover:bg-[var(--coral)] hover:text-white transition-colors cursor-pointer bg-transparent"
-                        onClick={handleImportClick}>
-                  ⬆ {t('backup_import_btn')}
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".zip,application/zip,application/x-zip-compressed"
-                  className="hidden"
-                  onChange={handleImportFile}
-                />
-              </div>
-              {/* H48 — Re-show backup reminder. Si el usuario cerró el banner
-                  con × en el Dashboard, queda dismissado por toda la sesión.
-                  Este botón limpia el sessionStorage para que vuelva a aparecer
-                  en la próxima visita a una pantalla autenticada. Útil cuando
-                  alguien lo cerró por error y quiere volver a tenerlo visible. */}
-              <button type="button"
-                      className="text-[11px] text-[var(--mint)] hover:underline cursor-pointer bg-transparent border-none mt-2"
-                      onClick={() => {
-                        try { sessionStorage.removeItem('__gelatolab_backup_reminder_dismissed'); } catch {}
-                        showToast(t('backup_reminder_restored'));
-                      }}>
-                ↻ {t('backup_reminder_restore')}
+            <div className="flex gap-2 flex-wrap">
+              <button type="button" className="btn-primary text-xs" onClick={handleExport}>
+                ☁️ {t('backup_now')}
               </button>
+              <button type="button"
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--coral)] text-[var(--coral)] hover:bg-[var(--coral)] hover:text-white transition-colors cursor-pointer bg-transparent"
+                      onClick={handleImportClick}>
+                ⬆ {t('backup_restore')}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".zip,application/zip,application/x-zip-compressed"
+                className="hidden"
+                onChange={handleImportFile}
+              />
             </div>
-          </details>
+
+            {/* Si el usuario cerro el recordatorio con x en el panel, queda
+                descartado por toda la sesion. Esto lo vuelve a habilitar. */}
+            <button type="button"
+                    className="text-[11px] text-[var(--mint)] hover:underline cursor-pointer bg-transparent border-none mt-3"
+                    onClick={() => {
+                      try { sessionStorage.removeItem('__gelatolab_backup_reminder_dismissed'); } catch { /* tolerable */ }
+                      showToast(t('backup_reminder_restored'));
+                    }}>
+              ↻ {t('backup_reminder_restore')}
+            </button>
+          </div>
 
           {/* === EXPORTAR MIS DATOS ===
               Cumple derecho de acceso + portabilidad de Ley 21.719 chilena

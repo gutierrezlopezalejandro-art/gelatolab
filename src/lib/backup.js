@@ -1,7 +1,22 @@
-// Backup/restore local: serializa los stores principales a un ZIP descargable
-// y permite restaurar desde el mismo ZIP. NO incluye la clave de OpenAI por
+// Respaldo y restauracion: serializa los stores principales a un ZIP y
+// permite restaurar desde el mismo ZIP. NO incluye la clave de OpenAI por
 // seguridad (queda solo en localStorage del usuario).
 // JSZip se carga perezosamente para no inflar el bundle principal.
+//
+// COMO SE ENTREGA EL ARCHIVO
+// --------------------------
+// En app nativa NO se puede usar el truco del navegador de crear un enlace
+// con `download` y hacerle click: dentro de un WebView eso no descarga nada.
+// El archivo se escribe en el directorio de cache y se entrega por la hoja
+// nativa de compartir, desde donde el usuario elige iCloud Drive, Google
+// Drive, correo o lo que quiera.
+//
+// Esa es la decision de respaldo del proyecto: la copia vive en la nube que
+// el usuario ya tiene y ya paga. Nosotros no guardamos nada.
+//
+// En navegador se conserva la descarga de siempre.
+import { Capacitor } from '@capacitor/core';
+import { flushPendingWrites } from './appStorage';
 import { useRecipeStore } from '../store/recipeStore';
 import { useIngredientStore } from '../store/ingredientStore';
 import { useProductionStore } from '../store/productionStore';
@@ -45,18 +60,69 @@ export async function exportBackup() {
     zip.file(`${name}.json`, JSON.stringify(data, null, 2));
   }
 
+  const today = new Date().toISOString().slice(0, 10);
+  const filename = `gelatolab-respaldo-${today}.zip`;
+
+  const entregado = Capacitor.isNativePlatform()
+    ? await compartirEnNativo(zip, filename)
+    : await descargarEnNavegador(zip, filename);
+
+  // Si el usuario cancelo la hoja de compartir, no se marca como respaldado:
+  // decir que hay copia cuando no la hay es peor que no avisar.
+  if (!entregado) return { ok: false, cancelled: true };
+
+  marcarRespaldado();
+  return { ok: true, filename };
+}
+
+/** Marca la fecha del ultimo respaldo, para el recordatorio del panel. */
+export function marcarRespaldado() {
+  // Se usa localStorage y no appStorage a proposito: si el sistema lo borra,
+  // el peor caso es que la app recuerde respaldar antes de tiempo, que es
+  // el lado seguro del error.
+  try { localStorage.setItem(BACKUP_DATE_KEY, new Date().toISOString()); } catch { /* tolerable */ }
+}
+
+async function descargarEnNavegador(zip, filename) {
   const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
   const url = URL.createObjectURL(blob);
-  const today = new Date().toISOString().slice(0, 10);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `gelatolab-backup-${today}.zip`;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+  return true;
+}
 
-  // Marca timestamp del ultimo backup para mostrar avisos en el dashboard.
-  localStorage.setItem(BACKUP_DATE_KEY, new Date().toISOString());
-  return { ok: true };
+async function compartirEnNativo(zip, filename) {
+  const [{ Filesystem, Directory }, { Share }] = await Promise.all([
+    import('@capacitor/filesystem'),
+    import('@capacitor/share'),
+  ]);
+
+  // base64 porque el ZIP es binario y Filesystem escribe texto o base64.
+  const data = await zip.generateAsync({ type: 'base64', compression: 'DEFLATE' });
+
+  // Cache y no Data: es un archivo de paso. Una vez que el usuario lo guardo
+  // en su Drive, que el sistema lo borre cuando quiera.
+  const { uri } = await Filesystem.writeFile({
+    path: filename,
+    data,
+    directory: Directory.Cache,
+  });
+
+  try {
+    await Share.share({
+      title: filename,
+      files: [uri],
+      dialogTitle: filename,
+    });
+    return true;
+  } catch (e) {
+    // Cancelar la hoja de compartir lanza. No es un error que mostrar.
+    if (/cancel/i.test(String(e?.message || e))) return false;
+    throw e;
+  }
 }
 
 export async function importBackup(file) {
@@ -78,6 +144,13 @@ export async function importBackup(file) {
     useStore.setState(data);
     restored.push(name);
   }
+
+  // CRITICO: zustand/persist escribe a disco de forma asincronica despues de
+  // cada setState. Quien llama a esto recarga la app para que todas las
+  // pantallas lean el estado nuevo, y si la recarga llega antes de que
+  // terminen las escrituras, la restauracion se pierde en silencio: el
+  // usuario cree que recupero sus datos y no.
+  await flushPendingWrites();
 
   return { ok: true, meta, restored };
 }

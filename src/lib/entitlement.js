@@ -47,7 +47,9 @@ export const FEATURES = {
   PRINT_PRODUCTION:  'print_production',
   RECIPE_COMPARE:    'recipe_compare',
   LABELS:            'labels',
-  FOLDER_BACKUP:     'folder_backup',
+  // FOLDER_BACKUP se elimino junto con folderBackup. La copia de
+  // seguridad a la nube del usuario NO se gatea por plan: no se le
+  // cobra a nadie por no perder sus datos.
   RECIPE_LIMIT:      'recipe_limit',
 };
 
@@ -66,7 +68,6 @@ const PRO_ONLY = new Set([
   FEATURES.PRINT_PRODUCTION,
   FEATURES.RECIPE_COMPARE,
   FEATURES.LABELS,
-  FEATURES.FOLDER_BACKUP,
 ]);
 
 // Plan check helper. Ya no existe el plan 'admin': el panel de
