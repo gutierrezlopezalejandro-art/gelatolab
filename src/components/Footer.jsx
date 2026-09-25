@@ -18,9 +18,9 @@ export function Footer() {
           <Link to="/privacy" className="text-[var(--ink3)] hover:text-[var(--ink)] transition-colors">
             {t('legal_privacy_title')}
           </Link>
-          <Link to="/refund-policy" className="text-[var(--ink3)] hover:text-[var(--ink)] transition-colors">
-            {t('legal_refund_title')}
-          </Link>
+          {/* La politica de reembolsos se elimino: al vender con compra
+              in-app, el reembolso lo gestiona Apple o Google segun sus
+              propias reglas, no nosotros. */}
         </nav>
       </div>
     </footer>

@@ -1,20 +1,21 @@
 // ===========================================================================
 // Entitlement / gating system — Free vs Pro
 //
-// Single source of truth for which features require Pro. The user's plan
-// lives on `profiles.plan` ('free' | 'pro' | 'admin') in Supabase. The
-// `useEntitlement()` hook reads it via the existing authStore profile and
-// exposes helpers to gate UI.
+// Single source of truth for which features require Pro.
 //
-// Anonymous users (no Supabase configured, or not signed in) are treated
-// as 'free' so the local-first experience still works.
+// El plan sale de `entitlementStore` (local, alimentado por la compra
+// in-app). Hasta la 1.1.0 salia de `profiles.plan` en Supabase; ese camino
+// se elimino al desconectar el backend.
+//
+// Sin compra vigente el plan es 'free', asi que la experiencia local-first
+// sigue funcionando entera.
 //
 // Adding a feature: add to FEATURES, decide PRO_FEATURES membership, then
 // wrap the relevant UI with <ProGate feature="..."> or guard imperatively
 // with `if (!isFeatureAllowed(feature, plan))`.
 // ===========================================================================
 
-import { useAuthStore } from '../store/authStore';
+import { useEntitlementStore } from '../store/entitlementStore';
 import { useRecipeStore } from '../store/recipeStore';
 import seedRecipes from '../data/recipes.json';
 
@@ -36,7 +37,9 @@ export const FREE_VISIBLE_SEED_IDS = new Set([2, 24]);
 // Feature keys — strings used everywhere in the app to identify gated
 // features. Keep these stable; they are referenced from many components.
 export const FEATURES = {
-  CLOUD_SYNC:        'cloud_sync',
+  // CLOUD_SYNC se elimino al desconectar Supabase: ya no hay nube que
+  // sincronizar. Era una de las funciones que justificaban Pro, asi que el
+  // paquete quedo con una menos — revisar el argumento de venta.
   MULTI_EQUIPMENT:   'multi_equipment',
   INVENTORY:         'inventory',
   COSTS:             'costs',
@@ -56,7 +59,6 @@ export const FREE_LIMITS = {
 
 // All features that require Pro. Free users get everything else.
 const PRO_ONLY = new Set([
-  FEATURES.CLOUD_SYNC,
   FEATURES.MULTI_EQUIPMENT,
   FEATURES.INVENTORY,
   FEATURES.COSTS,
@@ -67,9 +69,10 @@ const PRO_ONLY = new Set([
   FEATURES.FOLDER_BACKUP,
 ]);
 
-// Plan check helpers. Admin === Pro for entitlement purposes.
+// Plan check helper. Ya no existe el plan 'admin': el panel de
+// administracion se elimino junto con Supabase.
 export function isPro(plan) {
-  return plan === 'pro' || plan === 'admin';
+  return plan === 'pro';
 }
 
 export function isFeatureAllowed(feature, plan) {
@@ -79,17 +82,14 @@ export function isFeatureAllowed(feature, plan) {
 
 // React hook: returns the current entitlement snapshot.
 export function useEntitlement() {
-  const profile = useAuthStore(s => s.profile);
-  const user    = useAuthStore(s => s.user);
-  const recipes = useRecipeStore(s => s.recipes);
+  const plan      = useEntitlementStore(s => s.plan);
+  const storedExp = useEntitlementStore(s => s.expiresAt);
+  const recipes   = useRecipeStore(s => s.recipes);
 
-  const plan = profile?.plan || 'free';
-  const expiresAt = profile?.plan_expires_at
-    ? new Date(profile.plan_expires_at)
-    : null;
+  const expiresAt = storedExp ? new Date(storedExp) : null;
 
-  // If the stored plan is 'pro' but expiration has passed, treat as free.
-  // Backend webhooks should keep this clean; this is a safety net.
+  // Una suscripcion vencida vuelve a Free. La tienda es la que manda, pero
+  // esta red de seguridad cubre el caso de no haber podido consultarla.
   const expired = expiresAt && expiresAt.getTime() < Date.now();
   const effectivePlan = expired && plan === 'pro' ? 'free' : plan;
 
@@ -103,8 +103,6 @@ export function useEntitlement() {
   return {
     plan: effectivePlan,
     isPro: isPro(effectivePlan),
-    isAdmin: effectivePlan === 'admin',
-    isAnonymous: !user,
     expiresAt,
     recipeCount,
     userCreatedCount,

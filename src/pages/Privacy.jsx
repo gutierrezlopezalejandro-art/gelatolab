@@ -43,7 +43,6 @@ export default function Privacy() {
             <h2 className="font-display text-lg text-[var(--ink)] mb-2">4. {t('legal_privacy_s4_title')}</h2>
             <p>{t('legal_privacy_s4_body')}</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li><strong>Supabase</strong> — {t('legal_privacy_s4_supabase')}</li>
               <li><strong>Google OAuth</strong> — {t('legal_privacy_s4_google')}</li>
               <li><strong>Lemonsqueezy</strong> — {t('legal_privacy_s4_lemonsqueezy')}</li>
             </ul>

@@ -5,10 +5,8 @@
 // El ZIP contiene 1 archivo JSON por store + un archivo README.txt explicando
 // la estructura. Nombre del ZIP: gelatolab-export-YYYY-MM-DD.zip
 //
-// NOTA: este export usa el state CURRENT del store en memoria (que es lo que
-// el usuario ve en pantalla). No hace pull del cloud explicitamente — si el
-// usuario quiere la version mas reciente del cloud, debe primero recargar
-// la app para que CloudSyncProvider haga pullFromCloud al login.
+// NOTA: este export usa el state CURRENT del store en memoria, que es lo que
+// el usuario ve en pantalla y, al no haber nube, tambien lo unico que existe.
 
 import JSZip from 'jszip';
 import { useRecipeStore } from '../store/recipeStore';

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 import defaultIngredients from '../data/ingredients.json';
 
 export const useIngredientStore = create(
@@ -70,6 +70,6 @@ export const useIngredientStore = create(
         set({ ingredients: defaultIngredients, nextId: defaultIngredients.length + 1 });
       },
     }),
-    { name: 'heladeria-ingredients', storage: createJSONStorage(() => idbStorage) }
+    { name: 'heladeria-ingredients', storage: createJSONStorage(() => appStorage) }
   )
 );

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 import defaultRecipes from '../data/recipes.json';
 
 export const useRecipeStore = create(
@@ -58,7 +58,7 @@ export const useRecipeStore = create(
     }),
     {
       name: 'heladeria-recipes',
-      storage: createJSONStorage(() => idbStorage),
+      storage: createJSONStorage(() => appStorage),
       merge: (persisted, current) => {
         // Si localStorage tiene recetas, usarlas; si está vacío, cargar las default
         if (persisted && persisted.recipes && persisted.recipes.length > 0) {

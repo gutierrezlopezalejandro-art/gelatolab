@@ -1831,6 +1831,7 @@ export default {
     pricing_title: "Piani che crescono con te",
     pricing_sub: "Free per sperimentare. Pro per chi produce e vende.",
     pricing_coming_soon: "Stiamo finalizzando l'integrazione dei pagamenti. Nel frattempo puoi usare GelatoLab gratuitamente con il tuo account Free.",
+    pricing_purchase_unavailable: "L'acquisto in-app non e ancora disponibile in questa versione.",
     pricing_footnote: "Annulla quando vuoi. Nessun vincolo. Garanzia 14 giorni.",
     plan_free: "Free",
     plan_free_sub: "Per iniziare e imparare le basi.",

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 import { useIngredientStore } from './ingredientStore';
 import { useProductionStore } from './productionStore';
 
@@ -143,7 +143,7 @@ export const useInventoryStore = create(
         set({ movements: [], nextId: 1, stocktakes: [], nextStockId: 1 });
       },
     }),
-    { name: 'gelatolab-inventory', storage: createJSONStorage(() => idbStorage) }
+    { name: 'gelatolab-inventory', storage: createJSONStorage(() => appStorage) }
   )
 );
 

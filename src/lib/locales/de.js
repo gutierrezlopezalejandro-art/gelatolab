@@ -1831,6 +1831,7 @@ export default {
     pricing_title: "Pläne, die mit dir wachsen",
     pricing_sub: "Free zum Experimentieren. Pro für Produzenten und Verkäufer.",
     pricing_coming_soon: "Wir schließen gerade die Zahlungsintegration ab. In der Zwischenzeit kannst du GelatoLab mit deinem Free-Konto kostenlos nutzen.",
+    pricing_purchase_unavailable: "Der In-App-Kauf ist in dieser Version noch nicht verfuegbar.",
     pricing_footnote: "Jederzeit kündbar. Keine Bindung. 14 Tage Geld-zurück-Garantie.",
     plan_free: "Free",
     plan_free_sub: "Zum Starten und Lernen der Grundlagen.",

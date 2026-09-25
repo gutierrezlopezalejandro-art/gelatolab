@@ -5,7 +5,6 @@ import { getBusinessFields, COUNTRIES } from '../lib/countryRegulations';
 import { useCountryStore } from '../store/countryStore';
 import { useBusinessStore } from '../store/businessStore';
 import { useAppStore } from '../store/appStore';
-import { useAuthStore } from '../store/authStore';
 import { getBatchFreezers, getPasteurizers } from '../data/machines';
 import { useEntitlement, FEATURES, FREE_LIMITS } from '../lib/entitlement';
 import { ProBadge, ProGate } from './ProGate';
@@ -43,11 +42,6 @@ export function BusinessSettingsModal({ onClose }) {
   const [pinHasSaved, setPinHasSaved] = useState(isPinSet());
   // Account deletion (requisito Apple App Store)
   const navigate = useNavigate();
-  const user = useAuthStore(s => s.user);
-  const deleteAccount = useAuthStore(s => s.deleteAccount);
-  const [deleteConfirmText, setDeleteConfirmText] = useState('');
-  const [deleting, setDeleting] = useState(false);
-  const DELETE_KEYWORD = 'ELIMINAR';
   const [exporting, setExporting] = useState(false);
 
   // Exportacion de datos personales (derecho de acceso + portabilidad,
@@ -76,41 +70,6 @@ export function BusinessSettingsModal({ onClose }) {
     setPinHasSaved(true);
     showToast(t('pin_set_ok'));
   }
-  // Borrar cuenta completa: server-side via edge function delete-account,
-  // luego limpiar IndexedDB local, signOut y navegar a la landing.
-  // Cumple Apple App Store Review Guideline 5.1.1(v).
-  async function handleDeleteAccount() {
-    if (deleteConfirmText !== DELETE_KEYWORD) {
-      showToast(t('account_delete_confirm_required'), 'error');
-      return;
-    }
-    setDeleting(true);
-    try {
-      const { error } = await deleteAccount();
-      if (error) {
-        showToast(error.message || t('account_delete_failed'), 'error');
-        setDeleting(false);
-        return;
-      }
-      // Limpiar IndexedDB local (recetas, ingredientes, lotes, etc.).
-      // Las claves usadas por Zustand persist están en localStorage.
-      try {
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k && k.startsWith('gelatolab')) keysToRemove.push(k);
-        }
-        keysToRemove.forEach(k => localStorage.removeItem(k));
-      } catch { /* tolerable */ }
-      showToast(t('account_deleted_ok'));
-      onClose();
-      navigate('/');
-    } catch (e) {
-      showToast(e.message || t('account_delete_failed'), 'error');
-      setDeleting(false);
-    }
-  }
-
   async function handleClearPin() {
     const ok = await confirm(t('pin_clear_confirm'));
     if (!ok) return;
@@ -562,8 +521,10 @@ export function BusinessSettingsModal({ onClose }) {
               (auditoria legal Sandra Fernandez 2026-05-11, gap G11). El
               usuario puede descargar un ZIP con TODOS sus datos en formato
               JSON estandar para llevarse a otro sistema o tener un respaldo
-              independiente. Disponible para todos (Free y Pro). */}
-          {user && (
+              independiente. Disponible para todos (Free y Pro).
+              Sin cuentas ya no se gatea por sesion: es el respaldo del
+              usuario y el dispositivo es la unica copia. */}
+          {(
             <details className="border-t border-black/10 pt-3 mt-2">
               <summary className="text-xs font-semibold text-[var(--ink2)] cursor-pointer hover:opacity-80 select-none">
                 {t('account_export_section')}
@@ -585,50 +546,6 @@ export function BusinessSettingsModal({ onClose }) {
                              hover:opacity-90 transition-opacity"
                 >
                   {exporting ? t('saving') : `↓ ${t('account_export_btn')}`}
-                </button>
-              </div>
-            </details>
-          )}
-
-          {/* === ZONA DE PELIGRO: eliminar cuenta ===
-              Solo se muestra si el usuario tiene sesión iniciada (sentido).
-              El borrado es definitivo: borra la cuenta de Supabase, todos
-              los datos en la nube (recetas/ingredientes/lotes/etc. via
-              FK ON DELETE CASCADE) y los datos locales del navegador.
-              Cumple App Store Review Guideline 5.1.1(v). */}
-          {user && (
-            <details className="border-t border-[var(--coral)]/30 pt-3 mt-2">
-              <summary className="text-xs font-semibold text-[var(--coral)] cursor-pointer hover:opacity-80 select-none">
-                {t('danger_zone')}
-              </summary>
-              <div className="mt-3 p-4 rounded-lg bg-[var(--coral)]/5 border border-[var(--coral)]/30">
-                <h3 className="font-semibold text-sm text-[var(--coral)] mb-1">
-                  {t('account_delete_title')}
-                </h3>
-                <p className="text-xs text-[var(--ink2)] leading-relaxed mb-3">
-                  {t('account_delete_warning')}
-                </p>
-                <p className="text-xs text-[var(--ink2)] mb-2">
-                  {t('account_delete_type_keyword', { keyword: DELETE_KEYWORD })}
-                </p>
-                <input
-                  type="text"
-                  className="input mb-3 font-mono"
-                  value={deleteConfirmText}
-                  onChange={e => setDeleteConfirmText(e.target.value)}
-                  placeholder={DELETE_KEYWORD}
-                  autoComplete="off"
-                />
-                <button
-                  type="button"
-                  onClick={handleDeleteAccount}
-                  disabled={deleteConfirmText !== DELETE_KEYWORD || deleting}
-                  className="w-full text-sm font-semibold px-4 py-2 rounded-lg
-                             bg-[var(--coral)] text-white border-none cursor-pointer
-                             disabled:opacity-40 disabled:cursor-not-allowed
-                             hover:opacity-90 transition-opacity"
-                >
-                  {deleting ? t('saving') : t('account_delete_btn')}
                 </button>
               </div>
             </details>

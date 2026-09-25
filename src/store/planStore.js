@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 
 export const usePlanStore = create(
   persist(
@@ -30,6 +30,6 @@ export const usePlanStore = create(
         });
       },
     }),
-    { name: 'heladeria-plans', storage: createJSONStorage(() => idbStorage) }
+    { name: 'heladeria-plans', storage: createJSONStorage(() => appStorage) }
   )
 );

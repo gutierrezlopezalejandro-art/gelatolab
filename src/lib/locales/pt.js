@@ -1905,6 +1905,7 @@ export default {
     pricing_title: "Planos que crescem com você",
     pricing_sub: "Free é perfeito para experimentar em casa. Pro é para quem produz e vende.",
     pricing_coming_soon: "Estamos finalizando a integração de pagamentos. Enquanto isso pode usar o GelatoLab grátis com sua conta Free.",
+    pricing_purchase_unavailable: "A compra dentro do app ainda nao esta disponivel nesta versao.",
     pricing_footnote: "Cancele quando quiser. Sem fidelidade. Garantia de 14 dias.",
     plan_free: "Free",
     plan_free_sub: "Para começar e aprender o básico.",

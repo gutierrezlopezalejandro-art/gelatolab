@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 
 /**
  * Catalogo global de proveedores. Reusables entre ingredientes para no repetir
@@ -59,6 +59,6 @@ export const useSupplierStore = create(
         set({ suppliers: [], nextId: 1 });
       },
     }),
-    { name: 'gelatolab-suppliers', storage: createJSONStorage(() => idbStorage) }
+    { name: 'gelatolab-suppliers', storage: createJSONStorage(() => appStorage) }
   )
 );

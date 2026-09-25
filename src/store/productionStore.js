@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 
 /**
  * Dedupe por COUNT (no por presencia) entre `orders` (lo que el usuario
@@ -127,6 +127,6 @@ export const useProductionStore = create(
         };
       },
     }),
-    { name: 'heladeria-production', storage: createJSONStorage(() => idbStorage) }
+    { name: 'heladeria-production', storage: createJSONStorage(() => appStorage) }
   )
 );

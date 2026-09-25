@@ -4,7 +4,6 @@ import { useT, useIngredientName } from '../lib/i18n';
 import { useIngredientStore } from '../store/ingredientStore';
 import { useInventoryStore } from '../store/inventoryStore';
 import { useAppStore } from '../store/appStore';
-import { useAuthStore } from '../store/authStore';
 import { useBusinessStore } from '../store/businessStore';
 import { BarcodeScannerModal } from '../components/BarcodeScannerModal';
 import { isWebcamAvailable } from '../lib/barcode';
@@ -34,7 +33,6 @@ export default function Mobile() {
   const ingredients = useIngredientStore(s => s.ingredients);
   const recordMovement = useInventoryStore(s => s.record);
   const { showToast } = useAppStore();
-  const user = useAuthStore(s => s.user);
   const businessName = useBusinessStore(s => s.fantasy_name);
 
   const [mode, setMode] = useState(null); // null = home, 'in'|'count'|'query' = scanning
@@ -131,12 +129,6 @@ export default function Mobile() {
         </header>
 
         <main className="flex-1 p-5 space-y-4">
-          {!user && (
-            <div className="rounded-xl bg-[#fff8e1] border-l-4 border-[#f5c842] p-3 text-xs text-[var(--ink2)]">
-              ⚠ {t('mobile_no_session')}
-            </div>
-          )}
-
           <p className="text-sm text-[var(--ink2)] text-center mt-2 mb-4">
             {t('mobile_intro')}
           </p>

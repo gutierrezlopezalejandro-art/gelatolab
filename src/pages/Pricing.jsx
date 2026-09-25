@@ -5,22 +5,20 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
 import { track } from '../lib/analytics';
 import { shouldHidePricingUI } from '../lib/platform';
-import { useAuthStore } from '../store/authStore';
-
-const CHECKOUT_URLS = {
-  monthly: 'https://gelatolab-mensual.lemonsqueezy.com/checkout/buy/2692dd77-d226-41c4-a457-b1e88c7d3fe3',
-  annual:  'https://gelatolab-mensual.lemonsqueezy.com/checkout/buy/a8aacb9b-c091-41f0-8fd1-32f32f572614',
-};
 
 /**
- * Pricing page. Lists Free vs Pro features and a CTA. The CTA is currently
- * a placeholder that shows a toast — Stripe wiring lands in the next phase.
+ * Pantalla de planes. Compara Free contra Pro.
  *
- * Apple App Store compliance: en iOS Capacitor (shouldHidePricingUI()=true)
- * NO mostramos precio ni botón "Suscribirse" — Apple Review Guidelines
- * 3.1.1/3.1.3 prohíben que la app iOS lleve al usuario a payments externos.
- * Estrategia adoptada (camino B): Pro management vía web. La app iOS muestra
- * solo info y le sugiere al usuario gestionar su plan desde gelatolab.app.
+ * ESTADO: sin via de compra. El checkout de Lemonsqueezy se elimino porque
+ * App Store y Play prohiben cobrar contenido digital fuera de su propio
+ * sistema de compras. La compra in-app (StoreKit 2 / Play Billing) es la
+ * Fase 2 del plan de transformacion; hasta entonces esta pantalla informa
+ * pero no vende.
+ *
+ * PENDIENTE FASE 2: `shouldHidePricingUI()` implementa el viejo "camino B"
+ * (ocultar precios en iOS porque el pago ocurria en la web). Esa estrategia
+ * quedo derogada al decidir vender con compra in-app, asi que ese gate debe
+ * removerse cuando se conecte la tienda.
  */
 export default function Pricing() {
   const t = useT();
@@ -29,23 +27,11 @@ export default function Pricing() {
   const ent = useEntitlement();
   const hidePricing = shouldHidePricingUI();
   const [billingPeriod, setBillingPeriod] = useState('monthly');
-  const { user } = useAuthStore();
 
   function handleSubscribe() {
-    // Si no está logueado, redirigir a registro antes del checkout.
-    // Así el email de Lemonsqueezy siempre coincide con la cuenta GelatoLab.
-    if (!user) {
-      navigate('/auth?mode=signup', { state: { from: '/pricing' } });
-      return;
-    }
-    track('pricing_subscribe_clicked', { period: billingPeriod });
-    let url = CHECKOUT_URLS[billingPeriod];
-    url += `?checkout[email]=${encodeURIComponent(user.email)}`;
-    if (window.LemonSqueezy?.Url?.Open) {
-      window.LemonSqueezy.Url.Open(url);
-    } else {
-      window.open(url, '_blank');
-    }
+    // La compra in-app llega en la Fase 2. No se deja un boton que simule
+    // cobrar: se avisa el estado real.
+    showToast(t('pricing_purchase_unavailable'));
   }
 
   function goBack() {
@@ -169,20 +155,10 @@ export default function Pricing() {
                   ? `Suscribirse anual · $99/año`
                   : `Suscribirse · $11/mes`}
               </button>
-              {/* Garantía 30 días — visible debajo del CTA Pro. Refuerza
-                  confianza al momento de decidir suscribirse. Linkea a
-                  /refund-policy con la política completa. */}
-              <div className="mt-3 text-center">
-                <span className="inline-block px-2 py-0.5 rounded-full bg-[var(--mint3)] text-[var(--mint)] text-[10px] font-bold uppercase tracking-wider">
-                  ✓ {t('pricing_guarantee_badge')}
-                </span>
-                <p className="mt-2 text-[11px] text-[var(--ink3)] leading-relaxed">
-                  {t('pricing_guarantee_body')}{' '}
-                  <Link to="/refund-policy" className="underline hover:text-[var(--ink)]">
-                    {t('pricing_refund_link')}
-                  </Link>
-                </p>
-              </div>
+              {/* La garantia de 30 dias y el enlace a /refund-policy se
+                  eliminaron: con compra in-app el reembolso lo gestiona la
+                  tienda segun sus propias reglas, no nosotros. La politica
+                  definitiva se redacta en la Fase 2. */}
             </>
           )}
         </div>

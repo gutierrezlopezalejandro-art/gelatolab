@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 
 /**
  * Business / heladería profile. Captured during the first-run wizard, then
@@ -44,7 +44,7 @@ export const useBusinessStore = create(
     }),
     {
       name: 'gelatolab-business',
-      storage: createJSONStorage(() => idbStorage),
+      storage: createJSONStorage(() => appStorage),
       // Migracion: si hay machine_id / pasteurizer_id (string) pero los arrays
       // estan vacios, los promovemos al array. Asi usuarios existentes no
       // pierden su seleccion al actualizar a multi-equipment.

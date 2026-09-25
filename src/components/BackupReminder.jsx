@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useT } from '../lib/i18n';
 import { useAppStore } from '../store/appStore';
-import { useAuthStore } from '../store/authStore';
 import { exportBackup } from '../lib/backup';
 import {
   isFolderBackupSupported, getStoredFolderHandle, ensureFolderPermission,
@@ -22,7 +21,6 @@ const SESSION_DISMISS_KEY = '__gelatolab_backup_reminder_dismissed';
 export function BackupReminder() {
   const t = useT();
   const { showToast } = useAppStore();
-  const user = useAuthStore(s => s.user);
   const [dismissed, setDismissed] = useState(
     sessionStorage.getItem(SESSION_DISMISS_KEY) === '1'
   );
@@ -45,7 +43,10 @@ export function BackupReminder() {
   // Sin recordatorio: usuario no logueado (no hay datos reales que respaldar
   // aún), ya hay carpeta conectada con permiso, o el usuario descartó el
   // banner en esta sesion.
-  if (!user || dismissed || folderConnected) return null;
+  // Antes exigia sesion iniciada. Sin cuentas ese gate desaparece, y el
+  // recordatorio pasa a ser mas importante: el dispositivo es la unica
+  // copia del recetario.
+  if (dismissed || folderConnected) return null;
 
   function dismiss() {
     setDismissed(true);

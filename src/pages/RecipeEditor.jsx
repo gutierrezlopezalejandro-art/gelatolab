@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useRecipeStore } from '../store/recipeStore';
 import { useIngredientStore } from '../store/ingredientStore';
 import { useAppStore } from '../store/appStore';
-import { useAuthStore } from '../store/authStore';
-import { pushNow } from '../lib/cloudSync';
 import { track } from '../lib/analytics';
 import AnalysisPanel from '../components/AnalysisPanel';
 import DiagnosticPanel from '../components/DiagnosticPanel';
@@ -275,9 +273,8 @@ export default function RecipeEditor() {
   }
 
   // ── Save ──────────────────────────────────────────────────
-  // Local save is synchronous and never blocks on cloud. The cloud push is
-  // fired in the background via pushNow (cancels any pending debounce so the
-  // latest snapshot reaches Supabase immediately, but the UI never waits).
+  // El guardado es sincronico contra el store; la persistencia a disco la
+  // hace appStorage de forma asincronica sin bloquear la UI.
   function handleSave() {
     if (!name.trim()) return showToast(t('name_required'), 'error');
     // PIN gate: si hay PIN configurado y la sesion no esta desbloqueada, abre
@@ -327,13 +324,11 @@ export default function RecipeEditor() {
 
       if (isNew) {
         const created = recipeStore.create({ ...payload, revisions: trimmedRevisions });
-        flushRecipesToCloud();
         track('recipe_created', { type });
         showToast(t('recipe_created'));
         navigate(`/recipes/${created.id}`, { replace: true });
       } else {
         recipeStore.update(id, { ...payload, revisions: trimmedRevisions });
-        flushRecipesToCloud();
         track('recipe_updated', { type });
         showToast(t('recipe_saved'));
         setDirty(false);
@@ -372,14 +367,6 @@ export default function RecipeEditor() {
     }
     setDirty(true);
     showToast(t('history_restored'));
-  }
-
-  // Background cloud push — bypasses the 2s debounce so the latest state hits
-  // the server right away, but is fire-and-forget so the UI never waits on it.
-  function flushRecipesToCloud() {
-    const user = useAuthStore.getState().user;
-    if (!user) return;
-    pushNow(user.id, 'recipes', useRecipeStore.getState()).catch(() => { /* non-blocking */ });
   }
 
   // ── Column helper: per-ingredient breakdown ───────────────

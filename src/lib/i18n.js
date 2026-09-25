@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from './idbStorage';
+import { appStorage } from './appStorage';
 
 // ── Diccionarios ────────────────────────────────────────────
 import esDict from './locales/es';
@@ -74,7 +74,7 @@ export const useI18nStore = create(
     }),
     {
       name: 'heladeria-lang',
-      storage: createJSONStorage(() => idbStorage),
+      storage: createJSONStorage(() => appStorage),
       // Solo persistimos `lang`. `dictsLoaded` es estado en memoria, no tiene
       // sentido guardarlo (los dicts arrancan vacios al abrir la app).
       partialize: (state) => ({ lang: state.lang }),

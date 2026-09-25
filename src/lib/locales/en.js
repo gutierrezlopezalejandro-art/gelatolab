@@ -1966,6 +1966,7 @@ export default {
     pricing_title: "Plans that grow with you",
     pricing_sub: "Free is perfect for hobby formulation. Pro is for producers and sellers: sync, legal labels, production sheets and the works.",
     pricing_coming_soon: "We're finishing the payment integration. In the meantime you can use GelatoLab for free with your Free account.",
+    pricing_purchase_unavailable: "In-app purchase is not available yet in this version.",
     pricing_footnote: "Cancel anytime from your account. No commitment. 14-day money-back guarantee.",
     plan_free: "Free",
     plan_free_sub: "To get started and learn the basics.",

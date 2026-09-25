@@ -1,26 +1,21 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from './store/appStore';
-import { useAuthStore } from './store/authStore';
 import { useIngredientStore } from './store/ingredientStore';
 import { getLowStock, processDueInventoryDeductions, getPendingConfirmations } from './store/inventoryStore';
 import { useProductionStore } from './store/productionStore';
-import { supabase } from './lib/supabase';
 import { useI18nStore, useT, LANGUAGES } from './lib/i18n';
 import { trackPageview } from './lib/analytics';
-import { UserMenu } from './components/UserMenu';
+import { SettingsButton } from './components/SettingsButton';
 import { isBarcodeAvailable } from './lib/barcode';
 import { useIsMobile } from './lib/hooks';
 import { OnboardingWizard } from './components/OnboardingWizard';
 import { useBusinessStore } from './store/businessStore';
-import { CloudSyncProvider } from './components/CloudSyncProvider';
 import { BackupReminder } from './components/BackupReminder';
 import { Spinner } from './components/ui/index.jsx';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { NotFound } from './components/NotFound';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import { Footer } from './components/Footer';
-import { CookieBanner } from './components/CookieBanner';
 import { HelpAssistant } from './components/HelpAssistant';
 import { UIHighlightOverlay } from './components/UIHighlightOverlay';
 import { Logo } from './components/Logo';
@@ -36,22 +31,12 @@ const BatchCalc      = lazy(() => import('./pages/BatchCalc'));
 const ProductionPlan = lazy(() => import('./pages/ProductionPlan'));
 const ProductionLog  = lazy(() => import('./pages/ProductionLog'));
 const IngredientDB   = lazy(() => import('./pages/IngredientDB'));
-const Auth           = lazy(() => import('./pages/Auth'));
-const ResetPassword  = lazy(() => import('./pages/ResetPassword'));
 const Terms          = lazy(() => import('./pages/Terms'));
 const Privacy        = lazy(() => import('./pages/Privacy'));
 const Help           = lazy(() => import('./pages/Help'));
 const Mobile         = lazy(() => import('./pages/Mobile'));
 const Haccp          = lazy(() => import('./pages/Haccp'));
-const Landing        = lazy(() => import('./pages/Landing'));
-import { resetVisited } from './pages/Landing';
 const Pricing        = lazy(() => import('./pages/Pricing'));
-const Refund         = lazy(() => import('./pages/Refund'));
-const Download       = lazy(() => import('./pages/Download'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const AdminUsers     = lazy(() => import('./pages/AdminUsers'));
-const AdminAuditLog  = lazy(() => import('./pages/AdminAuditLog'));
-import { AdminLayout } from './components/AdminLayout';
 
 const NAV_KEYS = [
   { to: '/dashboard',   key: 'dashboard' },
@@ -113,8 +98,6 @@ function LangSelector() {
 
 export default function App() {
   const { toast, modal, resolveModal } = useAppStore();
-  const initAuth = useAuthStore(s => s.init);
-  const user = useAuthStore(s => s.user);
   const ingredients = useIngredientStore(s => s.ingredients);
   const navigate = useNavigate();
   const location = useLocation();
@@ -122,9 +105,6 @@ export default function App() {
   // — sin navbar ni footer ni onboarding. Atajo para evitar que el navbar
   // ocupe pantalla en una herramienta que se usa una mano caminando.
   const isMobileFullscreen = location.pathname.startsWith('/mobile');
-  // Paginas publicas (marketing): traen su propio header/footer y no necesitan
-  // el chrome de la app. Evita que un bot indexe el navbar como contenido.
-  const isLanding = location.pathname === '/' || location.pathname === '/download';
   const isMobile = useIsMobile();
   const t = useT();
   const lowStockCount = getLowStock(ingredients).length;
@@ -141,8 +121,6 @@ export default function App() {
   const [pendingUpdate, setPendingUpdate] = useState(null);
   const businessCompleted = useBusinessStore(s => s.completed);
   const fantasyName = useBusinessStore(s => s.fantasy_name);
-
-  useEffect(() => { initAuth(); }, [initAuth]);
 
   // Auto-update check (Tauri desktop only). Best-effort: si no hay red o
   // GitHub no responde, falla en silencio. Solo se pregunta una vez por
@@ -214,15 +192,6 @@ export default function App() {
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, []);
 
-  // Redirect to reset-password form when the user arrives via the recovery email.
-  useEffect(() => {
-    if (!supabase) return;
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') navigate('/reset-password');
-    });
-    return () => sub.subscription?.unsubscribe?.();
-  }, [navigate]);
-
   // Modo standalone: pinta SOLO la ruta sin navbar/footer/banners.
   if (isMobileFullscreen) {
     return (
@@ -235,27 +204,6 @@ export default function App() {
         {toast && <Toast toast={toast} />}
         {modal && <ConfirmModal modal={modal} onResolve={resolveModal} />}
         <UpdateAvailableModal update={pendingUpdate} onDismiss={() => setPendingUpdate(null)} />
-        <CloudSyncProvider />
-      </ErrorBoundary>
-    );
-  }
-
-  // Paginas publicas (Landing, Download): standalone (sin navbar app), pero
-  // conservan el CookieBanner para cumplir GDPR si el visitante navega ahi
-  // primero.
-  if (isLanding) {
-    return (
-      <ErrorBoundary>
-        <Suspense fallback={<Spinner />}>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/download" element={<Download />} />
-          </Routes>
-        </Suspense>
-        {toast && <Toast toast={toast} />}
-        {modal && <ConfirmModal modal={modal} onResolve={resolveModal} />}
-        <UpdateAvailableModal update={pendingUpdate} onDismiss={() => setPendingUpdate(null)} />
-        <CookieBanner />
       </ErrorBoundary>
     );
   }
@@ -286,22 +234,12 @@ export default function App() {
 
           <button
             type="button"
-            onClick={() => {
-              // Si el usuario no esta logueado (modo "prueba"), volvemos a la
-              // landing reseteando el flag visited para que se vea la pagina
-              // publica. Si esta logueado, el logo no hace nada — el dashboard
-              // es su pantalla principal.
-              if (!user) {
-                resetVisited();
-                navigate('/');
-              }
-            }}
-            disabled={!!user}
+            // Sin landing ni sesion, el logo lleva al inicio de la app.
+            onClick={() => navigate('/dashboard')}
             className="flex items-center gap-2.5 py-3 pr-5 md:mr-4 md:border-r md:border-white/15 flex-shrink-0
-                       bg-transparent border-none cursor-pointer disabled:cursor-default
+                       bg-transparent border-none cursor-pointer
                        hover:opacity-90 transition-opacity"
-            aria-label={user ? 'GelatoLab' : t('back_to_landing')}
-            title={user ? '' : t('back_to_landing')}
+            aria-label="GelatoLab"
           >
             <Logo size={32} variant="dark" />
             <div className="text-left">
@@ -375,7 +313,7 @@ export default function App() {
             >
               ?
             </NavLink>
-            <UserMenu />
+            <SettingsButton />
             <LangSelector />
           </div>
         </div>
@@ -420,7 +358,7 @@ export default function App() {
             cuando hay entries con prod_date == hoy esperando confirmación
             del usuario. Click → /production con scroll al primer pendiente.
             Se oculta en /production (ya está la UI ahí). */}
-        {user && pendingCount > 0 && location.pathname !== '/production' && (
+        {pendingCount > 0 && location.pathname !== '/production' && (
           <div className="max-w-[1280px] mx-auto px-4 mt-3">
             <button
               onClick={() => navigate('/production')}
@@ -439,31 +377,23 @@ export default function App() {
         <ErrorBoundary>
           <Suspense fallback={<Spinner />}>
             <Routes>
-              {/* "/" se maneja en el early-return de isLanding, arriba. */}
+              {/* Sin cuentas no hay rutas protegidas: la app entera es
+                  accesible desde el arranque. El gating que queda es por
+                  plan (ProGate), no por sesion. */}
+              <Route path="/"            element={<Dashboard />} />
               <Route path="/dashboard"   element={<Dashboard />} />
               <Route path="/recipes"     element={<Recipes />} />
-              <Route path="/recipes/new" element={<ProtectedRoute><RecipeEditor /></ProtectedRoute>} />
-              <Route path="/recipes/:id" element={<ProtectedRoute><RecipeEditor /></ProtectedRoute>} />
+              <Route path="/recipes/new" element={<RecipeEditor />} />
+              <Route path="/recipes/:id" element={<RecipeEditor />} />
               <Route path="/batch"       element={<BatchCalc />} />
-              <Route path="/plan"        element={<ProtectedRoute><ProductionPlan /></ProtectedRoute>} />
-              <Route path="/production"  element={<ProtectedRoute><ProductionLog /></ProtectedRoute>} />
-              <Route path="/haccp"       element={<ProtectedRoute><Haccp /></ProtectedRoute>} />
-              <Route path="/ingredients" element={<ProtectedRoute><IngredientDB /></ProtectedRoute>} />
-              <Route path="/auth"        element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/plan"        element={<ProductionPlan />} />
+              <Route path="/production"  element={<ProductionLog />} />
+              <Route path="/haccp"       element={<Haccp />} />
+              <Route path="/ingredients" element={<IngredientDB />} />
               <Route path="/terms"       element={<Terms />} />
               <Route path="/privacy"     element={<Privacy />} />
-              <Route path="/refund-policy" element={<Refund />} />
               <Route path="/help"        element={<Help />} />
               <Route path="/pricing"     element={<Pricing />} />
-              {/* Admin panel — gateado por role='admin' (requireAdmin chequea
-                  profile.role !== 'admin' y muestra el card "⛔" si no aplica).
-                  3 sub-rutas anidadas bajo AdminLayout (sidebar tabs). */}
-              <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
-                <Route index            element={<AdminDashboard />} />
-                <Route path="users"     element={<AdminUsers />} />
-                <Route path="audit"     element={<AdminAuditLog />} />
-              </Route>
               <Route path="*"            element={<NotFound />} />
             </Routes>
           </Suspense>
@@ -479,12 +409,7 @@ export default function App() {
           aparecía sobre la pantalla de auth (al cliquear "Iniciar sesión"
           en DesktopWelcome veías el wizard antes que el formulario de
           login), lo cual era confuso e ilógico. */}
-      {!businessCompleted
-        && location.pathname !== '/auth'
-        && location.pathname !== '/reset-password'
-        && <OnboardingWizard />}
-      <CloudSyncProvider />
-      <CookieBanner />
+      {!businessCompleted && <OnboardingWizard />}
       {/* HelpAssistant (Marco IA flotante) solo en páginas de "trabajo".
           Lo ocultamos en /terms, /privacy, /help (redundante con la
           página de ayuda completa), /pricing y /download — esas son

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 
 /**
  * Registro HACCP (Hazard Analysis Critical Control Points). Bitacora de
@@ -109,7 +109,7 @@ export const useHaccpStore = create(
         set({ entries: [], nextId: 1 });
       },
     }),
-    { name: 'gelatolab-haccp', storage: createJSONStorage(() => idbStorage) }
+    { name: 'gelatolab-haccp', storage: createJSONStorage(() => appStorage) }
   )
 );
 

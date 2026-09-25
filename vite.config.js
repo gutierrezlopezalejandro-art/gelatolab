@@ -57,12 +57,6 @@ const pwaConfig = {
           expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 },
         },
       },
-      {
-        // Supabase API — network-only. Datos vivos, NO se deben cachear o
-        // mostraria info stale (ej: receta editada en otro device).
-        urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-        handler: 'NetworkOnly',
-      },
     ],
     // Permite navigationFallback al index.html para que las rutas SPA funcionen
     // offline (ej: /#/recipes abre directo cuando no hay red).

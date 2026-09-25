@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { idbStorage } from '../lib/idbStorage';
+import { appStorage } from '../lib/appStorage';
 
 // Configuracion de los asistentes IA. La clave de OpenAI se guarda en
 // localStorage del navegador y nunca sale de la maquina del usuario.
@@ -13,7 +13,7 @@ export const useAiStore = create(
       setModel:  (model)  => set({ model }),
       clear:     ()       => set({ apiKey: '' }),
     }),
-    { name: 'gelatolab-ai', storage: createJSONStorage(() => idbStorage) }
+    { name: 'gelatolab-ai', storage: createJSONStorage(() => appStorage) }
   )
 );
 
