@@ -108,6 +108,10 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
+    // Las pruebas de extremo a extremo viven en e2e/ y las corre Playwright
+    // (`npm run e2e`), no vitest. Sin esta exclusion vitest las recoge por
+    // el patron *.spec.js y falla con "did not expect test.describe()".
+    exclude: ['node_modules/**', 'dist/**', 'e2e/**'],
     // El setup se aplica a todos los tests; los matchers de jest-dom solo
     // aplican cuando el archivo opta por jsdom via "// @vitest-environment jsdom".
     setupFiles: ['./vitest.setup.js'],

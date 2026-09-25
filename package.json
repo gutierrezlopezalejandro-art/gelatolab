@@ -16,7 +16,10 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "capture:screenshots": "node scripts/capture-screenshots.mjs"
+    "capture:screenshots": "node scripts/capture-screenshots.mjs",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@capacitor-mlkit/barcode-scanning": "^8.0.1",
@@ -45,6 +48,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.3.1",
+    "@playwright/test": "^1.63.0",
     "@tauri-apps/cli": "^2.0.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

@@ -31,10 +31,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # --legacy-peer-deps porque @vitejs/plugin-basic-ssl@2.3 espera vite>=6
-        # pero seguimos en vite 5; no es bloqueante en runtime, npm rechaza
-        # de mas. Mantenerlo asi hasta migrar a vite 6.
-        run: npm ci --legacy-peer-deps
+        # Ya no hace falta --legacy-peer-deps: @vitejs/plugin-basic-ssl se
+        # bajo a 1.2.0, que si soporta vite 5. El conflicto de peers que
+        # obligaba al parche quedo resuelto.
+        run: npm ci
 
       - name: Run tests
         run: npm test
@@ -47,4 +47,39 @@ jobs:
         with:
           name: dist
           path: dist/
+          retention-days: 7
+
+  e2e:
+    # Pruebas de extremo a extremo: abren la app en un navegador real y la
+    # usan como una persona. Cubren lo que la compilacion no ve (pantallas en
+    # blanco, botones que desaparecen, datos que no sobreviven a reabrir).
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install browsers
+        # Solo WebKit: es el motor de iOS, donde va a correr la app dentro
+        # de un WKWebView. Es el entorno mas fiel y el mas exigente.
+        run: npx playwright install --with-deps webkit
+
+      - name: Run e2e tests
+        run: npm run e2e
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
           retention-days: 7
