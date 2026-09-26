@@ -18,26 +18,21 @@ import { abrirApp } from './helpers.js';
  * vuelva a esconder funciones por tamano de pantalla.
  */
 
-const enTelefono = ({}, testInfo) => testInfo.project.name === 'iphone';
-
 test.describe('Editor de recetas', () => {
-  test('las 5 secciones son alcanzables', async ({ page }, testInfo) => {
-    // Hoy en telefono la barra de pestanas completa esta oculta por la regla
-    // `hidden sm:flex` y un matchMedia fuerza la seccion "Formulacion".
-    test.fail(enTelefono({}, testInfo), 'Pendiente Fase 3: la barra de pestanas se oculta bajo 640px');
-
+  test('las 5 secciones son alcanzables', async ({ page }) => {
+    // RESUELTO en la Fase 3. Antes la regla `hidden sm:flex` ocultaba la
+    // barra entera bajo 640px y un matchMedia encerraba al usuario en
+    // "Formulación". Queda como candado permanente.
     await abrirApp(page, '/recipes/2');
 
     for (const seccion of [/Formulaci/i, /Proceso/i, /Curva/i, /Nutricional/i, /An.lisis/i]) {
-      await expect(page.getByRole('button', { name: seccion })).toBeVisible();
+      await expect(page.getByRole('tab', { name: seccion })).toBeVisible();
     }
   });
 
-  test('no se le sugiere al usuario irse al escritorio', async ({ page }, testInfo) => {
-    // El aviso MobileDesktopHint manda al usuario al PC. En una app de
-    // telefono vendida en la tienda, eso no puede existir.
-    test.fail(enTelefono({}, testInfo), 'Pendiente Fase 3: MobileDesktopHint sigue presente');
-
+  test('no se le sugiere al usuario irse al escritorio', async ({ page }) => {
+    // RESUELTO en la Fase 3: MobileDesktopHint se elimino de toda la app.
+    // La prueba queda como candado permanente.
     await abrirApp(page, '/recipes/2');
     await expect(page.getByText(/Mejor experiencia en escritorio/i)).toHaveCount(0);
   });
@@ -49,20 +44,16 @@ test.describe('Editor de recetas', () => {
  * en el telefono hay dos barreras encadenadas, y cada una tiene su prueba
  * para que quede claro que son dos arreglos distintos.
  *
- * Se localiza el boton por `title` y no por su nombre accesible porque su
- * unico contenido es "✓": para un lector de pantalla se llama "marca de
- * verificacion". Ademas ese `title` esta escrito en espanol fijo, sin pasar
- * por las traducciones, en una app con 6 idiomas.
+ * RESUELTO en la Fase 3: el boton ya no depende del hover, tiene nombre
+ * accesible propio y su texto sale de las traducciones.
  */
 test.describe('Lista de recetas', () => {
-  const SELECTOR = 'button[title="Seleccionar para reporte"]';
+  const SELECTOR = 'button[aria-pressed="false"]';
 
-  test('la seleccion de recetas se puede tocar sin mouse', async ({ page }, testInfo) => {
-    // El boton usa `opacity-0 group-hover:opacity-100`: solo aparece cuando
-    // el mouse pasa por encima. En una pantalla tactil no hay hover.
-    // OJO: esto NO es un problema solo del telefono. El iPad tampoco tiene
-    // mouse, asi que la seleccion multiple esta rota en los dos perfiles.
-    test.fail(true, 'Pendiente Fase 3: el boton depende de hover, roto en todo dispositivo tactil');
+  test('la seleccion de recetas se puede tocar sin mouse', async ({ page }) => {
+    // RESUELTO en la Fase 3. Antes el boton usaba
+    // `opacity-0 group-hover:opacity-100` y solo aparecia con el mouse
+    // encima, lo que lo hacia inalcanzable en telefono Y en iPad.
 
     await abrirApp(page, '/recipes');
     const opacidad = await page.locator(SELECTOR).first()
@@ -70,11 +61,10 @@ test.describe('Lista de recetas', () => {
     expect(opacidad).not.toBe('0');
   });
 
-  test('comparar y generar reporte estan disponibles al seleccionar', async ({ page }, testInfo) => {
-    // Aun forzando la seleccion, ambos botones llevan `hidden sm:inline-block`
-    // y bajo 640px se reemplazan por el texto "Disponible solo en escritorio".
-    // No se puede cobrar por algo que el comprador no alcanza a ver.
-    test.fail(enTelefono({}, testInfo), 'Pendiente Fase 3: ambos botones ocultos bajo 640px');
+  test('comparar y generar reporte estan disponibles al seleccionar', async ({ page }) => {
+    // RESUELTO en la Fase 3: ambos botones perdieron el `hidden sm:` y el
+    // texto "Disponible solo en escritorio" desaparecio. Son funciones del
+    // plan Pro: no se puede cobrar por algo que el comprador no ve.
 
     await abrirApp(page, '/recipes');
     const seleccionar = page.locator(SELECTOR);
@@ -82,14 +72,16 @@ test.describe('Lista de recetas', () => {
     await seleccionar.nth(0).click({ force: true }); // la primera ya cambio de title
 
     await expect(page.getByText(/Disponible solo en escritorio/i)).toBeHidden();
-    await expect(page.getByRole('button', { name: /Comparar/i })).toBeVisible();
+    // Se usa el anclaje `data-tour` que la app ya tiene: buscar por el texto
+    // "Comparar" trae tambien el contenido de la ayuda.
+    await expect(page.locator('[data-tour="compare-btn"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Generar|reporte/i }).first()).toBeVisible();
   });
 });
 
 test.describe('Base de ingredientes', () => {
-  test('no se le sugiere al usuario irse al escritorio', async ({ page }, testInfo) => {
-    test.fail(enTelefono({}, testInfo), 'Pendiente Fase 3: MobileDesktopHint sigue presente');
-
+  test('no se le sugiere al usuario irse al escritorio', async ({ page }) => {
+    // RESUELTO en la Fase 3. Candado permanente.
     await abrirApp(page, '/ingredients');
     await expect(page.getByText(/Mejor experiencia en escritorio/i)).toHaveCount(0);
   });

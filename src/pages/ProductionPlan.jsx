@@ -14,7 +14,6 @@ import { printHtml } from '../lib/printHtml';
 import { MachineVolumeWarning, PasteurizerVolumeWarning } from '../components/MachineVolumeWarning';
 import { NumberInput } from '../components/NumberInput';
 import { ProGate } from '../components/ProGate';
-import { MobileDesktopHint } from '../components/MobileDesktopHint';
 import { FEATURES } from '../lib/entitlement';
 import { useBusinessStore } from '../store/businessStore';
 import { getMachine, rateBatchVolume, ratePasteurizerVolume, pickBestFit } from '../data/machines';
@@ -590,7 +589,6 @@ ${issuesSection}
   // ── Render ────────────────────────────────────────────────
   return (
     <div>
-      <MobileDesktopHint pageId="production-plan" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-2xl text-[var(--ink)]">{t('production_plan')}</h1>

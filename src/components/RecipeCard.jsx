@@ -53,19 +53,37 @@ export default function RecipeCard({ recipe, ingredients, onEdit, onDuplicate, o
       onClick={() => onEdit(recipe.id)}
       onKeyDown={handleCardKey}
     >
-      {/* Checkbox para seleccion multiple (visible al hover o cuando esta seleccionada) */}
+      {/* Boton de seleccion multiple.
+
+          Antes usaba `opacity-0 group-hover:opacity-100`, o sea que solo
+          aparecia al pasar el mouse por encima. En una pantalla tactil no hay
+          hover, ni en telefono ni en iPad, asi que la seleccion multiple era
+          inalcanzable — y con ella las dos funciones de pago que dependen de
+          seleccionar recetas.
+
+          Ahora esta siempre visible. Sin seleccionar se ve tenue para no
+          competir con el contenido de la tarjeta; al seleccionar toma el
+          color de marca. El area tactil es de 44px, la guia de Apple, aunque
+          el circulo dibujado sea mas chico. */}
       {onToggleSelect && (
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onToggleSelect(); }}
-          className={`absolute top-2 right-2 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs cursor-pointer transition-all
-            ${selected
-              ? 'bg-[var(--mint)] border-[var(--mint)] text-white opacity-100'
-              : 'bg-white/80 border-black/20 text-transparent opacity-0 group-hover:opacity-100 hover:border-[var(--mint)]'}`}
-          title={selected ? 'Quitar de selección' : 'Seleccionar para reporte'}
+          className="absolute top-0 right-0 z-10 w-11 h-11 flex items-center justify-center
+                     cursor-pointer bg-transparent border-none p-0"
+          title={selected ? t('recipe_unselect') : t('recipe_select')}
+          aria-label={selected ? t('recipe_unselect') : t('recipe_select')}
           aria-pressed={selected}
         >
-          ✓
+          <span
+            aria-hidden="true"
+            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs transition-all
+              ${selected
+                ? 'bg-[var(--mint)] border-[var(--mint)] text-white'
+                : 'bg-white/80 border-black/25 text-transparent'}`}
+          >
+            ✓
+          </span>
         </button>
       )}
       {/* Color bar */}

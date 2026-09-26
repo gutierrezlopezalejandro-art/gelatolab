@@ -21,7 +21,6 @@ import { FEATURES, useEntitlement } from '../lib/entitlement';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { StocktakeModal } from '../components/StocktakeModal';
 import { SuppliersModal } from '../components/SuppliersModal';
-import { MobileDesktopHint } from '../components/MobileDesktopHint';
 
 const CAT_COLORS = {
   'Lacteo': '#1a5c3a', 'Azucar': '#b8860b', 'Fruta': '#2e7d52',
@@ -393,7 +392,6 @@ export default function IngredientDB() {
   // ── Render ────────────────────────────────────────────────
   return (
     <div>
-      <MobileDesktopHint pageId="ingredient-db" />
       {/* Page header */}
       <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
         <div>

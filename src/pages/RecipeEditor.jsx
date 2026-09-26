@@ -21,7 +21,6 @@ import SearchSelect from '../components/SearchSelect';
 import { Spinner } from '../components/ui/index.jsx';
 import { NumberInput } from '../components/NumberInput';
 import { ProGate } from '../components/ProGate';
-import { MobileDesktopHint } from '../components/MobileDesktopHint';
 import { FEATURES } from '../lib/entitlement';
 import { calcStats, calcDensity, calcServingTemp, getParams, resolveRecipeItems, applyEvaporation } from '../lib/icecreamCalc';
 import { useT, useIngredientName, useCategoryName, useI18nStore } from '../lib/i18n';
@@ -71,16 +70,6 @@ export default function RecipeEditor() {
   const [saving,     setSaving]     = useState(false);
   const [activeTab,  setActiveTab]  = useState('formulacion');
 
-  // En mobile (≤640px) las tabs secundarias estan ocultas. Forzamos
-  // activeTab='formulacion' para que la pagina nunca quede en blanco
-  // si el usuario estaba en otra tab y achica la ventana.
-  useEffect(() => {
-    const mql = window.matchMedia('(max-width: 640px)');
-    function sync() { if (mql.matches) setActiveTab('formulacion'); }
-    sync();
-    mql.addEventListener('change', sync);
-    return () => mql.removeEventListener('change', sync);
-  }, []);
   const [showBalance, setShowBalance] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showPinPrompt, setShowPinPrompt] = useState(false);
@@ -401,7 +390,6 @@ export default function RecipeEditor() {
     // de ingredientes en vez de pegado al borde derecho del viewport.
     // Reportado por usuario 2026-05-15.
     <div className="max-w-[1100px] mx-auto">
-      <MobileDesktopHint pageId="recipe-editor" />
       {/* h1 oculto: el nombre de la receta es un input editable, no un heading
           tradicional. Para landmarks/SEO/screen-readers necesitamos un h1
           presente en el DOM. Esta pantalla antes no tenía ningún h1. */}
@@ -537,18 +525,29 @@ export default function RecipeEditor() {
         </div>
       </div>
 
-      {/* ═══════════════════ Tabs ═══════════════════
-          En mobile (≤640px) ocultamos las tabs secundarias y solo
-          mostramos Formulación. Las tabs de análisis (curva, valores
-          nutricionales, análisis IA) son densas en datos y no se ven
-          bien en pantalla chica — el usuario ya recibe el aviso
-          MobileDesktopHint sugiriendo usar desktop para ver todo. */}
-      <div data-tour="recipe-tabs" className="hidden sm:flex border-b-2 border-black/10 mb-6">
+      {/* ═══════════════════ Secciones ═══════════════════
+          Las cinco secciones estan SIEMPRE accesibles, tambien en telefono.
+          Antes la regla `hidden sm:flex` ocultaba esta barra entera bajo
+          640px y un matchMedia forzaba "Formulación", de modo que proceso,
+          curva, nutrición y análisis eran inalcanzables desde un telefono.
+
+          En pantalla chica la barra se desplaza en horizontal, con las
+          pestañas dimensionadas para el pulgar (44px de alto minimo, que es
+          la guia de Apple). En pantalla grande se ve completa. */}
+      <div
+        data-tour="recipe-tabs"
+        role="tablist"
+        className="flex border-b-2 border-black/10 mb-6 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0
+                   [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         {tabs.map(([k, lbl]) => (
           <button
             key={k}
+            role="tab"
+            aria-selected={activeTab === k}
             onClick={() => setActiveTab(k)}
-            className={`px-5 py-3 text-sm font-medium border-b-[2.5px] -mb-0.5 transition-all
+            className={`px-4 sm:px-5 min-h-[44px] py-3 text-sm font-medium border-b-[2.5px] -mb-0.5
+              transition-all whitespace-nowrap flex-shrink-0
               ${activeTab === k
                 ? 'text-[var(--mint)] border-[var(--mint)] font-semibold'
                 : 'text-[var(--ink3)] border-transparent hover:text-[var(--ink)]'}`}

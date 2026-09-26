@@ -288,7 +288,7 @@ export default function Recipes() {
             <button
               type="button"
               onClick={handleGenerateReport}
-              className="hidden sm:inline-block text-xs font-bold px-4 py-1.5 rounded-full bg-white text-[var(--ink)] hover:bg-[var(--cream)] cursor-pointer border-none transition-colors"
+              className="text-xs font-bold px-4 py-2 min-h-[36px] rounded-full bg-white text-[var(--ink)] hover:bg-[var(--cream)] cursor-pointer border-none transition-colors"
             >
               📄 {t('report_generate')}
             </button>
@@ -299,15 +299,12 @@ export default function Recipes() {
               type="button"
               onClick={() => { setShowCompare(true); track('recipes_compared', { count: selectedIds.length }); }}
               disabled={selectedIds.length < 2}
-              className="hidden sm:inline-block text-xs font-bold px-4 py-1.5 rounded-full bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-xs font-bold px-4 py-2 min-h-[36px] rounded-full bg-[#e8b920] text-[var(--ink)] hover:opacity-90 cursor-pointer border-none transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               title={selectedIds.length < 2 ? t('compare_need_two') : t('compare_btn_tooltip')}
             >
               ⚖️ {t('compare_btn')}
             </button>
           </ProGate>
-          <span className="sm:hidden text-[10px] text-white/60 italic">
-            {t('report_actions_desktop_only')}
-          </span>
           <button
             type="button"
             onClick={clearSelection}
