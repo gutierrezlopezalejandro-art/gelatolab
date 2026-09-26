@@ -47,6 +47,40 @@ test.describe('Editor de recetas', () => {
  * RESUELTO en la Fase 3: el boton ya no depende del hover, tiene nombre
  * accesible propio y su texto sale de las traducciones.
  */
+test.describe('Ficha de detalle del ingrediente', () => {
+  test('la tabla de formulacion cabe en el telefono', async ({ page }, testInfo) => {
+    // El desglose por ingrediente ocupaba ocho columnas permanentes y
+    // obligaba a desplazar la tabla en horizontal. Ahora son tres datos.
+    test.skip(testInfo.project.name !== 'iphone', 'solo aplica al telefono');
+
+    await abrirApp(page, '/recipes/2');
+    const medidas = await page.locator('table').first().evaluate((t) => ({
+      tabla: t.scrollWidth,
+      contenedor: t.parentElement.clientWidth,
+      ventana: window.innerWidth,
+    }));
+    expect(medidas.tabla, 'la tabla se sale del contenedor').toBeLessThanOrEqual(medidas.contenedor);
+    expect(medidas.contenedor, 'el contenedor se sale de la pantalla').toBeLessThanOrEqual(medidas.ventana);
+  });
+
+  test('el desglose completo sigue disponible al tocar la fila', async ({ page }) => {
+    // Nada se elimino: agua, grasa, SNG, azucar, otros, POD, PAC y costo
+    // dejaron de ocupar columnas y viven en la ficha.
+    await abrirApp(page, '/recipes/2');
+    await page.getByRole('button', { name: /Ver detalle del ingrediente/i }).first().click();
+
+    const ficha = page.getByRole('dialog');
+    await expect(ficha).toBeVisible();
+    for (const dato of [/Agua/i, /Grasa/i, /SNG/i, /Az.car/i, /Otros/i, /POD/, /PAC/, /Costo/i]) {
+      await expect(ficha.getByText(dato).first()).toBeVisible();
+    }
+
+    // Se cierra con Escape.
+    await page.keyboard.press('Escape');
+    await expect(ficha).toBeHidden();
+  });
+});
+
 test.describe('Lista de recetas', () => {
   const SELECTOR = 'button[aria-pressed="false"]';
 

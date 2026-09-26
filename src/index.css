@@ -102,13 +102,15 @@
   }
 
   .tbl { @apply w-full border-collapse text-sm; }
+  /* px-1.5 en telefono y px-3 desde sm: con cinco columnas, el relleno
+     horizontal era lo que empujaba la tabla fuera de la pantalla. */
   .tbl th {
     @apply text-[10px] font-semibold text-[var(--ink3)] uppercase tracking-widest
-           py-2 px-3 border-b-2 border-black/10 text-right whitespace-nowrap bg-white;
+           py-2 px-1.5 sm:px-3 border-b-2 border-black/10 text-right whitespace-nowrap bg-white;
   }
   .tbl th:first-child { @apply text-left; }
   .tbl td {
-    @apply py-2 px-3 border-b border-black/10 text-right text-[var(--ink2)];
+    @apply py-2 px-1.5 sm:px-3 border-b border-black/10 text-right text-[var(--ink2)];
   }
   .tbl td:first-child { @apply text-left text-[var(--ink)] font-medium; }
   .tbl tr:hover td   { @apply bg-[var(--cream)]; }
@@ -133,6 +135,14 @@
   vertical-align: middle;
   margin-right: 4px;
 }
+/* Hoja de detalle: en telefono sube desde abajo. En pantalla grande el
+   desplazamiento es imperceptible y queda como una aparicion suave.
+   Se respeta a quien pidio menos movimiento en su sistema. */
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  @keyframes slideUp { from { opacity: 0; } to { opacity: 1; } }
+}
+
 @keyframes spin { to { transform: rotate(360deg); } }
 
 ::-webkit-scrollbar       { width: 6px; height: 6px; }

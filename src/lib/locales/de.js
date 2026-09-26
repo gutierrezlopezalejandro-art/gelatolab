@@ -82,6 +82,7 @@ export default {
 
     // Formulation table
     ingredient: 'Zutat',
+    row_detail_open: "Zutaten-Details ansehen",
     select_ingredient: '-- Zutat --',
     add_ingredient: '+ Zutat hinzufuegen',
     pod_tooltip: 'Relative Suesskraft x Gramm',

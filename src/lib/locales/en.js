@@ -166,6 +166,7 @@ export default {
     tab_nutrition: 'Nutritional Values',
     tab_analysis: 'Analysis',
     ingredient: 'Ingredient',
+    row_detail_open: "View ingredient breakdown",
     select_ingredient: '-- Ingredient --',
     add_ingredient: '+ Add ingredient',
     pod_tooltip: 'Relative sweetening power x grams',

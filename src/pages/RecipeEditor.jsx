@@ -16,6 +16,7 @@ import { PinPromptModal } from '../components/PinPromptModal';
 import { isPinSet, isUnlocked } from '../lib/pinLock';
 import ProcessTab from '../components/ProcessTab';
 import GelatoParams from '../components/GelatoParams';
+import { DetailSheet, DetailRow } from '../components/ui/DetailSheet';
 import AnalysisCharts from '../components/AnalysisCharts';
 import SearchSelect from '../components/SearchSelect';
 import { Spinner } from '../components/ui/index.jsx';
@@ -70,6 +71,8 @@ export default function RecipeEditor() {
   const [saving,     setSaving]     = useState(false);
   const [activeTab,  setActiveTab]  = useState('formulacion');
 
+  // Fila cuyo desglose se esta mirando. null = ninguna.
+  const [filaDetalle, setFilaDetalle] = useState(null);
   const [showBalance, setShowBalance] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showPinPrompt, setShowPinPrompt] = useState(false);
@@ -358,6 +361,14 @@ export default function RecipeEditor() {
     showToast(t('history_restored'));
   }
 
+  // Nombre visible de una fila: puede ser un ingrediente, una sub-receta, o
+  // una fila recien agregada que todavia no tiene nada elegido.
+  const nombreFila = (row, ing, nested) => {
+    if (nested) return `📋 ${nested.name}`;
+    if (ing) return tIng(ing.name);
+    return t('select_ingredient');
+  };
+
   // ── Column helper: per-ingredient breakdown ───────────────
   const COL = (ing, qty) => {
     const g = parseFloat(qty) || 0;
@@ -559,7 +570,11 @@ export default function RecipeEditor() {
 
       {/* ═══════════════════ TAB: FORMULACION ═══════════════════ */}
       {activeTab === 'formulacion' && (
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
+        // En telefono el panel de analisis va PRIMERO: es el resumen que se
+        // mira mientras se formula, y antes quedaba al final de la pagina,
+        // obligando a bajar cada vez. En pantalla grande vuelve a su lugar
+        // como barra lateral fija a la derecha.
+        <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
           {/* ── Left: ingredients table + diagnostics ── */}
           <div data-tour="recipe-formulation" className="card p-5 min-w-0">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
@@ -590,20 +605,19 @@ export default function RecipeEditor() {
               <table className="tbl text-xs">
                 <thead>
                   <tr>
-                    <th style={{ minWidth: 190, textAlign: 'center' }}>{t('ingredient')}</th>
+                    {/* Tres datos: con eso se formula. El desglose por
+                        ingrediente (agua, grasa, SNG, azucar, otros, POD, PAC
+                        y costo) vive en la ficha que abre el boton de detalle.
+                        Antes eran ocho columnas permanentes que no cabian en
+                        un telefono y que repiten, ingrediente por ingrediente,
+                        lo que el panel de analisis ya totaliza. */}
+                    <th style={{ minWidth: 120, textAlign: 'center' }}>{t('ingredient')}</th>
                     <th style={{ textAlign: 'center' }}>{t('grams_col')}</th>
-                    <th style={{ textAlign: 'center' }} title={pctMode === 'bakers' ? t('pct_mode_bakers_tooltip') : t('pct_mode_total_tooltip')}>
-                      % <span className="text-[9px] text-[var(--ink3)]">({pctMode === 'bakers' ? t('pct_mode_bakers_short') : t('pct_mode_total_short')})</span>
-                    </th>
-                    <th style={{ textAlign: 'center' }}>{t('water_col')}</th>
-                    <th style={{ textAlign: 'center' }}>{t('fat_col')}</th>
-                    <th style={{ textAlign: 'center' }}>{t('sng_col')}</th>
-                    <th style={{ textAlign: 'center' }}>{t('sugar_col')}</th>
-                    <th style={{ textAlign: 'center' }}>{t('others_col')}</th>
-                    <th style={{ textAlign: 'center' }} title={t('pod_tooltip')}>POD</th>
-                    <th style={{ textAlign: 'center' }} title={t('pac_tooltip')}>PAC</th>
-                    <th style={{ textAlign: 'center' }}>{t('cost_col')}</th>
-                    <th style={{ textAlign: 'center' }} title={t('addin_col_tooltip')}>{t('addin_col')}</th>
+                    {/* Sin la etiqueta del modo: el selector de arriba ya muestra
+                        cual esta activo, resaltado. Repetirlo aca costaba 60px
+                        de ancho en una pantalla de telefono. */}
+                    <th style={{ textAlign: 'center' }} title={pctMode === 'bakers' ? t('pct_mode_bakers_tooltip') : t('pct_mode_total_tooltip')}>%</th>
+                    <th></th>
                     <th></th>
                   </tr>
                 </thead>
@@ -670,30 +684,26 @@ export default function RecipeEditor() {
                           />
                         </td>
                         <td>{pct}{pct !== '—' ? '%' : ''}</td>
-                        <td>{c.agua}</td>
-                        <td>{c.grasa}</td>
-                        <td>{c.sng}</td>
-                        <td>{c.azucar}</td>
-                        <td>{c.otros}</td>
-                        <td className="text-[#6a3d00]">{c.pod}</td>
-                        <td className="text-[var(--teal)]">{c.pac}</td>
-                        <td>{c.costo}</td>
                         <td className="text-center">
                           <button
                             type="button"
-                            onClick={() => updateRow(row._key, 'addin', !row.addin)}
-                            className={`text-base leading-none px-1.5 py-0.5 rounded border-none cursor-pointer transition-colors
-                              ${row.addin
-                                ? 'bg-[#e8b920] text-[var(--ink)]'
-                                : 'bg-transparent text-black/20 hover:text-[var(--gold)]'}`}
-                            title={t('addin_toggle_tooltip')}
-                            aria-pressed={row.addin}
-                          >⊕</button>
+                            onClick={() => setFilaDetalle({ key: row._key, nombre: nombreFila(row, ing, nestedRecipe), c, g, pct, addin: !!row.addin })}
+                            aria-label={t('row_detail_open')}
+                            title={t('row_detail_open')}
+                            className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-[var(--ink3)]
+                                       hover:text-[var(--mint)] transition-colors cursor-pointer
+                                       bg-transparent border-none"
+                          >
+                            {row.addin ? '⊕' : 'ⓘ'}
+                          </button>
                         </td>
                         <td>
                           <button
                             onClick={() => removeRow(row._key)}
-                            className="text-black/20 hover:text-[var(--coral)] transition-colors px-1"
+                            aria-label={t('delete')}
+                            className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-black/20
+                                       hover:text-[var(--coral)] transition-colors cursor-pointer
+                                       bg-transparent border-none"
                           >✕</button>
                         </td>
                       </tr>
@@ -708,16 +718,7 @@ export default function RecipeEditor() {
                       </td>
                       <td className="font-bold">{Math.round(stats.T)} g</td>
                       <td className="text-[var(--ink3)]">100%</td>
-                      <td>{stats.agua.toFixed(1)} g</td>
-                      <td>{stats.grasa.toFixed(1)} g</td>
-                      <td>{stats.sng.toFixed(1)} g</td>
-                      <td>{stats.azucar.toFixed(1)} g</td>
-                      <td>{stats.otros.toFixed(1)} g</td>
-                      <td className="text-[#6a3d00]">{(stats.pod * 10).toFixed(1)}</td>
-                      <td className="text-[var(--teal)]">{(stats.pac * 10).toFixed(1)}</td>
-                      <td>{fmtCurrency(Math.round(stats.cost))}</td>
-                      <td></td>
-                      <td></td>
+                      <td colSpan={2}></td>
                     </tr>
                   )}
 
@@ -728,66 +729,16 @@ export default function RecipeEditor() {
                         <span className="font-bold text-[var(--ink2)]">{t('final_mix')}</span>
                       </td>
                       <td className="font-bold">{Math.round(statsFull.T)} g</td>
-                      <td colSpan={8} className="text-[var(--ink3)] text-[10px]">
+                      <td colSpan={3} className="text-[var(--ink3)] text-[10px]">
                         {t('final_mix_note')}
                       </td>
-                      <td>{fmtCurrency(Math.round(statsFull.cost))}</td>
-                      <td></td>
-                      <td></td>
                     </tr>
                   )}
 
-                  {/* ── Percentage row ── */}
-                  {stats && stats.T > 0 && (
-                    <tr className="text-xs" style={{ background:'#f0f7f3' }}>
-                      <td className="text-[var(--mint)] font-semibold text-[10px] uppercase tracking-wide">
-                        {t('pct_of_total')}
-                      </td>
-                      <td></td>
-                      <td></td>
-                      <td>
-                        <span className="font-semibold">{(stats.pAgua * 100).toFixed(1)}%</span>
-                      </td>
-                      <td>
-                        <span className="font-semibold">{(stats.pGrasa * 100).toFixed(1)}%</span>
-                      </td>
-                      <td>
-                        <span className="font-semibold">{(stats.pSng * 100).toFixed(1)}%</span>
-                      </td>
-                      <td>
-                        <span className="font-semibold">{(stats.pAzucar * 100).toFixed(1)}%</span>
-                      </td>
-                      <td>
-                        <span className="font-semibold">
-                          {(stats.T > 0 ? stats.otros / stats.T * 100 : 0).toFixed(1)}%
-                        </span>
-                      </td>
-                      <td colSpan={5} className="text-[var(--ink3)] text-[10px]">
-                        {t('pct_over_total')}
-                      </td>
-                    </tr>
-                  )}
-
-                  {/* ── Cumulative PAC/POD row ── */}
-                  {stats && stats.T > 0 && (
-                    <tr className="text-xs" style={{ background:'#e8f5ed' }}>
-                      <td className="text-[var(--ink3)] font-semibold text-[10px] uppercase tracking-wide">
-                        {t('pac_pod_accumulated')}
-                      </td>
-                      <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                      <td className="text-[#6a3d00] font-bold">
-                        {(stats.podPct * 10).toFixed(1)}
-                        <span className="text-[9px] font-normal ml-0.5 text-[var(--ink3)]"> POD</span>
-                      </td>
-                      <td className="text-[var(--teal)] font-bold">
-                        {(stats.pacPct * 10).toFixed(1)}
-                        <span className="text-[9px] font-normal ml-0.5 text-[var(--ink3)]"> PAC</span>
-                      </td>
-                      <td colSpan={3} className="text-[var(--ink3)] text-[10px]">
-                        FPD = {stats.fpd.toFixed(2)}°C
-                      </td>
-                    </tr>
-                  )}
+                  {/* Las filas de resumen "% del total" y "PAC/POD acumulado" se
+                      retiraron: repetian, con otro formato, exactamente lo que
+                      totaliza el panel de analisis, que ahora aparece primero
+                      en telefono en vez de quedar al final de la pagina. */}
                 </tbody>
               </table>
             </div>
@@ -832,8 +783,9 @@ export default function RecipeEditor() {
             )}
           </div>
 
-          {/* ── Right: sticky AnalysisPanel sidebar ── */}
-          <div className="sticky top-20 min-w-0">
+          {/* ── Panel de analisis: primero en telefono, barra lateral fija
+                 en pantalla grande ── */}
+          <div className="order-first lg:order-none lg:sticky lg:top-20 min-w-0 w-full">
             <AnalysisPanel
               items={flattenedBase}
               type={type}
@@ -1090,6 +1042,52 @@ export default function RecipeEditor() {
           onClose={() => setShowHistory(false)}
         />
       )}
+
+      {/* Ficha de detalle de una fila de ingrediente.
+
+          Aca vive el desglose que antes ocupaba ocho columnas permanentes de
+          la tabla: cuanto aporta ESE ingrediente a cada macro. Sirve para
+          cazar un problema puntual; el total, que es lo que se persigue al
+          formular, esta siempre a la vista en el panel de analisis. */}
+      <DetailSheet
+        open={!!filaDetalle}
+        onClose={() => setFilaDetalle(null)}
+        title={filaDetalle?.nombre || ''}
+        subtitle={filaDetalle ? `${filaDetalle.g} g · ${filaDetalle.pct}${filaDetalle.pct !== '—' ? '%' : ''}` : ''}
+      >
+        {filaDetalle && (
+          <>
+            <DetailRow label={t('water_col')}  value={`${filaDetalle.c.agua} g`} />
+            <DetailRow label={t('fat_col')}    value={`${filaDetalle.c.grasa} g`} />
+            <DetailRow label={t('sng_col')}    value={`${filaDetalle.c.sng} g`} hint={t('tooltip_sng')} />
+            <DetailRow label={t('sugar_col')}  value={`${filaDetalle.c.azucar} g`} />
+            <DetailRow label={t('others_col')} value={`${filaDetalle.c.otros} g`} />
+            <DetailRow label="POD"             value={filaDetalle.c.pod} hint={t('pod_tooltip')} />
+            <DetailRow label="PAC"             value={filaDetalle.c.pac} hint={t('pac_tooltip')} />
+            <DetailRow label={t('cost_col')}   value={filaDetalle.c.costo} />
+
+            {/* "Añadido" es una opcion, no un dato: se decide aca. */}
+            <div className="mt-4 pt-3 border-t border-black/10">
+              <button
+                type="button"
+                onClick={() => {
+                  updateRow(filaDetalle.key, 'addin', !filaDetalle.addin);
+                  setFilaDetalle(f => ({ ...f, addin: !f.addin }));
+                }}
+                aria-pressed={filaDetalle.addin}
+                className={`w-full min-h-[44px] rounded-lg text-sm font-semibold cursor-pointer
+                           border-2 transition-colors
+                           ${filaDetalle.addin
+                             ? 'bg-[#e8b920] border-[#e8b920] text-[var(--ink)]'
+                             : 'bg-transparent border-black/15 text-[var(--ink2)] hover:border-[var(--gold)]'}`}
+              >
+                ⊕ {t('addin_col')}
+              </button>
+              <p className="text-[11px] text-[var(--ink3)] mt-2">{t('addin_col_tooltip')}</p>
+            </div>
+          </>
+        )}
+      </DetailSheet>
 
       {/* PIN prompt: aparece cuando se intenta guardar y hay PIN sin desbloquear */}
       {showPinPrompt && (

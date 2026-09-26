@@ -82,6 +82,7 @@ export default {
 
     // Formulation table
     ingredient: 'Ingrediente',
+    row_detail_open: "Vedi dettaglio dell'ingrediente",
     select_ingredient: '-- Ingrediente --',
     add_ingredient: '+ Aggiungi ingrediente',
     pod_tooltip: 'Potere dolcificante relativo x grammi',

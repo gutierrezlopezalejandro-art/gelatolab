@@ -82,6 +82,7 @@ export default {
 
     // Formulation table
     ingredient: 'Ingredient',
+    row_detail_open: "Voir le detail de l'ingredient",
     select_ingredient: '-- Ingredient --',
     add_ingredient: '+ Ajouter un ingredient',
     pod_tooltip: 'Pouvoir sucrant relatif x grammes',

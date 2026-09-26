@@ -178,6 +178,7 @@ export default {
 
     // Formulation table
     ingredient: 'Ingrediente',
+    row_detail_open: "Ver detalle del ingrediente",
     select_ingredient: '-- Ingrediente --',
     add_ingredient: '+ Agregar ingrediente',
     pod_tooltip: 'Poder edulcorante relativo x gramos',
