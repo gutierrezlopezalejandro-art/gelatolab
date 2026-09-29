@@ -938,8 +938,16 @@ export function HelpAssistant() {
         <button
           onClick={handleOpen}
           aria-label={t('assistant_open')}
-          className="fixed bottom-5 right-5 z-[200] w-16 h-16 rounded-full shadow-2xl
-                     cursor-pointer border-none bg-white hover:scale-105 transition-transform p-1"
+          /* En telefono va a la IZQUIERDA. Medido en una pantalla de 390x664:
+             la burbuja ocupaba de (306,580) a (370,644) y tapaba el boton de
+             accion de la fila que quedara abajo — las acciones de las tablas
+             van pegadas al borde derecho, justo donde estaba. Como el choque
+             se repite en cualquier fila al desplazar, moverla es el arreglo,
+             no darle mas aire. Desde sm vuelve a la derecha, donde sobra
+             espacio y es la posicion esperada. */
+          className="fixed bottom-5 left-5 sm:left-auto sm:right-5 z-[200] w-14 h-14 sm:w-16 sm:h-16
+                     rounded-full shadow-2xl cursor-pointer border-none bg-white
+                     hover:scale-105 transition-transform p-1"
           style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.20)' }}
         >
           <MarcoAvatar size="md" talking animated />

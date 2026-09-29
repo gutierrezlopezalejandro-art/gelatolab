@@ -16,6 +16,7 @@ import { computeBlendMacros } from '../lib/icecreamCalc';
 import { useAiStore } from '../store/aiStore';
 import { AiKeyModal } from '../components/AiKeyModal';
 import { NumberInput } from '../components/NumberInput';
+import { DetailSheet } from '../components/ui/DetailSheet';
 import { ProGate, ProBadge } from '../components/ProGate';
 import { FEATURES, useEntitlement } from '../lib/entitlement';
 import { UpgradeModal } from '../components/UpgradeModal';
@@ -72,6 +73,18 @@ const NUM_FIELDS_KEYS = [
   { key: 'min_stock_g', labelKey: 'min_stock_col', step: 10, decimals: 0, group: 'inventory' },
 ];
 
+// Dato que acompana a cada fila segun la vista activa. Es lo que se mira al
+// recorrer la lista; el resto vive en la ficha del ingrediente.
+const RESUMEN_POR_VISTA = {
+  formulation: ['fat_pct', 'sugar_pct'],
+  nutrition:   ['calories'],
+  inventory:   ['stock_g'],
+};
+
+// Grupo aparte y plegado en la ficha: lo usan 3 ingredientes de 91, y
+// `other_fat_pct` no lo usa ninguno. Ocupaban tres columnas permanentes.
+const CAMPOS_CHOCOLATE = ['cocoa_fat_pct', 'cocoa_solids_pct', 'other_fat_pct'];
+
 const VIEW_TABS = [
   { id: 'formulation', labelKey: 'view_formulation' },
   { id: 'nutrition',   labelKey: 'view_nutrition' },
@@ -115,6 +128,8 @@ export default function IngredientDB() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+  // Ingrediente cuya ficha se esta mirando. null = ninguna.
+  const [fichaIng, setFichaIng] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [invIngredient, setInvIngredient] = useState(null); // ingredient being viewed in inventory modal
@@ -419,23 +434,23 @@ export default function IngredientDB() {
                   onClick={() => setShowModal(true)}>
             {t('add_ingredient_btn')}
           </button>
-          <button className="btn-primary hidden sm:inline-flex" onClick={() => setShowStocktake(true)}
+          <button className="btn-primary" onClick={() => setShowStocktake(true)}
                   title={t('stk_btn_tooltip')}>
             🧮 {t('stk_btn')}
           </button>
-          <button className="btn-primary hidden sm:inline-flex" onClick={() => setShowSuppliers(true)}
+          <button className="btn-primary" onClick={() => setShowSuppliers(true)}
                   title={t('suppliers_btn_tooltip')}>
             🚚 {t('suppliers_btn')}
           </button>
           <button
             onClick={exportXLSX}
-            className="hidden sm:inline-flex px-4 py-2 rounded-lg text-sm font-semibold text-white border-none cursor-pointer"
+            className="px-4 py-2 rounded-lg text-sm font-semibold text-white border-none cursor-pointer"
             style={{ background: '#0d5c6e' }}
           >
             {t('export_excel')}
           </button>
           <label
-            className="hidden sm:inline-flex px-4 py-2 rounded-lg text-sm font-semibold text-white cursor-pointer"
+            className="px-4 py-2 rounded-lg text-sm font-semibold text-white cursor-pointer"
             style={{ background: '#b8860b' }}
           >
             {t('import_excel')}
@@ -506,22 +521,20 @@ export default function IngredientDB() {
 
         {/* Edit instructions — solo visibles en desktop, ocultas en mobile
             para no abrumar (en mobile no se editan inline las celdas). */}
-        <p className="hidden sm:block text-[10px] text-[var(--ink3)] mt-2">
-          {t('edit_instruction')}
-          &nbsp;·&nbsp;
-          <kbd className="bg-black/8 px-1 rounded">Enter</kbd> {t('enter_save')}
-          &nbsp;·&nbsp;
-          <kbd className="bg-black/8 px-1 rounded">Esc</kbd> {t('esc_cancel')}
+        {/* El texto anterior decia "clic en cualquier valor para editarlo",
+            que describia la edicion en linea de las columnas numericas. Esas
+            columnas pasaron a la ficha, asi que ahora seria falso. */}
+        <p className="text-[10px] text-[var(--ink3)] mt-2">
+          {t('ingredient_edit_hint')}
           &nbsp;·&nbsp;
           <kbd className="bg-black/8 px-1 rounded">/</kbd> {t('shortcut_focus_search')}
         </p>
       </div>
 
-      {/* View tabs (which column group to show). Ocultas en mobile porque
-          ahi solo mostramos las columnas Nombre y Categoria — los grupos
-          de columnas tecnicas (formulacion/nutricion/inventario) no se ven
-          en pantalla chica de todas formas. */}
-      <div className="hidden sm:flex gap-1 mb-3 flex-wrap" role="tablist">
+      {/* Pestanas de vista: eligen que dato acompana a cada fila. Antes
+          estaban ocultas en telefono, con lo que no habia forma de cambiar
+          de grupo desde un celular. */}
+      <div className="flex gap-1 mb-3 flex-wrap overflow-x-auto" role="tablist">
         {VIEW_TABS.map(tab => (
           <button
             key={tab.id}
@@ -561,15 +574,18 @@ export default function IngredientDB() {
           <table className="tbl">
             <thead>
               <tr>
+                {/* La tabla muestra nombre, categoria y el dato que da sentido
+                    a la vista activa. Los 21 datos numericos y los alergenos
+                    viven en la ficha del ingrediente: en un telefono no caben
+                    como columnas, y esconderlos por CSS era justo lo que habia
+                    que revertir. */}
                 <th className="text-left">{t('name')}</th>
                 <th>{t('category')}</th>
-                {NUM_FIELDS.map(f => (
-                  <th key={f.key} className="hidden sm:table-cell" title={f.tooltip}>
-                    {f.label}
-                    {f.tooltip && <span className="ml-1 text-[var(--ink3)] cursor-help" aria-hidden="true">ⓘ</span>}
-                  </th>
-                ))}
-                <th className="hidden sm:table-cell">{t('allergens_col')}</th>
+                {(RESUMEN_POR_VISTA[view] || []).map(k => {
+                  const f = NUM_FIELDS_KEYS.find(x => x.key === k);
+                  return <th key={k}>{f?.labelKey ? t(f.labelKey) + (f.suffix || '') : f?.label || k}</th>;
+                })}
+                <th></th>
                 <th></th>
               </tr>
             </thead>
@@ -653,62 +669,34 @@ export default function IngredientDB() {
                       )}
                     </td>
 
-                    {/* Numeric fields */}
-                    {NUM_FIELDS.map(({ key, step, decimals }) => {
-                      const isEd = editing?.id === ingredient.id && editing.field === key;
-                      const isPrice = key === 'cost_per_kg';
-
+                    {/* Los datos numericos y los alergenos pasaron a la ficha.
+                        Aca solo queda el dato que acompana a la vista activa. */}
+                    {(RESUMEN_POR_VISTA[view] || []).map(k => {
+                      const f = NUM_FIELDS_KEYS.find(x => x.key === k);
+                      const valor = parseFloat(ingredient[k]) || 0;
                       return (
-                        <td key={key} className="hidden sm:table-cell">
-                          {isEd ? (
-                            <NumberInput
-                              autoFocus
-                              min="0"
-                              step={step}
-                              className={`${isPrice ? 'input-gold' : 'input'} w-24 text-xs py-1 px-2 rounded`}
-                              value={editing.value}
-                              onChange={v => setEditing({ ...editing, value: v })}
-                              onKeyDown={e => {
-                                if (e.key === 'Enter') commitNum(ingredient);
-                                if (e.key === 'Escape') setEditing(null);
-                              }}
-                              onBlur={() => commitNum(ingredient)}
-                            />
-                          ) : (
-                            <button
-                              className="font-semibold text-[var(--ink)] hover:text-[var(--mint)]
-                                         hover:underline transition-colors cursor-pointer bg-transparent
-                                         border-none text-xs"
-                              onClick={() => setEditing({
-                                id: ingredient.id, field: key, value: parseFloat(ingredient[key]) || 0,
-                              })}
-                              title={t('click_edit_field', { field: key })}
-                            >
-                              {isPrice
-                                ? `$${Math.round(parseFloat(ingredient[key]) || 0).toLocaleString('es-CL')}`
-                                : (parseFloat(ingredient[key]) || 0).toFixed(decimals)
-                              }
-                            </button>
-                          )}
+                        <td key={k}>
+                          <span className="font-semibold text-[var(--ink)] text-xs tabular-nums">
+                            {k === 'cost_per_kg'
+                              ? `$${Math.round(valor).toLocaleString('es-CL')}`
+                              : valor.toFixed(f?.decimals ?? 1)}
+                            {f?.suffix || ''}
+                          </span>
                         </td>
                       );
                     })}
 
-                    {/* Allergens (read-only chips) */}
-                    <td className="hidden sm:table-cell">
-                      <div className="flex flex-wrap gap-1 justify-center">
-                        {(ingredient.allergens || []).map(a => (
-                          <span key={a}
-                                className="text-[9px] font-semibold px-1.5 py-0.5 rounded text-white"
-                                style={{ background: '#c0392b' }}
-                                title={t('allergen_' + a)}>
-                            {t('allergen_' + a)}
-                          </span>
-                        ))}
-                        {(!ingredient.allergens || ingredient.allergens.length === 0) && (
-                          <span className="text-[9px] text-[var(--ink3)]">—</span>
-                        )}
-                      </div>
+                    {/* Abre la ficha con TODOS los datos del ingrediente. */}
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => setFichaIng(ingredient)}
+                        aria-label={t('ingredient_detail_open')}
+                        title={t('ingredient_detail_open')}
+                        className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center
+                                   text-[var(--ink3)] hover:text-[var(--mint)] transition-colors
+                                   cursor-pointer bg-transparent border-none"
+                      >ⓘ</button>
                     </td>
 
                     {/* Actions */}
@@ -930,6 +918,111 @@ export default function IngredientDB() {
       )}
 
       {/* Inventory movements modal */}
+      {/* ── Ficha del ingrediente ──────────────────────────────────────
+          Aca viven los 21 datos numericos que antes eran columnas de la
+          tabla y que en un telefono no se veian en absoluto.
+
+          Muestra los TRES grupos a la vez. Antes habia que cambiar de
+          pestana para editar los de nutricion, aunque se estuviera mirando
+          el mismo ingrediente.
+
+          Los campos de cacao y otras grasas van aparte y plegados: los usan
+          3 ingredientes de 91, y `other_fat_pct` no lo usa ninguno. */}
+      <DetailSheet
+        open={!!fichaIng}
+        onClose={() => setFichaIng(null)}
+        title={fichaIng ? tIng(fichaIng.name) : ''}
+        subtitle={fichaIng ? tCat(fichaIng.category) : ''}
+      >
+        {fichaIng && (() => {
+          const actual = ingredients.find(i => i.id === fichaIng.id) || fichaIng;
+          const editable = !!actual.is_custom;
+
+          const campo = (f) => {
+            const valor = parseFloat(actual[f.key]) || 0;
+            const etiqueta = f.labelKey ? t(f.labelKey) + (f.suffix || '') : f.label;
+            return (
+              <div key={f.key} className="flex items-center justify-between gap-3 py-2
+                                          border-b border-black/5 last:border-0">
+                <label htmlFor={`f-${f.key}`} className="text-xs text-[var(--ink2)] min-w-0">
+                  {etiqueta}
+                  {f.tooltip && <span className="block text-[10px] text-[var(--ink3)] mt-0.5">{f.tooltip}</span>}
+                </label>
+                <NumberInput
+                  id={`f-${f.key}`}
+                  min="0"
+                  step={f.step}
+                  disabled={!editable}
+                  className="input w-28 text-sm py-1.5 px-2 rounded text-right disabled:opacity-60"
+                  value={valor}
+                  onChange={(v) => store.update(actual.id, { [f.key]: v })}
+                />
+              </div>
+            );
+          };
+
+          const grupo = (id, titulo) => {
+            const campos = NUM_FIELDS_KEYS.filter(
+              f => f.group === id && !CAMPOS_CHOCOLATE.includes(f.key)
+            ).map(f => ({
+              ...f,
+              tooltip: f.tooltipKey ? t(f.tooltipKey) : undefined,
+            }));
+            if (!campos.length) return null;
+            return (
+              <section key={id} className="mb-5">
+                <h3 className="text-[11px] font-semibold uppercase tracking-widest
+                               text-[var(--ink3)] mb-1">{titulo}</h3>
+                {campos.map(campo)}
+              </section>
+            );
+          };
+
+          return (
+            <>
+              {!editable && (
+                <p className="text-[11px] text-[var(--ink3)] bg-[var(--cream2)]/50 rounded-lg p-2 mb-4">
+                  {t('ingredient_seed_readonly')}
+                </p>
+              )}
+
+              {grupo('formulation', t('view_formulation'))}
+              {grupo('nutrition',   t('view_nutrition'))}
+              {grupo('inventory',   t('view_inventory'))}
+
+              <details className="mb-5 border-t border-black/10 pt-3">
+                <summary className="text-[11px] font-semibold uppercase tracking-widest
+                                    text-[var(--ink3)] cursor-pointer select-none">
+                  {t('ingredient_cocoa_group')}
+                </summary>
+                <p className="text-[11px] text-[var(--ink3)] mt-2 mb-1">
+                  {t('ingredient_cocoa_hint')}
+                </p>
+                {NUM_FIELDS_KEYS
+                  .filter(f => CAMPOS_CHOCOLATE.includes(f.key))
+                  .map(f => campo({ ...f, tooltip: undefined }))}
+              </details>
+
+              <section>
+                <h3 className="text-[11px] font-semibold uppercase tracking-widest
+                               text-[var(--ink3)] mb-2">{t('allergens_col')}</h3>
+                <div className="flex flex-wrap gap-1">
+                  {(actual.allergens || []).map(a => (
+                    <span key={a} className="text-[10px] font-semibold px-2 py-1 rounded text-white"
+                          style={{ background: '#c0392b' }}>
+                      {t('allergen_' + a)}
+                    </span>
+                  ))}
+                  {(!actual.allergens || actual.allergens.length === 0) && (
+                    <span className="text-xs text-[var(--ink3)]">—</span>
+                  )}
+                </div>
+              </section>
+            </>
+          );
+        })()}
+      </DetailSheet>
+
       {invIngredient && (
         <InventoryModal
           ingredient={invIngredient}

@@ -1420,6 +1420,10 @@ export default {
     // Allergens
     allergens_title: 'Allergens',
     allergens_col: 'Allergens',
+    ingredient_detail_open: "View ingredient details",
+    ingredient_seed_readonly: "This ingredient ships with the app and cannot be edited. Duplicate it if you need your own version.",
+    ingredient_cocoa_group: "Cocoa and vegetable fats",
+    ingredient_cocoa_hint: "Only apply to chocolate and non-dairy fats (coconut, palm, margarine). Zero for everything else.",
     allergens_none: 'No declared allergens',
     allergens_contains: 'Contains',
     allergen_milk: 'Milk',
@@ -1662,6 +1666,7 @@ export default {
     ing_subtitle: 'ingredients with technical parameters — values per 100g',
     all_categories: 'All',
     edit_instruction: 'Click any value to edit it',
+    ingredient_edit_hint: "Tap ⓘ to view and edit all the ingredient data",
     enter_save: 'Enter = save',
     esc_cancel: 'Esc = cancel',
     no_results: 'No results',

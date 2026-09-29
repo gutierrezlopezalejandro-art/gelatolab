@@ -113,7 +113,92 @@ test.describe('Lista de recetas', () => {
   });
 });
 
+test.describe('Asistente flotante', () => {
+  test('no tapa los botones de accion de las filas', async ({ page }) => {
+    // Medido en 390x664: la burbuja ocupaba de (306,580) a (370,644) y el
+    // boton de ficha de la fila que quedara abajo caia justo debajo. Como
+    // las acciones de las tablas van pegadas al borde derecho, el choque se
+    // repetia en cualquier fila al desplazar. La burbuja se movio a la
+    // izquierda en telefono.
+    await abrirApp(page, '/ingredients');
+
+    const tapado = await page.evaluate(() => {
+      const burbuja = document.querySelector('button[aria-label*="asistente"], button[aria-label*="ayuda"]');
+      if (!burbuja) return 'sin burbuja';
+      const b = burbuja.getBoundingClientRect();
+      // Se recorre la lista comprobando que ningun boton de accion visible
+      // caiga dentro del area de la burbuja.
+      const acciones = [...document.querySelectorAll('button[aria-label="Ver ficha del ingrediente"]')];
+      for (const a of acciones) {
+        const r = a.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) continue; // fuera de pantalla
+        const solapa = !(r.right < b.left || r.left > b.right || r.bottom < b.top || r.top > b.bottom);
+        if (solapa) return `fila tapada en y=${Math.round(r.top)}`;
+      }
+      return null;
+    });
+
+    expect(tapado, 'el asistente flotante tapa un boton de accion').toBeNull();
+  });
+});
+
 test.describe('Base de ingredientes', () => {
+  test('todo lo que estaba escondido en telefono esta disponible', async ({ page }) => {
+    // Habia 10 reglas `hidden sm:` que en un telefono dejaban la pantalla
+    // reducida a nombre y categoria: sin conteo fisico, sin proveedores, sin
+    // exportar ni importar, sin las pestanas de vista y sin NINGUNO de los
+    // 21 datos numericos.
+    await abrirApp(page, '/ingredients');
+
+    await expect(page.getByRole('button', { name: /Conteo f.sico/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Proveedores/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Exportar Excel/i })).toBeVisible();
+    await expect(page.getByText(/Importar Excel/i)).toBeVisible();
+
+    // Las tres vistas se pueden elegir desde el telefono.
+    for (const vista of [/Formulaci/i, /Nutrici/i, /Inventario/i]) {
+      await expect(page.getByRole('tab', { name: vista })).toBeVisible();
+    }
+  });
+
+  test('la ficha trae los tres grupos de datos juntos', async ({ page }) => {
+    // Antes habia que cambiar de pestana para editar los de nutricion,
+    // aunque se estuviera mirando el mismo ingrediente.
+    await abrirApp(page, '/ingredients');
+    // Se centra antes de tocar: el asistente flotante ocupa la esquina
+    // inferior derecha y el desplazamiento minimo puede dejar el boton justo
+    // debajo.
+    const abrirFicha = page.getByRole('button', { name: /Ver ficha del ingrediente/i }).first();
+    await abrirFicha.scrollIntoViewIfNeeded();
+    await abrirFicha.click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+
+    const ficha = page.getByRole('dialog');
+    await expect(ficha).toBeVisible();
+    await expect(ficha.getByRole('heading', { name: /Formulaci/i })).toBeVisible();
+    await expect(ficha.getByRole('heading', { name: /Nutrici/i })).toBeVisible();
+    await expect(ficha.getByRole('heading', { name: /Inventario/i })).toBeVisible();
+  });
+
+  test('las columnas de cacao quedan aparte y plegadas', async ({ page }) => {
+    // Las usan 3 ingredientes de 91, y `other_fat_pct` no lo usa ninguno.
+    // Siguen disponibles, pero no estorban.
+    await abrirApp(page, '/ingredients');
+    const abrir = page.getByRole('button', { name: /Ver ficha del ingrediente/i }).first();
+    await abrir.scrollIntoViewIfNeeded();
+    await abrir.click();
+
+    const ficha = page.getByRole('dialog');
+    await expect(ficha).toBeVisible();
+    const grupo = ficha.getByText(/Cacao y grasas vegetales/i);
+    await expect(grupo).toBeVisible();
+    // Plegado: el campo no se ve hasta abrirlo.
+    await expect(ficha.getByLabel('Cocoa fat %')).toBeHidden();
+    await grupo.click();
+    await expect(ficha.getByLabel('Cocoa fat %')).toBeVisible();
+  });
+
+
   test('no se le sugiere al usuario irse al escritorio', async ({ page }) => {
     // RESUELTO en la Fase 3. Candado permanente.
     await abrirApp(page, '/ingredients');

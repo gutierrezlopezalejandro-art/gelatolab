@@ -1500,6 +1500,10 @@ export default {
     // Allergens
     allergens_title: 'Alérgenos',
     allergens_col: 'Alérgenos',
+    ingredient_detail_open: "Ver ficha del ingrediente",
+    ingredient_seed_readonly: "Este ingrediente viene con la app y no se puede editar. Duplicalo si necesitas una version propia.",
+    ingredient_cocoa_group: "Cacao y grasas vegetales",
+    ingredient_cocoa_hint: "Solo aplican al chocolate y a grasas no lacteas (coco, palma, margarina). En el resto van en cero.",
     allergens_none: 'No contiene alérgenos declarados',
     allergens_contains: 'Contiene',
     allergen_milk: 'Leche',
@@ -1774,6 +1778,7 @@ export default {
     ing_subtitle: 'ingredientes con parámetros técnicos — valores por 100g',
     all_categories: 'Todos',
     edit_instruction: 'Clic en cualquier valor para editarlo',
+    ingredient_edit_hint: "Toca ⓘ para ver y editar todos los datos del ingrediente",
     enter_save: 'Enter = guardar',
     esc_cancel: 'Esc = cancelar',
     no_results: 'Sin resultados',

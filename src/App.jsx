@@ -314,7 +314,11 @@ export default function App() {
         )}
       </nav>
 
-      <main id="main-content" className="max-w-[1280px] mx-auto px-4 py-6" role="main">
+      {/* pb-28 en telefono: el asistente flotante de Marco ocupa 64px fijos
+          abajo a la derecha, y tapaba los botones de la ultima fila de
+          cualquier tabla. Con este aire el contenido puede desplazarse
+          por debajo de la burbuja en vez de quedar atrapado. */}
+      <main id="main-content" className="max-w-[1280px] mx-auto px-4 py-6 pb-28 sm:pb-6" role="main">
         {/* Banner transversal de recordatorio de backup. Antes solo aparecía
             en Dashboard, lo que dejaba al usuario que entra directo a
             /recipes o /production sin verlo. El propio componente decide
